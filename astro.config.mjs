@@ -29,6 +29,13 @@ export default defineConfig({
     },
     vite: {
         plugins: [tailwindcss()],
+        server: {
+            // Lets the dev server accept requests through a tunnel (zrok, ngrok,
+            // etc.) whose Host header won't match localhost/LAN addresses. Vite
+            // would otherwise 403 those requests by default. Dev-only — unrelated
+            // to `astro build`, no effect on the production site.
+            allowedHosts: true,
+        },
     },
     prefetch: {
         prefetchAll: true,

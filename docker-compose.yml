@@ -1,0 +1,48 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        container_name: craft-and-colours-app
+        volumes:
+            - .:/app
+            - node_modules:/app/node_modules
+            - astro_cache:/app/.astro
+        ports:
+            - "4321:4321"
+
+    # zrok tunnels the `app` service to a public URL so you can share your
+    # local dev server with a client. One-time setup before first use:
+    #
+    #   1. Get an account token from https://myzrok.io/ (or your self-hosted
+    #      zrok instance's console), then enable this machine's zrok identity.
+    #      Note: the entrypoint is already `zrok`, so don't repeat it here.
+    #        docker compose run --rm zrok enable <your_account_token>
+    #
+    #   2. Reserve a stable share name pointing at the app service (only
+    #      needs doing once — the name/URL stay the same after this):
+    #        docker compose run --rm zrok reserve public http://app:4321 --unique-name craftandcolours
+    #
+    # After that, `docker compose up` brings the share back online at
+    # https://craftandcolours.share.zrok.io every time, as long as
+    # `app` is also running.
+    #
+    # Don't want a fixed URL? Skip step 2 and replace this service's `command:`
+    # below with: share public --headless http://app:4321
+    # (gives a new random *.share.zrok.io link each time it starts).
+    zrok:
+        image: openziti/zrok
+        container_name: craft-and-colours-zrok
+        restart: unless-stopped
+        depends_on:
+            - app
+        user: "${UID:-1000}:${GID:-1000}"
+        environment:
+            PFXLOG_NO_JSON: "true"
+        volumes:
+            - ${HOME}/.zrok:/home/ziggy/.zrok
+        command: share reserved "craftandcolours" --headless
+
+volumes:
+    node_modules:
+    astro_cache:
