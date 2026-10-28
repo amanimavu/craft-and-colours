@@ -8,16 +8,20 @@ import Sticker from "../components/ui/Sticker.astro";
 import Badge from "../components/ui/Badge.astro";
 import WavyDivider from "../components/ui/WavyDivider.astro";
 import heroImage from "../assets/images/landing-page-hero-image.png";
+import heroImageTablet from "../assets/images/landing-page-hero-image_3_to_2.png";
+import heroImageMobile from "../assets/images/landing-page-hero-image_9_to_16.png";
 import brushStrokeTexture from "../assets/images/brush-stroke-texture.jpg";
 import mustardYarnDecorator from "../assets/images/mustard-yarn.png";
 import ugcBackground from "../assets/images/ugc_bg.png";
+import ugcBackgroundTablet from "../assets/images/ugc_bg_3_to_2.png";
+import ugcBackgroundMobile from "../assets/images/ugc_bg_9_to_16.png";
 import { formatDate } from "../lib/format";
 import { demoUgc, demoVibes } from "../lib/demo-data";
 import { DEMO_FREE_GIFT_THRESHOLD } from "../lib/cart-api";
 import { getBestsellers, getProducts } from "../lib/woocommerce";
 import { getPosts } from "../lib/wordpress";
 import { getUpcomingWorkshops } from "../lib/workshops";
-import { Image } from "astro:assets";
+import { Image, getImage } from "astro:assets";
 import heartPastel from "../assets/images/pastel-chalk-heart.png";
 
 const [bestsellers, bundles, posts, upcomingWorkshops] = await Promise.all([
@@ -42,6 +46,20 @@ const seatsRemainingPercent =
               ),
           )
         : 0;
+
+// Art-directed responsive images: a different crop per breakpoint, not just
+// a resized version of the same crop. Breakpoints match Tailwind's sm/lg.
+const heroImageDesktop = await getImage({ src: heroImage });
+const heroImageTabletOptimized = await getImage({ src: heroImageTablet });
+const heroImageMobileOptimized = await getImage({ src: heroImageMobile });
+
+const ugcBackgroundDesktop = await getImage({ src: ugcBackground });
+const ugcBackgroundTabletOptimized = await getImage({
+    src: ugcBackgroundTablet,
+});
+const ugcBackgroundMobileOptimized = await getImage({
+    src: ugcBackgroundMobile,
+});
 
 const marqueeItems = [
     "Free delivery in Nairobi over KES 4,500",
@@ -80,12 +98,28 @@ const schema = {
 >
     <section class="relative overflow-hidden bg-butter-50">
         <div class="relative">
-            <Image
-                src={heroImage}
-                alt="A colourful flat-lay of paint, yarn, clay, fabric and craft supplies spelling Craft & Colours"
-                class="block h-auto w-full"
-                fetchpriority="high"
-            />
+            <picture>
+                <source
+                    media="(max-width: 639px)"
+                    srcset={heroImageMobileOptimized.src}
+                    width={heroImageMobileOptimized.attributes.width}
+                    height={heroImageMobileOptimized.attributes.height}
+                />
+                <source
+                    media="(max-width: 1023px)"
+                    srcset={heroImageTabletOptimized.src}
+                    width={heroImageTabletOptimized.attributes.width}
+                    height={heroImageTabletOptimized.attributes.height}
+                />
+                <img
+                    src={heroImageDesktop.src}
+                    width={heroImageDesktop.attributes.width}
+                    height={heroImageDesktop.attributes.height}
+                    alt="A colourful flat-lay of paint, yarn, clay, fabric and craft supplies spelling Craft & Colours"
+                    class="block h-auto w-full"
+                    fetchpriority="high"
+                />
+            </picture>
 
             <div
                 class="pointer-events-none absolute inset-x-0 top-3 flex justify-center px-4 sm:top-4"
@@ -413,14 +447,14 @@ const schema = {
         class="relative overflow-hidden border-y border-ink-900/10 bg-cream-100/60 py-16 sm:py-20"
     >
         <div
-            class="pointer-events-none absolute -right-20 top-4 w-96 select-none sm:w-[32rem]"
+            class="pointer-events-none absolute -right-10 top-0 w-56 select-none sm:-right-20 sm:top-4 sm:w-96 lg:w-[32rem]"
         >
             <Image
                 src={mustardYarnDecorator}
                 alt=""
                 aria-hidden="true"
-                widths={[200, 350, 512]}
-                sizes="(max-width: 640px) 200px, 512px"
+                widths={[224, 350, 512]}
+                sizes="(max-width: 640px) 224px, (max-width: 1024px) 350px, 512px"
                 class="h-auto w-full"
             />
         </div>
@@ -475,8 +509,8 @@ const schema = {
     </section>
 
     <section
-        class="relative overflow-hidden bg-cream-100 bg-cover bg-center bg-fixed py-16 sm:py-24"
-        style={`background-image: url('${ugcBackground.src}');`}
+        class="ugc-section relative overflow-hidden bg-cream-100 bg-cover bg-center bg-fixed py-16 sm:py-24"
+        style={`--ugc-bg-desktop: url('${ugcBackgroundDesktop.src}'); --ugc-bg-tablet: url('${ugcBackgroundTabletOptimized.src}'); --ugc-bg-mobile: url('${ugcBackgroundMobileOptimized.src}');`}
     >
         <div
             class="pointer-events-none absolute -left-16 top-10 h-64 w-64 rounded-full bg-marigold-500/20 blur-3xl"
@@ -588,22 +622,25 @@ const schema = {
                 </p>
                 <a href="/about/" class="btn-secondary mt-7">Read our story</a>
             </div>
-            <div class="overflow-hidden rounded-4xl">
+            <div
+                class="aspect-[4/3] overflow-hidden rounded-4xl sm:aspect-[3/2] lg:aspect-auto"
+            >
                 <Image
                     src="https://placehold.co/800x1000/EDF8F5/211D19?text=The+Shop"
                     alt="A sunlit studio with shelves of handmade ceramics"
                     width={800}
                     height={1000}
+                    class="h-full w-full object-cover"
                 />
             </div>
         </div>
         <Image
             width={250}
-            widths={[120, 200, 250, 300]}
-            sizes="(max-width: 640px) 120px, 250px"
+            widths={[80, 120, 200, 250, 300]}
+            sizes="(max-width: 640px) 80px, (max-width: 1024px) 120px, 250px"
             src={heartPastel}
             alt="heart decorative element with pastel texture"
-            class="absolute -bottom-1 -left-12 rotate-30 -z-1"
+            class="absolute -bottom-1 left-2 z-10 w-16 rotate-30 sm:-left-6 sm:w-24 lg:-left-12 lg:-z-1 lg:w-[250px]"
         />
     </section>
 </BaseLayout>
@@ -626,3 +663,21 @@ const schema = {
         requestAnimationFrame(raf);
     }
 </script>
+
+<style>
+    .ugc-section {
+        background-image: var(--ugc-bg-desktop);
+    }
+
+    @media (max-width: 1023px) {
+        .ugc-section {
+            background-image: var(--ugc-bg-tablet);
+        }
+    }
+
+    @media (max-width: 639px) {
+        .ugc-section {
+            background-image: var(--ugc-bg-mobile);
+        }
+    }
+</style>
