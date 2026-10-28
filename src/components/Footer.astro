@@ -5,6 +5,12 @@ import Mpesa from "../assets/images/payment-methods/mpesa.svg";
 import Visa from "../assets/images/payment-methods/visa.svg";
 import MasterCard from "../assets/images/payment-methods/mastercard.svg";
 
+interface Props {
+    mobileBarSpace?: boolean;
+}
+
+const { mobileBarSpace = false } = Astro.props;
+
 const email =
     import.meta.env.PUBLIC_CONTACT_EMAIL || "hello@craftandcolours.co.ke";
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
@@ -23,7 +29,13 @@ const socials = [
 ];
 ---
 
-<footer class="mt-24 border-t border-ink-900/10 bg-cream-100">
+<footer
+    class:list={[
+        "mt-24 border-t border-ink-900/10 bg-cream-100",
+        mobileBarSpace &&
+            "pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0",
+    ]}
+>
     <div class="border-b border-ink-900/10">
         <div class="container-page py-12 sm:py-14">
             <div
@@ -67,7 +79,7 @@ const socials = [
                     >
                 </div>
 
-                <div class="mt-6 flex flex-wrap items-center gap-3">
+                <div class="mt-6 hidden flex-wrap items-center gap-3 lg:flex">
                     <span
                         class="mr-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-400"
                     >
@@ -89,7 +101,7 @@ const socials = [
                 </div>
             </div>
 
-            <div class="grid gap-10 sm:grid-cols-3">
+            <div class="grid grid-cols-2 gap-10 sm:grid-cols-3">
                 <div>
                     <p class="eyebrow">Explore</p>
                     <ul
@@ -150,7 +162,7 @@ const socials = [
                     </ul>
                 </div>
 
-                <div>
+                <div class="col-span-2 sm:col-span-1">
                     <p class="eyebrow">Say hello</p>
                     <ul
                         class="mt-4 space-y-3 text-sm font-semibold text-ink-700"
@@ -183,6 +195,27 @@ const socials = [
                         </li>
                     </ul>
                 </div>
+            </div>
+
+            <div class="mt-10 flex flex-wrap items-center gap-3 lg:hidden">
+                <span
+                    class="mr-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-400"
+                >
+                    Follow
+                </span>
+                {
+                    socials.map((social) => (
+                        <a
+                            href={social.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={social.label}
+                            class="grid h-9 w-9 place-items-center rounded-full border border-ink-900/15 bg-cream-50 text-ink-700 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                        >
+                            <Icon name={social.icon} class="h-4 w-4" />
+                        </a>
+                    ))
+                }
             </div>
         </div>
 
