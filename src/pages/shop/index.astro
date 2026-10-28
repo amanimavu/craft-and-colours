@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ShopFilters from '../../components/store/ShopFilters';
+import { getCategories, getProducts } from '../../lib/woocommerce';
+
+const [products, categories] = await Promise.all([getProducts(), getCategories()]);
+const formattedCategories = categories.map((c) => ({ name: c.name, slug: c.slug, count: c.count }));
+---
+
+<BaseLayout
+  title="Shop art supplies, haberdashery and DIY kits in Nairobi"
+  description="Shop paint, fabric, yarn, clay, sketchbooks, kids’ projects and DIY kits at Village Market, Nairobi."
+>
+  <section class="border-b border-ink-900/10 bg-cream-100/50">
+    <div class="container-page py-12 sm:py-16">
+      <Breadcrumbs items={[{ label: 'Shop' }]} />
+      <div class="mt-8 grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-end">
+        <div>
+          <p class="eyebrow">The collection</p>
+          <h1 class="mt-3 text-balance text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl">
+            Supplies for<br />your next idea.
+          </h1>
+        </div>
+        <p class="max-w-md text-sm leading-7 text-ink-500 md:pb-2">
+          Paint, stitch and sew, clay, sketch, kids’ projects and DIY kits.
+          Chosen by our team at Village Market, Nairobi.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page py-10 sm:py-14">
+    <ShopFilters client:load products={products} categories={formattedCategories} />
+  </section>
+</BaseLayout>

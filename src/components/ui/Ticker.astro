@@ -1,0 +1,72 @@
+---
+interface Props {
+  items: string[];
+  tone?: 'poppy' | 'olive' | 'ink' | 'butter' | 'cream';
+  rotate?: boolean;
+  compact?: boolean;
+  speed?: number;
+  label?: string;
+  class?: string;
+}
+
+const {
+  items,
+  tone = 'poppy',
+  rotate = false,
+  compact = false,
+  speed = 34,
+  label = 'Shop announcements',
+  class: className,
+} = Astro.props;
+
+const tones: Record<string, string> = {
+  poppy: 'bg-poppy-500 text-cream-50 border-ink-900/10',
+  olive: 'bg-olive-700 text-cream-50 border-cream-50/10',
+  ink: 'bg-ink-900 text-cream-50 border-cream-50/10',
+  butter: 'bg-butter-50 text-ink-900 border-ink-900/10',
+  cream: 'bg-cream-100 text-ink-900 border-ink-900/10',
+};
+---
+
+<div
+  class:list={[
+    'marquee relative w-full overflow-hidden border-y',
+    tones[tone],
+    rotate && '-rotate-2',
+    className,
+  ]}
+  role="region"
+  aria-label={label}
+>
+  <div
+    class="marquee-track flex w-max"
+    style={`animation-duration:${speed}s`}
+  >
+    {
+      [0, 1].map((group) => (
+        <div
+          class="flex shrink-0 items-center"
+          aria-hidden={group === 1 ? 'true' : undefined}
+        >
+          {items.map((item) => (
+            <span class="inline-flex items-center">
+              <span
+                class:list={[
+                  'whitespace-nowrap px-4 font-bold uppercase tracking-[0.16em]',
+                  compact
+                    ? 'py-1.5 text-[0.58rem] sm:text-[0.62rem]'
+                    : 'py-3 text-[0.62rem] sm:text-[0.66rem]',
+                ]}
+              >
+                {item}
+              </span>
+              <span class="opacity-50" aria-hidden="true">
+                •
+              </span>
+            </span>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>

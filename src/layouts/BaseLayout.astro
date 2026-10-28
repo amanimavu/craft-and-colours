@@ -1,0 +1,105 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+import CartDrawer from '../components/store/CartDrawer';
+import defaultImage from '../assets/images/landing-page-hero-image.png';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  schema?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title = 'Craft & Colours | Handmade textiles, ceramics and homeware',
+  description = 'Nairobi’s happiest home for art supplies, haberdashery, DIY kits and weekend workshops at Village Market.',
+  image = defaultImage.src,
+  noindex = false,
+  type = 'website',
+  publishedTime,
+  schema,
+} = Astro.props;
+
+const siteName = 'Craft & Colours';
+const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
+const canonical = Astro.site
+  ? new URL(Astro.url.pathname, Astro.site).toString()
+  : Astro.url.pathname;
+const socialImage = Astro.site
+  ? new URL(image, Astro.site).toString()
+  : image;
+
+const path = Astro.url.pathname;
+const showMobileBar = !['/cart/', '/checkout/', '/order-confirmation/'].some(
+  (prefix) => path.startsWith(prefix),
+);
+---
+
+<!doctype html>
+<html lang="en-KE">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#fbf7ef" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta
+      name="robots"
+      content={noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large'}
+    />
+
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:locale" content="en_ZA" />
+    {publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+
+    {schema && (
+      <script
+        type="application/ld+json"
+        set:html={JSON.stringify(schema)}
+      />
+    )}
+  </head>
+  <body
+    class:list={[
+      'min-h-screen',
+      showMobileBar &&
+        'pb-[calc(4.25rem+env(safe-area-inset-bottom))] md:pb-0',
+    ]}
+  >
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink-900 focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-cream-50"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    {showMobileBar && <MobileBar />}
+    <CartDrawer client:load />
+  </body>
+</html>

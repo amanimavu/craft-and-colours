@@ -1,0 +1,39 @@
+---
+interface Props {
+  tone?: 'poppy' | 'marigold' | 'bubblegum' | 'olive' | 'cream' | 'ink';
+  rotate?: 'left' | 'right' | 'none';
+  class?: string;
+}
+
+const {
+  tone = 'marigold',
+  rotate = 'none',
+  class: className,
+} = Astro.props;
+
+const tones: Record<string, string> = {
+  poppy: 'bg-poppy-500 text-cream-50',
+  marigold: 'bg-marigold-500 text-ink-900',
+  bubblegum: 'bg-bubblegum-500 text-cream-50',
+  olive: 'bg-olive-700 text-cream-50',
+  cream: 'bg-cream-50 text-ink-900 ring-1 ring-ink-900/15',
+  ink: 'bg-ink-900 text-cream-50',
+};
+
+const rotations: Record<string, string> = {
+  left: '-rotate-2',
+  right: 'rotate-2',
+  none: '',
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.55rem] font-extrabold uppercase tracking-[0.14em] shadow-[0_3px_0_rgb(33_29_25/0.14)] sm:px-4 sm:text-[0.62rem]',
+    tones[tone],
+    rotations[rotate],
+    className,
+  ]}
+>
+  <slot />
+</span>

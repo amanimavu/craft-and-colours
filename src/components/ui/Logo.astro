@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../../assets/images/craftandcolours-logo.png';
+
+interface Props {
+  href?: string;
+  wordmark?: boolean;
+  class?: string;
+}
+
+const { href = '/', wordmark = true, class: className } = Astro.props;
+
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag
+  href={href || undefined}
+  class:list={[
+    'group inline-flex flex-col items-start gap-1',
+    !href && 'cursor-default',
+    className,
+  ]}
+  aria-label={href ? 'Craft & Colours home' : undefined}
+>
+  <Image
+    src={logo}
+    alt="Craft & Colours"
+    width={336}
+    height={68}
+    class="h-8 w-auto shrink-0 transition duration-300 ease-bounce group-hover:scale-105 sm:h-9"
+  />
+
+  {
+    wordmark && (
+      <span class="hidden whitespace-nowrap text-[0.62rem] font-bold uppercase tracking-[0.2em] text-ink-500 sm:block">
+        Village Market · Nairobi
+      </span>
+    )
+  }
+</Tag>

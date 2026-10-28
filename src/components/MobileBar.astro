@@ -1,0 +1,51 @@
+---
+import Icon from './ui/Icon.astro';
+
+const path = Astro.url.pathname;
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+  'Hi Craft & Colours! I have a question about a product.',
+)}`;
+
+const links = [
+  { href: '/shop/', label: 'Shop', icon: 'lucide:shopping-bag' },
+  { href: '/workshops/', label: 'Workshops', icon: 'lucide:calendar-days' },
+];
+
+const isActive = (href: string) => path === href || path.startsWith(href);
+---
+
+<nav
+  class="fixed inset-x-0 bottom-0 z-40 border-t border-ink-900/10 bg-cream-50/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-20px_rgb(33_29_25/0.5)] backdrop-blur-md md:hidden"
+  aria-label="Quick links"
+>
+  <div class="grid grid-cols-3">
+    {
+      links.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            'flex flex-col items-center gap-1 py-2.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] transition',
+            isActive(link.href)
+              ? 'text-clay-600'
+              : 'text-ink-500 hover:text-ink-900',
+          ]}
+          aria-current={isActive(link.href) ? 'page' : undefined}
+        >
+          <Icon name={link.icon} class="h-[19px] w-[19px]" />
+          {link.label}
+        </a>
+      ))
+    }
+
+    <a
+      href={waHref}
+      target="_blank"
+      rel="noreferrer"
+      class="flex flex-col items-center gap-1 py-2.5 text-[0.6rem] font-bold uppercase tracking-[0.12em] text-olive-700 transition hover:text-olive-500"
+    >
+      <Icon name="simple-icons:whatsapp" class="h-[19px] w-[19px]" />
+      WhatsApp
+    </a>
+  </div>
+</nav>

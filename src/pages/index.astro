@@ -1,0 +1,628 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Bestsellers from "../components/Bestsellers.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Icon from "../components/ui/Icon.astro";
+import Ticker from "../components/ui/Ticker.astro";
+import Sticker from "../components/ui/Sticker.astro";
+import Badge from "../components/ui/Badge.astro";
+import WavyDivider from "../components/ui/WavyDivider.astro";
+import heroImage from "../assets/images/landing-page-hero-image.png";
+import brushStrokeTexture from "../assets/images/brush-stroke-texture.jpg";
+import mustardYarnDecorator from "../assets/images/mustard-yarn.png";
+import ugcBackground from "../assets/images/ugc_bg.png";
+import { formatDate } from "../lib/format";
+import { demoUgc, demoVibes } from "../lib/demo-data";
+import { DEMO_FREE_GIFT_THRESHOLD } from "../lib/cart-api";
+import { getBestsellers, getProducts } from "../lib/woocommerce";
+import { getPosts } from "../lib/wordpress";
+import { getUpcomingWorkshops } from "../lib/workshops";
+import { Image } from "astro:assets";
+import heartPastel from "../assets/images/pastel-chalk-heart.png";
+
+const [bestsellers, bundles, posts, upcomingWorkshops] = await Promise.all([
+    getBestsellers(5),
+    getProducts({ category: "bundles", limit: 3 }),
+    getPosts(3),
+    getUpcomingWorkshops(),
+]);
+
+const featuredWorkshop = upcomingWorkshops[0];
+
+const seatsRemainingPercent =
+    featuredWorkshop && featuredWorkshop.capacity > 0
+        ? Math.min(
+              100,
+              Math.max(
+                  0,
+                  Math.round(
+                      (featuredWorkshop.seatsLeft / featuredWorkshop.capacity) *
+                          100,
+                  ),
+              ),
+          )
+        : 0;
+
+const marqueeItems = [
+    "Free delivery in Nairobi over KES 4,500",
+    "Free Saturday crochet club",
+    "Air-dry pottery kits in stock",
+    "Gigiri Village Market, Level 2",
+    "Secure checkout · M-Pesa & card",
+    "Serving makers across East Africa",
+];
+
+const schema = {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: "Craft & Colours",
+    description:
+        "An art, craft and haberdashery shop at Village Market, Nairobi. Supplies, workshops and DIY kits for makers across East Africa.",
+    url: Astro.site?.toString() ?? Astro.url.origin,
+    image: Astro.site
+        ? new URL(heroImage.src, Astro.site).toString()
+        : heroImage.src,
+    priceRange: "KES 1,000–10,000",
+    address: {
+        "@type": "PostalAddress",
+        addressCountry: "KE",
+        addressRegion: "Nairobi County",
+        addressLocality: "Nairobi",
+        streetAddress: "Village Market, Limuru Road",
+    },
+};
+---
+
+<BaseLayout
+    title="Craft & Colours | Art supplies and workshops in Nairobi"
+    description="Nairobi’s happiest home for art supplies, haberdashery, DIY kits and weekend workshops at Village Market."
+    schema={schema}
+>
+    <section class="relative overflow-hidden bg-butter-50">
+        <div class="relative">
+            <Image
+                src={heroImage}
+                alt="A colourful flat-lay of paint, yarn, clay, fabric and craft supplies spelling Craft & Colours"
+                class="block h-auto w-full"
+                fetchpriority="high"
+            />
+
+            <div
+                class="pointer-events-none absolute inset-x-0 top-3 flex justify-center px-4 sm:top-4"
+            >
+                <Sticker tone="marigold">
+                    <span class="h-1.5 w-1.5 rounded-full bg-ink-900"></span>
+                    Village Market · Nairobi · East Africa shipping
+                </Sticker>
+            </div>
+
+            <div
+                class="pointer-events-none absolute bottom-4 right-4 hidden sm:block"
+            >
+                <Sticker tone="bubblegum" rotate="left">
+                    Happy mail · Good vibes only
+                </Sticker>
+            </div>
+        </div>
+
+        <div class="px-5 pb-10 pt-8 text-center sm:pb-12 sm:pt-10">
+            <h1
+                class="mx-auto max-w-2xl text-balance font-display text-xl leading-[1.4] tracking-tight text-ink-900 sm:text-2xl"
+            >
+                Nairobi’s happiest home for art supplies, sewing essentials
+                &amp; weekend workshops at Village Market.
+            </h1>
+
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <a
+                    href="/shop/"
+                    class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-5 py-2.5 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                >
+                    Shop All Supplies
+                    <Icon name="lucide:arrow-right" class="h-4 w-4" />
+                </a>
+
+                <a
+                    href="/contact/"
+                    class="inline-flex items-center gap-2 rounded-full border border-ink-900/25 px-5 py-2.5 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                >
+                    Book a Workshop
+                    <Icon
+                        name="lucide:scissors"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                </a>
+            </div>
+
+            <ul
+                class="mt-6 flex flex-wrap items-center justify-center gap-2 text-[0.64rem] font-semibold text-ink-700 sm:text-[0.68rem]"
+            >
+                <li
+                    class="inline-flex items-center gap-1.5 rounded-full bg-white/75 px-3 py-1.5 ring-1 ring-ink-900/10"
+                >
+                    <Icon name="lucide:sparkles" class="h-3.5 w-3.5" />
+                    Free Saturday Crochet Club
+                </li>
+
+                <li
+                    class="inline-flex items-center gap-1.5 rounded-full bg-white/75 px-3 py-1.5 ring-1 ring-ink-900/10"
+                >
+                    <Icon name="lucide:map-pin" class="h-3.5 w-3.5" />
+                    Village Market, Nairobi
+                </li>
+
+                <li
+                    class="inline-flex items-center gap-1.5 rounded-full bg-white/75 px-3 py-1.5 ring-1 ring-ink-900/10"
+                >
+                    <Icon name="lucide:truck" class="h-3.5 w-3.5" />
+                    East Africa Delivery
+                </li>
+            </ul>
+        </div>
+
+        <div class="relative overflow-hidden py-6">
+            <Ticker
+                items={marqueeItems}
+                tone="poppy"
+                rotate
+                label="Shop highlights"
+                class="shadow-sm"
+            />
+        </div>
+    </section>
+
+    <Bestsellers
+        bestsellers={bestsellers}
+        bundles={bundles}
+        giftThreshold={DEMO_FREE_GIFT_THRESHOLD / 100}
+    />
+
+    <section
+        class="relative overflow-hidden bg-olive-700 pb-16 pt-24 text-cream-50 sm:pb-20 sm:pt-28"
+    >
+        <WavyDivider class="absolute inset-x-0 top-0 text-[#f8f2e8]" flip />
+        <div class="container-page">
+            <div
+                class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+            >
+                <div class="max-w-2xl">
+                    <p
+                        class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-olive-100/80"
+                    >
+                        Shop by creative vibe
+                    </p>
+                    <h2
+                        class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight sm:text-5xl"
+                    >
+                        Start with the thing you want to make.
+                    </h2>
+                </div>
+                <p class="max-w-sm text-sm leading-7 text-cream-50/70">
+                    Want to paint? Sew? Keep small hands busy? Restock the whole
+                    art stash? Pick a vibe and we will point you to the good
+                    stuff.
+                </p>
+            </div>
+
+            <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {
+                    demoVibes.map((vibe) => (
+                        <a
+                            href={vibe.href}
+                            class="group flex flex-col items-center gap-4 text-center"
+                        >
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-0 rounded-full opacity-70 blur-xl transition group-hover:opacity-90"
+                                    style={`background-color: ${vibe.accent}`}
+                                    aria-hidden="true"
+                                />
+                                <div class="relative h-36 w-36 overflow-hidden rounded-full ring-4 ring-cream-50/15 transition duration-300 ease-bounce group-hover:scale-105 sm:h-40 sm:w-40">
+                                    <img
+                                        src={vibe.image.src}
+                                        alt={vibe.image.alt}
+                                        loading="lazy"
+                                        class="h-full w-full object-cover"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <p class="font-display text-lg leading-snug">
+                                    {vibe.title}
+                                </p>
+                                <p class="mt-1 text-xs leading-5 text-cream-50/70">
+                                    {vibe.description}
+                                </p>
+                            </div>
+                        </a>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+
+    <section
+        class="bg-butter-50 bg-cover bg-center border-b border-ink-900/10 py-16 text-ink-900 sm:py-20"
+        style={`background-image: url('${brushStrokeTexture.src}');`}
+    >
+        <div class="container-page">
+            <div
+                class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+            >
+                <div class="max-w-2xl">
+                    <p class="eyebrow text-clay-600">
+                        Upcoming workshop &amp; meetups
+                    </p>
+                    <h2
+                        class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight sm:text-5xl"
+                    >
+                        {
+                            featuredWorkshop
+                                ? featuredWorkshop.title
+                                : "Come make something with us"
+                        }
+                    </h2>
+                </div>
+                <a
+                    href="/workshops/"
+                    class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                >
+                    View all workshops
+                    <Icon name="lucide:arrow-right" class="h-4 w-4" />
+                </a>
+            </div>
+
+            {
+                featuredWorkshop && (
+                    <div class="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-center">
+                        <div class="overflow-hidden rounded-3xl bg-cream-200 aspect-[16/10] shadow-sm">
+                            <img
+                                src={featuredWorkshop.image.src}
+                                alt={featuredWorkshop.image.alt}
+                                loading="lazy"
+                                class="h-full w-full object-cover"
+                            />
+                        </div>
+                        <div class="space-y-6">
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                                <Badge tone="clay" size="sm">
+                                    {featuredWorkshop.isFree
+                                        ? "Free meetup"
+                                        : "Workshop"}
+                                </Badge>
+                                <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-800">
+                                    <Icon
+                                        name="lucide:calendar-days"
+                                        class="h-4 w-4 text-clay-600"
+                                        aria-hidden="true"
+                                    />
+                                    {featuredWorkshop.date
+                                        ? new Date(
+                                              featuredWorkshop.date,
+                                          ).toLocaleDateString("en-GB", {
+                                              weekday: "short",
+                                              day: "numeric",
+                                              month: "short",
+                                              year: "numeric",
+                                          })
+                                        : ""}
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-ink-800">
+                                    <Icon
+                                        name="lucide:clock"
+                                        class="h-4 w-4 text-clay-600"
+                                        aria-hidden="true"
+                                    />
+                                    {featuredWorkshop.time}
+                                </span>
+                            </div>
+
+                            <p class="text-base leading-7 text-ink-600">
+                                {featuredWorkshop.excerpt}
+                            </p>
+
+                            <div class="rounded-2xl bg-white/80 p-5 text-sm ring-1 ring-ink-900/10">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-[0.68rem] uppercase tracking-[0.14em] text-ink-400 font-bold">
+                                            Location
+                                        </p>
+                                        <p class="mt-1 font-semibold text-ink-900">
+                                            {featuredWorkshop.location}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[0.68rem] uppercase tracking-[0.14em] text-ink-400 font-bold">
+                                            Duration &amp; Skill
+                                        </p>
+                                        <p class="mt-1 font-semibold text-ink-900">
+                                            {featuredWorkshop.duration} ·{" "}
+                                            {featuredWorkshop.skill}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 border-t border-ink-900/10 pt-4">
+                                    <div class="flex items-baseline justify-between gap-4">
+                                        <p class="text-[0.68rem] uppercase tracking-[0.14em] text-ink-400 font-bold">
+                                            Seats left
+                                        </p>
+                                        <p class="font-semibold text-ink-900">
+                                            {featuredWorkshop.seatsLeft}
+                                            <span class="font-medium text-ink-500">
+                                                {" "}
+                                                of {featuredWorkshop.capacity}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div
+                                        class="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-900/10"
+                                        role="progressbar"
+                                        aria-label="Seats remaining"
+                                        aria-valuemin="0"
+                                        aria-valuemax={
+                                            featuredWorkshop.capacity
+                                        }
+                                        aria-valuenow={
+                                            featuredWorkshop.seatsLeft
+                                        }
+                                    >
+                                        <div
+                                            class="h-full rounded-full bg-clay-500"
+                                            style={`width: ${seatsRemainingPercent}%`}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-4 pt-2">
+                                {featuredWorkshop.wooProductId ? (
+                                    <a
+                                        href={`/shop/workshop-ticket-${featuredWorkshop.id}/`}
+                                        class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
+                                    >
+                                        Book workshop (KES{" "}
+                                        {(featuredWorkshop.price.price
+                                            ? Number(
+                                                  featuredWorkshop.price.price,
+                                              ) / 100
+                                            : 0
+                                        ).toLocaleString()}
+                                        )
+                                    </a>
+                                ) : (
+                                    <a
+                                        href="/contact/"
+                                        class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
+                                    >
+                                        {featuredWorkshop.isFree
+                                            ? "RSVP / Join meetup"
+                                            : "Book via contact"}
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+    </section>
+
+    <section
+        class="relative overflow-hidden border-y border-ink-900/10 bg-cream-100/60 py-16 sm:py-20"
+    >
+        <div
+            class="pointer-events-none absolute -right-20 top-4 w-96 select-none sm:w-[32rem]"
+        >
+            <Image
+                src={mustardYarnDecorator}
+                alt=""
+                aria-hidden="true"
+                widths={[200, 350, 512]}
+                sizes="(max-width: 640px) 200px, 512px"
+                class="h-auto w-full"
+            />
+        </div>
+        <div class="container-page relative">
+            <SectionHeading
+                eyebrow="From the journal"
+                title="Notes on colour, making and very good messes"
+                link={{ href: "/journal/", label: "All stories" }}
+            />
+
+            <div class="mt-10 grid gap-6 md:grid-cols-3">
+                {
+                    posts.map((post) => (
+                        <article class="group">
+                            <a
+                                href={`/journal/${post.slug}/`}
+                                class="block overflow-hidden rounded-2xl"
+                            >
+                                <div class="aspect-[3/2] overflow-hidden bg-cream-200">
+                                    {post.image ? (
+                                        <img
+                                            src={post.image.src}
+                                            alt={post.image.alt}
+                                            loading="lazy"
+                                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div class="h-full w-full bg-cream-200" />
+                                    )}
+                                </div>
+                            </a>
+                            <p class="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-300">
+                                {post.categories[0] ?? "Journal"} ·{" "}
+                                {formatDate(post.date)}
+                            </p>
+                            <h3 class="mt-2 font-display text-2xl leading-tight text-ink-900">
+                                <a
+                                    href={`/journal/${post.slug}/`}
+                                    class="hover:text-clay-600"
+                                >
+                                    {post.title}
+                                </a>
+                            </h3>
+                            <p class="mt-3 text-sm leading-7 text-ink-500">
+                                {post.excerpt}
+                            </p>
+                        </article>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+
+    <section
+        class="relative overflow-hidden bg-cream-100 bg-cover bg-center bg-fixed py-16 sm:py-24"
+        style={`background-image: url('${ugcBackground.src}');`}
+    >
+        <div
+            class="pointer-events-none absolute -left-16 top-10 h-64 w-64 rounded-full bg-marigold-500/20 blur-3xl"
+            aria-hidden="true"
+        >
+        </div>
+        <div
+            class="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-bubblegum-500/15 blur-3xl"
+            aria-hidden="true"
+        >
+        </div>
+
+        <div class="container-page relative">
+            <div class="flex flex-col items-center text-center">
+                <Sticker tone="olive" rotate="left">
+                    <Icon
+                        name="lucide:camera"
+                        class="h-3.5 w-3.5"
+                        aria-hidden="true"
+                    />
+                    Tag @craftandcolours
+                </Sticker>
+                <h2
+                    class="mt-5 max-w-xl text-balance font-display text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    What you're making with it.
+                </h2>
+                <p class="mt-3 max-w-md text-sm leading-7 text-ink-500">
+                    Pin it, tape it, show it off. Share your makes and we'll
+                    stick the best ones up here.
+                </p>
+            </div>
+
+            <div
+                class="mt-14 flex flex-wrap items-start justify-center gap-x-5 gap-y-10 sm:gap-x-7"
+            >
+                {
+                    demoUgc.map((post, index) => {
+                        const rotations = [
+                            "-rotate-6",
+                            "rotate-4",
+                            "-rotate-3",
+                            "rotate-6",
+                            "-rotate-4",
+                            "rotate-3",
+                        ];
+                        const lifts = [
+                            "sm:mt-0",
+                            "sm:mt-6",
+                            "sm:-mt-2",
+                            "sm:mt-4",
+                            "sm:mt-0",
+                            "sm:mt-8",
+                        ];
+                        const rotate = rotations[index % rotations.length];
+                        const lift = lifts[index % lifts.length];
+                        return (
+                            <a
+                                href="https://www.instagram.com/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class={`group relative block w-36 shrink-0 rounded-sm bg-cream-50 p-2.5 pb-4 shadow-sticker ring-1 ring-ink-900/10 transition duration-300 ease-bounce hover:z-10 hover:-translate-y-2 hover:rotate-0 hover:scale-105 hover:shadow-chunky sm:w-44 ${rotate} ${lift}`}
+                            >
+                                <span
+                                    class="absolute left-1/2 -top-2.5 h-5 w-5 -translate-x-1/2 rotate-12 rounded-full bg-poppy-500 shadow-sm ring-2 ring-cream-50"
+                                    aria-hidden="true"
+                                />
+                                <div class="aspect-square overflow-hidden bg-cream-200">
+                                    <img
+                                        src={post.image.src}
+                                        alt={post.image.alt}
+                                        loading="lazy"
+                                        class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                                    />
+                                </div>
+                                <p class="mt-3 truncate font-display text-sm text-ink-900">
+                                    {post.handle}
+                                </p>
+                                <p class="mt-0.5 line-clamp-2 text-[0.64rem] leading-4 text-ink-500">
+                                    {post.caption}
+                                </p>
+                            </a>
+                        );
+                    })
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="container-page py-16 sm:py-20 relative">
+        <div class="grid items-center gap-10 lg:grid-cols-2">
+            <div class="lg:pl-8">
+                <p class="eyebrow">The shop</p>
+                <h2
+                    class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    A bright shop, a big table and a very good excuse to make
+                    something.
+                </h2>
+                <p class="mt-5 text-base leading-8 text-ink-500">
+                    We are at Village Market, Nairobi, with shelves full of
+                    supplies we actually use and a table that is always free for
+                    a project. Come in with a question, leave with a new hobby.
+                </p>
+                <p class="mt-4 text-base leading-8 text-ink-500">
+                    We run workshops for every level, host free meetups, and
+                    stock the good pencils. No gatekeeping. No made-up rules.
+                    Just a friendly place to start.
+                </p>
+                <a href="/about/" class="btn-secondary mt-7">Read our story</a>
+            </div>
+            <div class="overflow-hidden rounded-4xl">
+                <Image
+                    src="https://placehold.co/800x1000/EDF8F5/211D19?text=The+Shop"
+                    alt="A sunlit studio with shelves of handmade ceramics"
+                    width={800}
+                    height={1000}
+                />
+            </div>
+        </div>
+        <Image
+            width={250}
+            widths={[120, 200, 250, 300]}
+            sizes="(max-width: 640px) 120px, 250px"
+            src={heartPastel}
+            alt="heart decorative element with pastel texture"
+            class="absolute -bottom-1 -left-12 rotate-30 -z-1"
+        />
+    </section>
+</BaseLayout>
+
+<script>
+    import Lenis from "lenis";
+
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (!prefersReducedMotion) {
+        const lenis = new Lenis();
+
+        function raf(time: number) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+
+        requestAnimationFrame(raf);
+    }
+</script>

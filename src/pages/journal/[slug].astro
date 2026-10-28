@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { formatDate, truncate } from '../../lib/format';
+import { getPost, getPosts } from '../../lib/wordpress';
+
+export async function getStaticPaths() {
+  const posts = await getPosts(50);
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const slug = Astro.params.slug;
+if (!slug) throw new Error('Missing post slug.');
+
+const post = await getPost(slug);
+if (!post) throw new Error(`Post not found: ${slug}`);
+
+const related = (await getPosts(24))
+  .filter((item) => item.slug !== post.slug)
+  .slice(0, 3);
+
+const absolute = (src: string) =>
+  Astro.site ? new URL(src, Astro.site).toString() : src;
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: truncate(post.excerpt, 180),
+  datePublished: post.date,
+  dateModified: post.date,
+  image: post.image ? absolute(post.image.src) : undefined,
+  author: { '@type': 'Organization', name: 'Craft & Colours' },
+  publisher: { '@type': 'Organization', name: 'Craft & Colours' },
+  mainEntityOfPage: absolute(`/journal/${post.slug}/`),
+};
+---
+
+<BaseLayout
+  title={post.title}
+  description={truncate(post.excerpt, 180)}
+  image={post.image?.src}
+  type="article"
+  schema={schema}
+>
+  <article>
+    <header class="border-b border-ink-900/10 bg-cream-100/50">
+      <div class="container-page py-12 sm:py-16">
+        <Breadcrumbs
+          items={[
+            { href: '/journal/', label: 'Journal' },
+            { label: post.title },
+          ]}
+        />
+
+        <div class="mx-auto mt-8 max-w-3xl text-center">
+          <p class="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-300">
+            {post.categories.join(' · ') || 'Journal'} · {formatDate(post.date)}
+          </p>
+          <h1 class="mt-4 text-balance font-display text-4xl leading-[1.04] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+            {post.title}
+          </h1>
+          <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-ink-500">
+            {post.excerpt}
+          </p>
+        </div>
+      </div>
+    </header>
+
+    {post.image && (
+      <div class="container-page -mb-2 pt-10">
+        <div class="overflow-hidden rounded-[2rem] bg-cream-200">
+          <img
+            src={post.image.src}
+            alt={post.image.alt}
+            class="h-auto w-full object-cover"
+            width="1600"
+            height="1000"
+          />
+        </div>
+      </div>
+    )}
+
+    <div class="container-page py-12 sm:py-16">
+      <div
+        class="prose-craft mx-auto max-w-2xl text-[1.02rem] leading-8"
+        set:html={post.content}
+      />
+
+      <div class="mx-auto mt-12 flex max-w-2xl flex-wrap items-center justify-between gap-4 border-t border-ink-900/10 pt-6">
+        <a href="/journal/" class="text-xs font-bold uppercase tracking-[0.14em] text-ink-500 hover:text-clay-600">
+          ← All stories
+        </a>
+        <a href="/shop/" class="btn-secondary">Shop the collection</a>
+      </div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="border-t border-ink-900/10 bg-cream-100/50 py-14 sm:py-20">
+      <div class="container-page">
+        <p class="eyebrow">Keep reading</p>
+        <h2 class="mt-2 font-display text-4xl leading-tight text-ink-900">
+          More from the journal
+        </h2>
+
+        <div class="mt-8 grid gap-6 md:grid-cols-3">
+          {related.map((item) => (
+            <article class="group">
+              <a href={`/journal/${item.slug}/`} class="block overflow-hidden rounded-2xl">
+                <div class="aspect-[3/2] overflow-hidden bg-cream-200">
+                  {item.image ? (
+                    <img
+                      src={item.image.src}
+                      alt={item.image.alt}
+                      loading="lazy"
+                      class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div class="h-full w-full bg-cream-200" />
+                  )}
+                </div>
+              </a>
+              <p class="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-300">
+                {formatDate(item.date)}
+              </p>
+              <h3 class="mt-2 font-display text-2xl leading-tight text-ink-900">
+                <a href={`/journal/${item.slug}/`} class="hover:text-clay-600">
+                  {item.title}
+                </a>
+              </h3>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+</BaseLayout>

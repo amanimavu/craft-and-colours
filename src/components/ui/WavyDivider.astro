@@ -1,0 +1,19 @@
+---
+interface Props {
+  class?: string;
+  flip?: boolean;
+}
+
+const { class: className = 'text-clay-300/60', flip = false } = Astro.props;
+---
+
+<div class:list={['wavy-divider w-full overflow-hidden leading-none', className]} aria-hidden="true">
+  <svg
+    viewBox="0 0 1440 40"
+    preserveAspectRatio="none"
+    class:list={['h-4 w-full sm:h-5', flip && 'rotate-180']}
+    fill="currentColor"
+  >
+    <path d="M0 23c120-16 240-16 360 0s240 16 360 0 240-16 360 0 240 16 360 0v17H0V23Z" />
+  </svg>
+</div>

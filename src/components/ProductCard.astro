@@ -1,0 +1,93 @@
+---
+import { formatCardPrice, formatMoney } from '../lib/format';
+import type { Product } from '../lib/types';
+import Badge from './ui/Badge.astro';
+import Icon from './ui/Icon.astro';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const image = product.images[0];
+const category = product.categories[0];
+const onSale =
+  Number(product.prices.sale_price) > 0 &&
+  Number(product.prices.sale_price) < Number(product.prices.regular_price);
+const soldOut = !product.isInStock || !product.isPurchasable;
+---
+
+<article class="group">
+  <a
+    href={`/shop/${product.slug}/`}
+    class="block overflow-hidden rounded-2xl bg-cream-200/60"
+  >
+    <div class="relative aspect-[4/5] overflow-hidden">
+      {image ? (
+        <img
+          src={image.src}
+          alt={image.alt}
+          loading="lazy"
+          decoding="async"
+          class="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
+        />
+      ) : (
+        <div class="grid h-full place-items-center bg-cream-200 text-sm text-ink-500">
+          Image coming soon
+        </div>
+      )}
+
+      <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+        {onSale && !soldOut && <Badge tone="clay">Sale</Badge>}
+        {soldOut && <Badge tone="ink">Sold out</Badge>}
+      </div>
+
+      <span
+        class="absolute bottom-3 right-3 grid h-10 w-10 translate-y-2 place-items-center rounded-full bg-cream-50 text-ink-900 opacity-0 shadow-sm transition duration-300 ease-bounce group-hover:translate-y-0 group-hover:opacity-100"
+        aria-hidden="true"
+      >
+        <Icon name="lucide:arrow-up-right" class="h-4 w-4" />
+      </span>
+    </div>
+  </a>
+
+  <div class="mt-4 flex items-start justify-between gap-4">
+    <div>
+      {category && (
+        <p class="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink-300">
+          {category.name}
+        </p>
+      )}
+      <h3 class="mt-1 font-display text-base leading-snug text-ink-900">
+        <a href={`/shop/${product.slug}/`} class="hover:text-clay-600">
+          {product.name}
+        </a>
+      </h3>
+    </div>
+
+    <div class="shrink-0 text-right">
+      {onSale ? (
+        <>
+          <p class="text-xs font-bold text-clay-600">
+            {formatMoney(
+              product.prices.sale_price,
+              product.prices.currency_code,
+              product.prices.currency_minor_unit,
+            )}
+          </p>
+          <p class="text-[0.68rem] text-ink-300 line-through">
+            {formatMoney(
+              product.prices.regular_price,
+              product.prices.currency_code,
+              product.prices.currency_minor_unit,
+            )}
+          </p>
+        </>
+      ) : (
+        <p class="text-xs font-bold text-ink-900">
+          {formatCardPrice(product)}
+        </p>
+      )}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,520 @@
+---
+import Ticker from './ui/Ticker.astro';
+import Logo from './ui/Logo.astro';
+import Icon from './ui/Icon.astro';
+import Badge from './ui/Badge.astro';
+import CartCount from './store/CartCount';
+import WishlistCount from './store/WishlistCount';
+import SearchOverlay from './store/SearchOverlay';
+import { hasStore, getCategories, getProducts } from '../lib/woocommerce';
+
+const path = Astro.url.pathname;
+const [categories, products] = await Promise.all([
+  getCategories(),
+  getProducts(),
+]);
+
+const links = [
+  { href: '/journal/', label: 'Journal' },
+  { href: '/workshops/', label: 'Workshops' },
+  { href: '/about/', label: 'Our story' },
+  { href: '/contact/', label: 'Contact' },
+];
+
+const announcements = [
+  'Free delivery in Nairobi over KES 4,500',
+  'Village Market, Nairobi · Level 2',
+  'Free Saturday crochet club',
+  'M-Pesa & card accepted',
+];
+
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+  'Hi Craft & Colours! I have a question about a product.',
+)}`;
+
+const searchProducts = products.map((product) => ({
+  id: product.id,
+  name: product.name,
+  slug: product.slug,
+  category: product.categories[0]?.name,
+  price: product.prices.price,
+  currencyCode: product.prices.currency_code,
+  minorUnit: product.prices.currency_minor_unit,
+  image: product.images[0]?.thumbnail || product.images[0]?.src,
+  imageAlt: product.images[0]?.alt,
+}));
+
+const searchCategories = categories.map((category) => ({
+  name: category.name,
+  slug: category.slug,
+}));
+
+const categoryMeta: Record<string, { icon: string; blurb: string }> = {
+  paint: { icon: 'lucide:palette', blurb: 'Acrylics, watercolour & brushes' },
+  'stitch-sew': {
+    icon: 'lucide:scissors',
+    blurb: 'Fabric, yarn, thread & notions',
+  },
+  clay: { icon: 'lucide:shapes', blurb: 'Air-dry clay, tools & glaze' },
+  sketch: { icon: 'lucide:pencil', blurb: 'Pencils, ink & sketchbooks' },
+  kids: { icon: 'lucide:sparkles', blurb: 'Colourful making for little hands' },
+  'diy-kits': {
+    icon: 'lucide:package',
+    blurb: 'Everything you need in one box',
+  },
+  bundles: { icon: 'lucide:gift', blurb: 'Curated sets & starter stashes' },
+};
+
+const categoryCards = categories.map((category) => ({
+  ...category,
+  ...(categoryMeta[category.slug] ?? {
+    icon: 'lucide:grid-2x2',
+    blurb: 'Explore the collection',
+  }),
+}));
+
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+
+const shopActive = isActive('/shop/');
+---
+
+<Ticker items={announcements} tone="olive" compact />
+
+<header
+  class="sticky top-0 z-50 border-b border-ink-900/10 bg-cream-50/90 backdrop-blur-md"
+>
+  <div class="container-page flex h-18 items-center justify-between gap-2 sm:gap-4">
+    <Logo />
+
+    <nav class="hidden items-center gap-6 lg:flex" aria-label="Main navigation">
+      <details class="group" data-mega-menu>
+        <summary
+          class:list={[
+            'flex cursor-pointer list-none items-center gap-1.5 whitespace-nowrap text-sm font-semibold tracking-wide transition marker:content-none',
+            shopActive ? 'text-clay-600' : 'text-ink-700 hover:text-ink-900',
+          ]}
+        >
+          Shop supplies
+          <Icon
+            name="lucide:chevron-down"
+            class="h-3.5 w-3.5 transition duration-200 group-open:rotate-180"
+          />
+        </summary>
+
+        <div class="pointer-events-none absolute inset-x-0 top-full">
+          <div class="container-page pt-3">
+            <div
+              class="modal-pop pointer-events-auto mx-auto w-full max-w-[68rem] rounded-[2rem] border border-ink-900/10 bg-cream-50 p-5 shadow-soft sm:p-7"
+            >
+              <div
+                class="flex flex-wrap items-end justify-between gap-4 border-b border-ink-900/10 pb-4"
+              >
+                <div>
+                  <p class="eyebrow">Shop by craft</p>
+                  <p class="mt-1 text-xs leading-5 text-ink-500">
+                    Seven little worlds of making, all under one roof.
+                  </p>
+                </div>
+                <a
+                  href="/shop/"
+                  class="inline-flex items-center gap-2 rounded-full border border-ink-900/15 px-4 py-2 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ink-700 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                >
+                  All {products.length} pieces
+                  <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
+                </a>
+              </div>
+
+              <div class="mt-5 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+                <div class="grid gap-3 sm:grid-cols-2">
+                  {
+                    categoryCards.map((category) => (
+                      <a
+                        href={`/shop/?category=${category.slug}`}
+                        class="group/card flex items-start gap-3 rounded-2xl border border-ink-900/10 bg-cream-50 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-clay-300 hover:bg-cream-100 hover:shadow-sm"
+                      >
+                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-olive-100 text-olive-700 transition group-hover/card:bg-olive-700 group-hover/card:text-cream-50">
+                          <Icon name={category.icon} class="h-[18px] w-[18px]" />
+                        </span>
+
+                        <span class="min-w-0 flex-1">
+                          <span class="flex flex-wrap items-center gap-2">
+                            <span class="text-sm font-bold text-ink-900">
+                              {category.name}
+                            </span>
+                            <Badge tone="olive" size="sm">
+                              {category.count}
+                            </Badge>
+                          </span>
+                          <span class="mt-1 block text-xs leading-5 text-ink-500">
+                            {category.blurb}
+                          </span>
+                        </span>
+
+                        <Icon
+                          name="lucide:arrow-up-right"
+                          class="mt-1 h-4 w-4 shrink-0 text-ink-300 opacity-0 transition group-hover/card:opacity-100"
+                        />
+                      </a>
+                    ))
+                  }
+
+                  <a
+                    href="/shop/"
+                    class="group/card flex items-start gap-3 rounded-2xl border border-dashed border-ink-900/20 bg-butter-50 p-4 transition duration-200 hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-sm"
+                  >
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-marigold-500 text-ink-900">
+                      <Icon name="lucide:layout-grid" class="h-[18px] w-[18px]" />
+                    </span>
+                    <span class="min-w-0 flex-1">
+                      <span class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm font-bold text-ink-900">
+                          All supplies
+                        </span>
+                        <Badge tone="marigold" size="sm">
+                          {products.length}
+                        </Badge>
+                      </span>
+                      <span class="mt-1 block text-xs leading-5 text-ink-500">
+                        Browse the whole collection
+                      </span>
+                    </span>
+                    <Icon
+                      name="lucide:arrow-up-right"
+                      class="mt-1 h-4 w-4 shrink-0 text-ink-300 opacity-0 transition group-hover/card:opacity-100"
+                    />
+                  </a>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                  <div
+                    class="relative overflow-hidden rounded-2xl bg-olive-700 p-5 text-cream-50"
+                  >
+                    <span
+                      class="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-marigold-500/25 blur-2xl"
+                      aria-hidden="true"
+                    />
+                    <p class="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-cream-50/60">
+                      New here?
+                    </p>
+                    <p class="mt-2 font-display text-2xl leading-tight">
+                      Start with a kit.
+                    </p>
+                    <p class="mt-2 text-xs leading-6 text-cream-50/70">
+                      Everything you need for a first project, packed in one
+                      box.
+                    </p>
+                    <a
+                      href="/shop/?category=diy-kits"
+                      class="mt-4 inline-flex items-center gap-2 rounded-full bg-cream-50 px-4 py-2 text-xs font-bold text-ink-900 transition hover:bg-marigold-500"
+                    >
+                      Shop DIY kits
+                      <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
+                    </a>
+                  </div>
+
+                  <div class="rounded-2xl border border-ink-900/10 bg-butter-50 p-5">
+                    <p class="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-clay-600">
+                      Good to know
+                    </p>
+                    <ul class="mt-3 space-y-3 text-xs leading-5 text-ink-700">
+                      <li class="flex items-start gap-2.5">
+                        <Icon
+                          name="lucide:truck"
+                          class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                        />
+                        Free Nairobi delivery over KES 4,500.
+                      </li>
+                      <li class="flex items-start gap-2.5">
+                        <Icon
+                          name="lucide:gift"
+                          class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                        />
+                        A free craft gift over KES 5,000.
+                      </li>
+                      <li class="flex items-start gap-2.5">
+                        <Icon
+                          name="lucide:calendar-days"
+                          class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                        />
+                        Free Saturday crochet club.
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'whitespace-nowrap text-sm font-semibold tracking-wide transition',
+              isActive(link.href)
+                ? 'text-clay-600'
+                : 'text-ink-700 hover:text-ink-900',
+            ]}
+            aria-current={isActive(link.href) ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-0.5">
+      <a
+        href={waHref}
+        target="_blank"
+        rel="noreferrer"
+        class="mr-2 hidden items-center gap-2 whitespace-nowrap rounded-full border border-olive-500/30 bg-olive-100 px-3.5 py-2 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-olive-700 transition hover:border-olive-700 hover:bg-olive-700 hover:text-cream-50 xl:inline-flex"
+      >
+        <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+        WhatsApp us
+      </a>
+
+      <button
+        type="button"
+        data-search-open
+        class="grid h-10 w-10 place-items-center rounded-full text-ink-900 transition hover:bg-ink-900/5"
+        aria-label="Search the shop"
+        aria-haspopup="dialog"
+      >
+        <Icon name="lucide:search" class="h-[19px] w-[19px]" />
+      </button>
+
+      <a
+        href="/wishlist/"
+        class="relative hidden h-10 w-10 place-items-center rounded-full text-ink-900 transition hover:bg-ink-900/5 sm:grid"
+        aria-label="Your wishlist"
+      >
+        <Icon name="lucide:heart" class="h-[19px] w-[19px]" />
+        <WishlistCount client:load />
+      </a>
+
+      <a
+        href="/cart/"
+        data-cart-open
+        class="relative grid h-10 w-10 place-items-center rounded-full text-ink-900 transition hover:bg-ink-900/5"
+        aria-label="Open cart"
+        aria-haspopup="dialog"
+      >
+        <Icon name="lucide:shopping-bag" class="h-[19px] w-[19px]" />
+        <CartCount client:load />
+      </a>
+
+      <details class="group relative lg:hidden">
+        <summary
+          class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-full border border-ink-900/15 text-ink-900 marker:content-none"
+          aria-label="Open menu"
+        >
+          <Icon name="lucide:menu" class="h-[18px] w-[18px]" />
+        </summary>
+
+        <div
+          class="absolute right-0 top-12 max-h-[calc(100dvh-5rem)] w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-2xl border border-ink-900/10 bg-cream-50 shadow-soft"
+        >
+          <div class="border-b border-ink-900/10 p-2">
+            <button
+              type="button"
+              data-search-open
+              class="flex w-full items-center gap-2 rounded-xl px-3 py-3 text-sm font-semibold text-ink-700 transition hover:bg-cream-100 hover:text-ink-900"
+            >
+              <Icon name="lucide:search" class="h-4 w-4" />
+              Search supplies
+              <kbd
+                class="ml-auto rounded border border-ink-900/15 bg-cream-100 px-1.5 py-0.5 text-[0.58rem] font-bold text-ink-300"
+              >
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          <div class="border-b border-ink-900/10 p-2">
+            <p
+              class="px-3 py-1 text-[0.58rem] font-bold uppercase tracking-[0.16em] text-ink-300"
+            >
+              Shop by craft
+            </p>
+            <div class="grid grid-cols-2">
+              <a
+                href="/shop/"
+                class="rounded-xl px-3 py-2 text-xs font-bold text-clay-600 hover:bg-cream-100"
+              >
+                All pieces
+              </a>
+              {
+                categories.map((category) => (
+                  <a
+                    href={`/shop/?category=${category.slug}`}
+                    class="rounded-xl px-3 py-2 text-xs font-semibold text-ink-700 hover:bg-cream-100 hover:text-ink-900"
+                  >
+                    {category.name}
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="p-2">
+            {
+              links.map((link) => (
+                <a
+                  href={link.href}
+                  class="block rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-700 hover:bg-cream-100 hover:text-ink-900"
+                  aria-current={isActive(link.href) ? 'page' : undefined}
+                >
+                  {link.label}
+                </a>
+              ))
+            }
+            <a
+              href="/wishlist/"
+              class="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-ink-700 hover:bg-cream-100 hover:text-ink-900"
+            >
+              <Icon name="lucide:heart" class="h-4 w-4" />
+              Wishlist
+            </a>
+          </div>
+
+          <div class="border-t border-ink-900/10 p-2">
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noreferrer"
+              class="flex items-center gap-2 rounded-xl bg-olive-100 px-3 py-2.5 text-sm font-semibold text-olive-700 hover:bg-olive-700 hover:text-cream-50"
+            >
+              <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+              Chat on WhatsApp
+            </a>
+            <a
+              href="/cart/"
+              data-cart-open
+              class="mt-1 flex items-center gap-2 rounded-xl bg-ink-900 px-3 py-2.5 text-sm font-semibold text-cream-50"
+            >
+              <Icon name="lucide:shopping-bag" class="h-4 w-4" />
+              Open cart
+            </a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<SearchOverlay
+  client:load
+  products={searchProducts}
+  categories={searchCategories}
+/>
+
+{
+  !hasStore && (
+    <div class="border-b border-clay-300/60 bg-clay-100 px-5 py-2 text-center text-[0.7rem] font-semibold text-clay-600">
+      Demo catalogue · Add <code class="font-mono">PUBLIC_WC_STORE_URL</code> to
+      connect your WordPress store.
+    </div>
+  )
+}
+
+<script>
+  const closeHeaderMenus = () => {
+    document
+      .querySelectorAll('header details[open]')
+      .forEach((details) => details.removeAttribute('open'));
+  };
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+
+    if (
+      target.closest('[data-search-open]') ||
+      target.closest('[data-cart-open]')
+    ) {
+      closeHeaderMenus();
+      return;
+    }
+
+    if (!target.closest('header details')) closeHeaderMenus();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeHeaderMenus();
+  });
+
+  const megaMenu = document.querySelector('details[data-mega-menu]');
+
+  if (megaMenu instanceof HTMLDetailsElement) {
+    const summary = megaMenu.querySelector('summary');
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    let openTimer = 0;
+    let closeTimer = 0;
+    let lastPointerType = '';
+
+    const openNow = () => {
+      window.clearTimeout(openTimer);
+      window.clearTimeout(closeTimer);
+      megaMenu.open = true;
+    };
+
+    const openSoon = () => {
+      window.clearTimeout(openTimer);
+      window.clearTimeout(closeTimer);
+      openTimer = window.setTimeout(
+        () => {
+          megaMenu.open = true;
+        },
+        reduceMotion ? 0 : 80,
+      );
+    };
+
+    const closeSoon = () => {
+      window.clearTimeout(openTimer);
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(
+        () => {
+          if (
+            !megaMenu.matches(':hover') &&
+            !megaMenu.contains(document.activeElement)
+          ) {
+            megaMenu.open = false;
+          }
+        },
+        reduceMotion ? 0 : 160,
+      );
+    };
+
+    megaMenu.addEventListener('pointerdown', (event) => {
+      lastPointerType = event.pointerType;
+    });
+
+    megaMenu.addEventListener('pointerenter', (event) => {
+      if (event.pointerType === 'mouse') openSoon();
+    });
+
+    megaMenu.addEventListener('pointerleave', (event) => {
+      if (event.pointerType === 'mouse') closeSoon();
+    });
+
+    megaMenu.addEventListener('focusin', openNow);
+
+    megaMenu.addEventListener('focusout', (event) => {
+      const next = event.relatedTarget;
+      if (!(next instanceof Node) || !megaMenu.contains(next)) closeSoon();
+    });
+
+    summary?.addEventListener('click', (event) => {
+      if (event.detail > 0 && megaMenu.open && lastPointerType === 'mouse') {
+        event.preventDefault();
+      }
+    });
+  }
+</script>

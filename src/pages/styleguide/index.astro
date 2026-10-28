@@ -1,0 +1,214 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Logo from '../../components/ui/Logo.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Sticker from '../../components/ui/Sticker.astro';
+import Ticker from '../../components/ui/Ticker.astro';
+import WavyDivider from '../../components/ui/WavyDivider.astro';
+
+const palette = [
+  { name: 'Cream 50', hex: '#FBF7EF', swatch: 'bg-cream-50' },
+  { name: 'Cream 100', hex: '#F6EFE2', swatch: 'bg-cream-100' },
+  { name: 'Cream 200', hex: '#ECDFCD', swatch: 'bg-cream-200' },
+  { name: 'Butter 50', hex: '#FFF9EB', swatch: 'bg-butter-50' },
+  { name: 'Olive 100', hex: '#E8EBD8', swatch: 'bg-olive-100' },
+  { name: 'Olive 500', hex: '#6F7D3F', swatch: 'bg-olive-500' },
+  { name: 'Olive 700', hex: '#3E4A24', swatch: 'bg-olive-700' },
+  { name: 'Clay 300', hex: '#D99A7B', swatch: 'bg-clay-300' },
+  { name: 'Clay 500', hex: '#B45F3F', swatch: 'bg-clay-500' },
+  { name: 'Poppy 500', hex: '#FF5E36', swatch: 'bg-poppy-500' },
+  { name: 'Bubblegum', hex: '#FF6584', swatch: 'bg-bubblegum-500' },
+  { name: 'Marigold', hex: '#FFAA00', swatch: 'bg-marigold-500' },
+  { name: 'Cobalt', hex: '#2354E6', swatch: 'bg-cobalt-500' },
+  { name: 'Ink 900', hex: '#211D19', swatch: 'bg-ink-900' },
+];
+
+const icons = [
+  'lucide:shopping-bag',
+  'lucide:heart',
+  'lucide:sparkles',
+  'lucide:map-pin',
+  'lucide:truck',
+  'lucide:calendar-days',
+  'lucide:clock',
+  'lucide:scissors',
+  'lucide:search',
+  'lucide:user-round',
+  'lucide:menu',
+  'lucide:check',
+];
+
+const tickerItems = [
+  'Free delivery in Nairobi over KES 4,500',
+  'Free Saturday crochet club',
+  'M-Pesa & card accepted',
+];
+---
+
+<BaseLayout
+  title="Style guide"
+  description="Internal style tile and component preview for Craft & Colours."
+  noindex
+>
+  <section class="container-page py-12 sm:py-16">
+    <p class="eyebrow">Internal</p>
+    <h1 class="mt-3 text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl">
+      Style guide
+    </h1>
+    <p class="mt-4 max-w-xl text-sm leading-7 text-ink-500">
+      Palette, type and shared components for the Craft &amp; Colours
+      storefront. This page is excluded from the sitemap and search engines.
+    </p>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Logo</h2>
+    <div class="mt-6 flex flex-wrap items-center gap-8 rounded-3xl border border-ink-900/10 bg-white/55 p-8">
+      <Logo />
+      <Logo wordmark={false} />
+      <span class="inline-flex items-center gap-3 rounded-2xl bg-cream-100 px-6 py-4">
+        <Logo wordmark={false} />
+        <span class="font-display text-xl text-ink-900">Craft &amp; Colours</span>
+      </span>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Colour</h2>
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+      {
+        palette.map((colour) => (
+          <div>
+            <div
+              class:list={[
+                'h-20 rounded-2xl border border-ink-900/10 shadow-sm',
+                colour.swatch,
+              ]}
+            />
+            <p class="mt-2 text-xs font-bold text-ink-800">{colour.name}</p>
+            <p class="text-[0.68rem] uppercase tracking-wide text-ink-300">
+              {colour.hex}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Type</h2>
+    <div class="mt-6 space-y-6 rounded-3xl border border-ink-900/10 bg-white/55 p-8">
+      <p class="eyebrow">Eyebrow label</p>
+      <p class="font-display text-6xl leading-[0.95] tracking-tight text-ink-900">
+        Make something you love.
+      </p>
+      <p class="font-display text-4xl leading-tight text-ink-900">
+        Supplies for your next idea.
+      </p>
+      <p class="font-display text-2xl text-ink-900">Section heading</p>
+      <p class="max-w-2xl text-base leading-8 text-ink-500">
+        Manrope carries the body copy. Warm, plain-spoken and easy to read at
+        small sizes, with enough character to hold its own next to Fraunces.
+      </p>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Buttons</h2>
+    <div class="mt-6 flex flex-wrap items-center gap-4 rounded-3xl border border-ink-900/10 bg-white/55 p-8">
+      <a href="/shop/" class="btn-primary">
+        Primary <Icon name="lucide:arrow-right" class="h-4 w-4" />
+      </a>
+      <a href="/shop/" class="btn-secondary">Secondary</a>
+      <a href="/shop/" class="btn-clay">Clay</a>
+      <button type="button" class="btn-primary" disabled>Disabled</button>
+      <button type="button" class="btn-secondary" disabled>Disabled</button>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Badges &amp; stickers</h2>
+    <div class="mt-6 space-y-8 rounded-3xl border border-ink-900/10 bg-white/55 p-8">
+      <div class="flex flex-wrap items-center gap-3">
+        <Badge tone="clay">Sale</Badge>
+        <Badge tone="ink">Sold out</Badge>
+        <Badge tone="olive">New</Badge>
+        <Badge tone="poppy">Fresh</Badge>
+        <Badge tone="marigold">Workshop</Badge>
+        <Badge tone="bubblegum">Free meetup</Badge>
+        <Badge tone="cream">Cream</Badge>
+        <Badge tone="clay" size="sm">Small</Badge>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-6">
+        <Sticker tone="marigold">
+          <span class="h-1.5 w-1.5 rounded-full bg-ink-900" />
+          Village Market · Nairobi
+        </Sticker>
+        <Sticker tone="bubblegum" rotate="left">Happy mail</Sticker>
+        <Sticker tone="poppy" rotate="right">Good vibes only</Sticker>
+        <Sticker tone="cream">Cream sticker</Sticker>
+        <Sticker tone="olive">Olive sticker</Sticker>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Ticker</h2>
+    <div class="mt-6 space-y-6 overflow-hidden rounded-3xl border border-ink-900/10">
+      <Ticker items={tickerItems} tone="olive" compact />
+      <Ticker items={tickerItems} tone="poppy" rotate />
+      <Ticker items={tickerItems} tone="butter" />
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Divider</h2>
+    <div class="mt-6 rounded-3xl border border-ink-900/10 bg-white/55 p-8">
+      <WavyDivider class="mt-4 text-clay-300/60" />
+      <WavyDivider class="mt-6 text-olive-500" flip />
+    </div>
+  </section>
+
+  <section class="container-page pb-16">
+    <h2 class="font-display text-3xl text-ink-900">Icons</h2>
+    <div class="mt-6 grid grid-cols-4 gap-4 rounded-3xl border border-ink-900/10 bg-white/55 p-8 sm:grid-cols-6 lg:grid-cols-12">
+      {
+        icons.map((icon) => (
+          <div class="grid place-items-center gap-2 rounded-2xl bg-cream-100/70 px-2 py-4 text-center">
+            <Icon name={icon} class="h-5 w-5 text-ink-800" />
+            <span class="text-[0.55rem] font-semibold text-ink-500">
+              {icon.replace('lucide:', '')}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="container-page pb-20">
+    <h2 class="font-display text-3xl text-ink-900">Cards &amp; shadows</h2>
+    <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="card p-6">
+        <p class="text-sm font-semibold text-ink-900">Base card</p>
+        <p class="mt-2 text-sm leading-7 text-ink-500">
+          `card` keeps surfaces quiet: 16px radius, 10% ink border, translucent
+          paper fill.
+        </p>
+      </div>
+      <div class="card card-hover p-6">
+        <p class="text-sm font-semibold text-ink-900">Card hover</p>
+        <p class="mt-2 text-sm leading-7 text-ink-500">
+          `card-hover` lifts on pointer with the bounce easing.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-ink-900/10 bg-butter-50 p-6 shadow-chunky">
+        <p class="text-sm font-semibold text-ink-900">Chunky shadow</p>
+        <p class="mt-2 text-sm leading-7 text-ink-500">
+          `shadow-chunky` stacks a hard offset under a soft ambient shadow.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

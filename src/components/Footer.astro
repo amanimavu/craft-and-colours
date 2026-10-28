@@ -1,0 +1,203 @@
+---
+import Icon from "./ui/Icon.astro";
+import NewsletterForm from "./store/NewsletterForm";
+import Mpesa from "../assets/images/payment-methods/mpesa.svg";
+import Visa from "../assets/images/payment-methods/visa.svg";
+import MasterCard from "../assets/images/payment-methods/mastercard.svg";
+
+const email =
+    import.meta.env.PUBLIC_CONTACT_EMAIL || "hello@craftandcolours.co.ke";
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+    "Hi Craft & Colours! I have a question about a product.",
+)}`;
+const instagram = "https://www.instagram.com/craftandcolours/";
+const facebook = "https://www.facebook.com/craft.colours.ke/";
+const tiktok = "https://www.tiktok.com/@craftandcolours";
+const year = new Date().getFullYear();
+
+const socials = [
+    { label: "Instagram", href: instagram, icon: "simple-icons:instagram" },
+    { label: "Facebook", href: facebook, icon: "simple-icons:facebook" },
+    { label: "TikTok", href: tiktok, icon: "simple-icons:tiktok" },
+];
+---
+
+<footer class="mt-24 border-t border-ink-900/10 bg-cream-100">
+    <div class="border-b border-ink-900/10">
+        <div class="container-page py-12 sm:py-14">
+            <div
+                class="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16"
+            >
+                <div>
+                    <p class="eyebrow">The good mail</p>
+                    <h2
+                        class="mt-3 max-w-lg text-balance font-display text-3xl leading-tight text-ink-900 sm:text-4xl"
+                    >
+                        Workshop dates, new supplies and small ideas.
+                    </h2>
+                    <p class="mt-3 max-w-md text-sm leading-7 text-ink-500">
+                        A letter or two a month from the shop. Handy for anyone
+                        who makes things with their hands.
+                    </p>
+                </div>
+
+                <div class="max-w-md lg:justify-self-end">
+                    <NewsletterForm client:load />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-page py-14">
+        <div class="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
+            <div>
+                <p class="font-display text-3xl leading-tight text-ink-900">
+                    Make something<br />you love.
+                </p>
+                <p class="mt-4 max-w-sm text-sm leading-7 text-ink-500">
+                    Art supplies, haberdashery and weekend workshops at Village
+                    Market, Nairobi. A happy little shop for makers across East
+                    Africa.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a class="btn-secondary" href="/shop/">Shop supplies</a>
+                    <a class="btn-secondary" href="/journal/"
+                        >Read the journal</a
+                    >
+                </div>
+
+                <div class="mt-6 flex flex-wrap items-center gap-3">
+                    <span
+                        class="mr-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-400"
+                    >
+                        Follow
+                    </span>
+                    {
+                        socials.map((social) => (
+                            <a
+                                href={social.href}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={social.label}
+                                class="grid h-9 w-9 place-items-center rounded-full border border-ink-900/15 bg-cream-50 text-ink-700 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                            >
+                                <Icon name={social.icon} class="h-4 w-4" />
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+
+            <div class="grid gap-10 sm:grid-cols-3">
+                <div>
+                    <p class="eyebrow">Explore</p>
+                    <ul
+                        class="mt-4 space-y-3 text-sm font-semibold text-ink-700"
+                    >
+                        <li>
+                            <a class="hover:text-clay-600" href="/shop/"
+                                >Shop all</a
+                            >
+                        </li>
+                        <li>
+                            <a class="hover:text-clay-600" href="/journal/"
+                                >Journal</a
+                            >
+                        </li>
+                        <li>
+                            <a class="hover:text-clay-600" href="/about/"
+                                >Our story</a
+                            >
+                        </li>
+                        <li>
+                            <a class="hover:text-clay-600" href="/contact/"
+                                >Contact</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p class="eyebrow">Help</p>
+                    <ul
+                        class="mt-4 space-y-3 text-sm font-semibold text-ink-700"
+                    >
+                        <li>
+                            <a
+                                class="hover:text-clay-600"
+                                href="/policies/#shipping">Shipping</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                class="hover:text-clay-600"
+                                href="/policies/#returns">Returns</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                class="hover:text-clay-600"
+                                href="/policies/#privacy">Privacy</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                class="hover:text-clay-600"
+                                href="/policies/#terms">Terms</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <p class="eyebrow">Say hello</p>
+                    <ul
+                        class="mt-4 space-y-3 text-sm font-semibold text-ink-700"
+                    >
+                        <li>
+                            <a
+                                class="hover:text-clay-600"
+                                href={`mailto:${email}`}>{email}</a
+                            >
+                        </li>
+                        <li>
+                            <a
+                                class="inline-flex items-center gap-1.5 hover:text-clay-600"
+                                href={waHref}
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <Icon
+                                    name="simple-icons:whatsapp"
+                                    class="h-3.5 w-3.5"
+                                />
+                                WhatsApp us
+                            </a>
+                        </li>
+                        <li
+                            class="pt-2 text-xs font-medium leading-6 text-ink-500"
+                        >
+                            Village Market, Limuru Road, Nairobi.<br />
+                            Mon–Sat 09:00–18:00 · Sun 10:00–16:00 EAT.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div
+            class="mt-12 flex flex-col gap-4 border-t border-ink-900/10 pt-6 text-xs text-ink-500 sm:flex-row sm:items-center sm:justify-between"
+        >
+            <p>© {year} Craft &amp; Colours. All rights reserved.</p>
+            <div class="flex flex-wrap items-center gap-3 font-semibold">
+                <span class="text-ink-600">Secure checkout</span>
+                <div class="flex items-center gap-2.5">
+                    <Mpesa width={64} />
+                    <Visa width={48} />
+                    <MasterCard width={44} height={34} />
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

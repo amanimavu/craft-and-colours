@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ContactForm from '../components/store/ContactForm';
+import { getPage } from '../lib/wordpress';
+
+const page = await getPage('contact');
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.ke';
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
+const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
+---
+
+<BaseLayout
+  title="Contact the studio"
+  description="Questions about an order, a workshop or a visit to Village Market? Get in touch with Craft & Colours in Nairobi."
+>
+  <section class="border-b border-ink-900/10 bg-cream-100/50">
+    <div class="container-page py-12 sm:py-16">
+      <Breadcrumbs items={[{ label: 'Contact' }]} />
+      <div class="mt-8 grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-end">
+        <div>
+          <p class="eyebrow">Say hello</p>
+          <h1 class="mt-3 text-balance text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl">
+            {page?.title ?? 'Come say hello.'}
+          </h1>
+        </div>
+        <p class="max-w-md text-sm leading-7 text-ink-500 md:pb-2">
+          Questions about an order, a workshop or a visit to Village Market?
+          Send us a note and we will get back to you within two working days.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page py-12 sm:py-16">
+    <div class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+      <div>
+        {page && (
+          <div class="prose-craft mb-8 max-w-xl" set:html={page.content} />
+        )}
+        <ContactForm client:load />
+      </div>
+
+      <aside class="space-y-4">
+        <div class="rounded-3xl border border-ink-900/10 bg-olive-700 p-6 text-cream-50 sm:p-8">
+          <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-olive-100/60">
+            The quickest way
+          </p>
+          <h2 class="mt-3 font-display text-3xl">Email us</h2>
+          <a
+            href={`mailto:${email}`}
+            class="mt-3 inline-block break-all text-sm font-semibold text-cream-50 underline decoration-cream-50/30 underline-offset-4 hover:decoration-cream-50"
+          >
+            {email}
+          </a>
+          <p class="mt-4 text-sm leading-7 text-cream-50/70">
+            We read every note ourselves. For order questions, include your
+            order number so we can help faster.
+          </p>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            class="btn-clay mt-6"
+          >
+            Message on WhatsApp
+          </a>
+        </div>
+
+        <div class="rounded-3xl border border-ink-900/10 bg-white/55 p-6 sm:p-8">
+          <p class="eyebrow">The shop</p>
+          <p class="mt-3 font-display text-2xl leading-snug text-ink-900">
+            Village Market<br />
+            Limuru Road, Nairobi
+          </p>
+          <p class="mt-3 text-sm leading-7 text-ink-500">
+            We are on Level 2, near the craft court. Come in, say hello and stay
+            for a while. Workshops and studio visits can be booked in advance.
+          </p>
+          <dl class="mt-5 space-y-3 border-t border-ink-900/10 pt-5 text-sm">
+            <div class="flex justify-between gap-4">
+              <dt class="font-semibold text-ink-700">Monday–Saturday</dt>
+              <dd class="text-ink-500">09:00–18:00</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="font-semibold text-ink-700">Sunday</dt>
+              <dd class="text-ink-500">10:00–16:00</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="font-semibold text-ink-700">Workshops</dt>
+              <dd class="text-ink-500">By booking</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="rounded-3xl border border-clay-300/60 bg-clay-100 p-6 sm:p-8">
+          <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-clay-600">
+            Order help
+          </p>
+          <p class="mt-3 text-sm leading-7 text-ink-700">
+            Already ordered? You will receive tracking by email once your parcel
+            leaves the shop. If something looks wrong, contact us within 14
+            days of delivery.
+          </p>
+          <a href="/policies/#returns" class="mt-4 inline-block text-xs font-bold uppercase tracking-[0.14em] text-clay-600 underline underline-offset-4">
+            Returns policy
+          </a>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
