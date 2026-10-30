@@ -1,0 +1,67 @@
+---
+import type { Workshop } from '../lib/types';
+import {
+  isAlmostFull,
+  isFullyBooked,
+  seatsFilledPercent,
+  seatsTaken,
+} from '../lib/workshops';
+
+interface Props {
+  workshop: Workshop;
+  /** "dark" for olive/ink backgrounds. */
+  tone?: 'light' | 'dark';
+  class?: string;
+}
+
+const { workshop, tone = 'light', class: className } = Astro.props;
+
+// The bar fills up as seats are taken (not down as they run out), so a full
+// session reads as a full bar.
+const full = isFullyBooked(workshop);
+const almostFull = isAlmostFull(workshop);
+const taken = seatsTaken(workshop);
+const percent = seatsFilledPercent(workshop);
+
+const status = full ? 'Fully booked' : almostFull ? 'Almost full' : 'Seats taken';
+const detail = full
+  ? `All ${workshop.capacity} seats taken`
+  : `${taken} of ${workshop.capacity} taken · ${workshop.seatsLeft} left`;
+
+const dark = tone === 'dark';
+---
+
+<div class={className}>
+  <div class="flex items-baseline justify-between gap-4 text-xs">
+    <span
+      class:list={[
+        'font-bold uppercase tracking-[0.12em]',
+        full || almostFull
+          ? dark ? 'text-marigold-500' : 'text-poppy-600'
+          : dark ? 'text-olive-100/70' : 'text-ink-400',
+      ]}
+    >
+      {status}
+    </span>
+    <span class:list={['font-semibold', dark ? 'text-cream-50' : 'text-ink-900']}>
+      {detail}
+    </span>
+  </div>
+  <div
+    class:list={['mt-2 h-2 overflow-hidden rounded-full', dark ? 'bg-cream-50/15' : 'bg-ink-900/10']}
+    role="meter"
+    aria-label="Seats taken"
+    aria-valuemin="0"
+    aria-valuemax={workshop.capacity}
+    aria-valuenow={taken}
+    aria-valuetext={detail}
+  >
+    <div
+      class:list={[
+        'h-full rounded-full',
+        full ? (dark ? 'bg-cream-50/60' : 'bg-ink-900/60') : almostFull ? 'bg-poppy-500' : 'bg-olive-500',
+      ]}
+      style={`width: ${percent}%`}
+    />
+  </div>
+</div>

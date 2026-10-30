@@ -1,267 +1,347 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import ProductCard from '../../components/ProductCard.astro';
-import Icon from '../../components/ui/Icon.astro';
-import AddToCart from '../../components/store/AddToCart';
-import ProductGallery from '../../components/store/ProductGallery';
-import WishlistToggle from '../../components/store/WishlistToggle';
-import { stripHtml } from '../../lib/format';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import Icon from "../../components/ui/Icon.astro";
+import AddToCart from "../../components/store/AddToCart";
+import ProductGallery from "../../components/store/ProductGallery";
+import WishlistToggle from "../../components/store/WishlistToggle";
+import { stripHtml } from "../../lib/format";
 import {
-  getProduct,
-  getProducts,
-  getRelatedProducts,
-} from '../../lib/woocommerce';
+    getProduct,
+    getProducts,
+    getRelatedProducts,
+    hasStore,
+} from "../../lib/woocommerce";
 
 export async function getStaticPaths() {
-  const products = await getProducts();
-  return products.map((product) => ({
-    params: { slug: product.slug },
-  }));
+    const products = await getProducts();
+    return products.map((product) => ({
+        params: { slug: product.slug },
+    }));
 }
 
 const slug = Astro.params.slug;
-if (!slug) throw new Error('Missing product slug.');
+if (!slug) throw new Error("Missing product slug.");
 
 const product = await getProduct(slug);
 if (!product) throw new Error(`Product not found: ${slug}`);
 
 const related = await getRelatedProducts(product, 4);
+
+// "Details" = WooCommerce product description, or the short description if
+// that's empty. "Good to know" = the product's own CMS box or the CMS default
+// (Craft & Colours → Settings); the demo copy is only for the demo catalogue.
+const detailsHtml = stripHtml(product.description)
+    ? product.description
+    : product.shortDescription;
+const hasDetails = stripHtml(detailsHtml) !== "";
+const demoGoodToKnow =
+    "<p>Store paints, clay and markers away from direct sunlight. Keep small parts away from children under three, and use adult supervision for kids’ craft tools.</p><p>If you are not sure which supply suits your project, send us a message. We are happy to help you choose.</p>";
+const goodToKnowHtml = hasStore ? (product.goodToKnow ?? "") : demoGoodToKnow;
+const hasGoodToKnow = stripHtml(goodToKnowHtml) !== "";
 const category = product.categories[0];
 const wishlistItem = {
-  id: product.id,
-  slug: product.slug,
-  name: product.name,
-  price: product.prices.price,
-  currencyCode: product.prices.currency_code,
-  minorUnit: product.prices.currency_minor_unit,
-  image: product.images[0]?.thumbnail || product.images[0]?.src,
-  imageAlt: product.images[0]?.alt,
-  category: category?.name,
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: product.prices.price,
+    currencyCode: product.prices.currency_code,
+    minorUnit: product.prices.currency_minor_unit,
+    image: product.images[0]?.thumbnail || product.images[0]?.src,
+    imageAlt: product.images[0]?.alt,
+    category: category?.name,
 };
 const description = stripHtml(
-  product.shortDescription || product.description,
+    product.shortDescription || product.description,
 ).slice(0, 180);
 
 const absolute = (src: string) =>
-  Astro.site ? new URL(src, Astro.site).toString() : src;
+    Astro.site ? new URL(src, Astro.site).toString() : src;
 
-const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
-const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-  `Hi! I have a question about ${product.name}.`,
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+    `Hi! I have a question about ${product.name}.`,
 )}`;
 
 const availability = product.isInStock
-  ? 'https://schema.org/InStock'
-  : 'https://schema.org/OutOfStock';
+    ? "https://schema.org/InStock"
+    : "https://schema.org/OutOfStock";
 
 const prices = product.variations?.length
-  ? product.variations.map((variation) => Number(variation.prices.price))
-  : [Number(product.prices.price)];
+    ? product.variations.map((variation) => Number(variation.prices.price))
+    : [Number(product.prices.price)];
 
 const schema = {
-  '@context': 'https://schema.org',
-  '@type': 'Product',
-  name: product.name,
-  description,
-  image: product.images.map((image) => absolute(image.src)),
-  sku: String(product.id),
-  category: product.categories.map((item) => item.name).join(' > '),
-  brand: { '@type': 'Brand', name: 'Craft & Colours' },
-  offers: {
-    '@type': product.variations?.length ? 'AggregateOffer' : 'Offer',
-    priceCurrency: product.prices.currency_code,
-    ...(product.variations?.length
-      ? {
-          lowPrice: String(Math.min(...prices) / 10 ** product.prices.currency_minor_unit),
-          highPrice: String(Math.max(...prices) / 10 ** product.prices.currency_minor_unit),
-          offerCount: product.variations.length,
-        }
-      : {
-          price: String(
-            Number(product.prices.price) /
-              10 ** product.prices.currency_minor_unit,
-          ),
-        }),
-    availability,
-    url: absolute(`/shop/${product.slug}/`),
-  },
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description,
+    image: product.images.map((image) => absolute(image.src)),
+    sku: String(product.id),
+    category: product.categories.map((item) => item.name).join(" > "),
+    brand: { "@type": "Brand", name: "Craft & Colours" },
+    offers: {
+        "@type": product.variations?.length ? "AggregateOffer" : "Offer",
+        priceCurrency: product.prices.currency_code,
+        ...(product.variations?.length
+            ? {
+                  lowPrice: String(
+                      Math.min(...prices) /
+                          10 ** product.prices.currency_minor_unit,
+                  ),
+                  highPrice: String(
+                      Math.max(...prices) /
+                          10 ** product.prices.currency_minor_unit,
+                  ),
+                  offerCount: product.variations.length,
+              }
+            : {
+                  price: String(
+                      Number(product.prices.price) /
+                          10 ** product.prices.currency_minor_unit,
+                  ),
+              }),
+        availability,
+        url: absolute(`/shop/${product.slug}/`),
+    },
 };
 ---
 
 <BaseLayout title={product.name} description={description} schema={schema}>
-  <section class="container-page py-10 sm:py-14">
-    <Breadcrumbs
-      items={[
-        { href: '/shop/', label: 'Shop' },
-        ...(category
-          ? [{ href: `/shop/?category=${category.slug}`, label: category.name }]
-          : []),
-        { label: product.name },
-      ]}
-    />
+    <section class="container-page py-10 sm:py-14">
+        <Breadcrumbs
+            items={[
+                { href: "/shop/", label: "Shop" },
+                ...(category
+                    ? [
+                          {
+                              href: `/shop/?category=${category.slug}`,
+                              label: category.name,
+                          },
+                      ]
+                    : []),
+                { label: product.name },
+            ]}
+        />
 
-    <div class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16">
-      <ProductGallery
-        client:load
-        images={product.images}
-        name={product.name}
-      />
-
-      <div class="lg:sticky lg:top-28">
-        {category && (
-          <a
-            href={`/shop/?category=${category.slug}`}
-            class="eyebrow hover:text-ink-900"
-          >
-            {category.name}
-          </a>
-        )}
-
-        <h1 class="mt-3 text-balance font-display text-4xl leading-[1.02] tracking-tight text-ink-900 sm:text-5xl">
-          {product.name}
-        </h1>
-
-        {product.rating && (
-          <div class="mt-2 flex items-center gap-2 text-sm text-ink-600">
-            <div class="flex items-center gap-0.5" aria-hidden="true">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Icon
-                  name="lucide:star"
-                  class={
-                    i < Math.round(product.rating ?? 0)
-                      ? 'h-4 w-4 fill-marigold-500 text-marigold-500'
-                      : 'h-4 w-4 text-ink-200'
-                  }
-                />
-              ))}
-            </div>
-            <span class="font-semibold text-ink-800">{product.rating.toFixed(1)}</span>
-            {product.reviewCount && (
-              <span class="text-ink-500">· {product.reviewCount} reviews</span>
-            )}
-          </div>
-        )}
-
-        {product.shortDescription && (
-          <div
-            class="prose-craft mt-4 text-sm leading-7 text-ink-500"
-            set:html={product.shortDescription}
-          />
-        )}
-
-        <div class="mt-6">
-          <AddToCart client:load product={product} />
-        </div>
-
-        <div class="mt-3 flex items-center justify-between gap-3">
-          <a
-            href={waHref}
-            target="_blank"
-            rel="noreferrer"
-            class="inline-flex items-center gap-2 text-sm font-semibold text-olive-700 hover:text-olive-500"
-          >
-            <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
-            Ask about this on WhatsApp
-          </a>
-          <WishlistToggle client:load product={wishlistItem} />
-        </div>
-
-        <ul class="mt-8 grid gap-3 border-t border-ink-900/10 pt-6 text-sm text-ink-500">
-          <li class="flex items-start gap-3">
-            <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700" aria-hidden="true">
-              ✓
-            </span>
-            Free delivery in Nairobi on orders over KES 4,500.
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700" aria-hidden="true">
-              ✓
-            </span>
-            Secure checkout with M-Pesa or card.
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700" aria-hidden="true">
-              ✓
-            </span>
-            Chosen by our team in Nairobi. Advice always included.
-          </li>
-        </ul>
-
-        <div class="mt-8 divide-y divide-ink-900/10 border-y border-ink-900/10">
-          <details class="group py-4" open>
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none">
-              Details
-              <span class="text-ink-300 transition group-open:rotate-45" aria-hidden="true">+</span>
-            </summary>
-            <div
-              class="prose-craft mt-3 text-sm leading-7 text-ink-500"
-              set:html={product.description}
+        <div
+            class="mt-8 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-16"
+        >
+            <ProductGallery
+                client:load
+                images={product.images}
+                name={product.name}
             />
-          </details>
 
-          <details class="group py-4">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none">
-              Good to know
-              <span class="text-ink-300 transition group-open:rotate-45" aria-hidden="true">+</span>
-            </summary>
-            <div class="mt-3 space-y-3 text-sm leading-7 text-ink-500">
-              <p>
-                Store paints, clay and markers away from direct sunlight. Keep
-                small parts away from children under three, and use adult
-                supervision for kids’ craft tools.
-              </p>
-              <p>
-                If you are not sure which supply suits your project, send us a
-                message. We are happy to help you choose.
-              </p>
+            <div class="lg:sticky lg:top-28">
+                {
+                    category && (
+                        <a
+                            href={`/shop/?category=${category.slug}`}
+                            class="eyebrow hover:text-ink-900"
+                        >
+                            {category.name}
+                        </a>
+                    )
+                }
+
+                <h1
+                    class="mt-3 text-balance font-display text-4xl leading-[1.02] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    {product.name}
+                </h1>
+
+                {
+                    product.rating && (
+                        <div class="mt-2 flex items-center gap-2 text-sm text-ink-600">
+                            <div
+                                class="flex items-center gap-0.5"
+                                aria-hidden="true"
+                            >
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <Icon
+                                        name="lucide:star"
+                                        class={
+                                            i < Math.round(product.rating ?? 0)
+                                                ? "h-4 w-4 fill-marigold-500 text-marigold-500"
+                                                : "h-4 w-4 text-ink-200"
+                                        }
+                                    />
+                                ))}
+                            </div>
+                            <span class="font-semibold text-ink-800">
+                                {product.rating.toFixed(1)}
+                            </span>
+                            {product.reviewCount && (
+                                <span class="text-ink-500">
+                                    · {product.reviewCount} reviews
+                                </span>
+                            )}
+                        </div>
+                    )
+                }
+
+                {
+                    product.shortDescription && (
+                        <div
+                            class="prose-craft mt-4 text-sm leading-7 text-ink-500"
+                            set:html={product.shortDescription}
+                        />
+                    )
+                }
+
+                <div class="mt-6">
+                    <AddToCart client:load product={product} />
+                </div>
+
+                <div class="mt-3 flex items-center justify-between gap-3">
+                    <a
+                        href={waHref}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="inline-flex items-center gap-2 text-sm font-semibold text-olive-700 hover:text-olive-500"
+                    >
+                        <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+                        Ask about this on WhatsApp
+                    </a>
+                    <WishlistToggle client:load product={wishlistItem} />
+                </div>
+
+                <ul
+                    class="mt-8 grid gap-3 border-t border-ink-900/10 pt-6 text-sm text-ink-500"
+                >
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700"
+                            aria-hidden="true"
+                        >
+                            ✓
+                        </span>
+                        Free delivery in Nairobi on orders over KES 4,500.
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700"
+                            aria-hidden="true"
+                        >
+                            ✓
+                        </span>
+                        Order online, then pay by M-Pesa or card on WhatsApp.
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span
+                            class="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-olive-100 text-olive-700"
+                            aria-hidden="true"
+                        >
+                            ✓
+                        </span>
+                        Chosen by our team in Nairobi. Advice always included.
+                    </li>
+                </ul>
+
+                <div
+                    class="mt-8 divide-y divide-ink-900/10 border-y border-ink-900/10"
+                >
+                    {
+                        hasDetails && (
+                            <details class="accordion group py-4" open>
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none">
+                                    Details
+                                    <span
+                                        class="inline-block text-ink-300 transition duration-300 ease-bounce group-open:rotate-45"
+                                        aria-hidden="true"
+                                    >
+                                        +
+                                    </span>
+                                </summary>
+                                <div
+                                    class="prose-craft mt-3 text-sm leading-7 text-ink-500"
+                                    set:html={detailsHtml}
+                                />
+                            </details>
+                        )
+                    }
+
+                    {
+                        hasGoodToKnow && (
+                            <details class="accordion group py-4" open={!hasDetails}>
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none">
+                                    Good to know
+                                    <span
+                                        class="inline-block text-ink-300 transition duration-300 ease-bounce group-open:rotate-45"
+                                        aria-hidden="true"
+                                    >
+                                        +
+                                    </span>
+                                </summary>
+                                <div
+                                    class="prose-craft mt-3 text-sm leading-7 text-ink-500"
+                                    set:html={goodToKnowHtml}
+                                />
+                            </details>
+                        )
+                    }
+
+                    <details class="accordion group py-4">
+                        <summary
+                            class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none"
+                        >
+                            Shipping &amp; returns
+                            <span
+                                class="inline-block text-ink-300 transition duration-300 ease-bounce group-open:rotate-45"
+                                aria-hidden="true">+</span
+                            >
+                        </summary>
+                        <div
+                            class="mt-3 space-y-3 text-sm leading-7 text-ink-500"
+                        >
+                            <p>
+                                Orders are packed with care and sent by courier
+                                within 3–5 working days. Free delivery in
+                                Nairobi on orders over KES 4,500.
+                            </p>
+                            <p>
+                                If something is not right, contact us within 14
+                                days of delivery and we will help you exchange
+                                it or arrange a return.
+                            </p>
+                            <a
+                                href="/policies/#returns"
+                                class="font-semibold text-clay-600 underline underline-offset-4"
+                            >
+                                Read the full policy
+                            </a>
+                        </div>
+                    </details>
+                </div>
             </div>
-          </details>
-
-          <details class="group py-4">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold text-ink-900 marker:content-none">
-              Shipping &amp; returns
-              <span class="text-ink-300 transition group-open:rotate-45" aria-hidden="true">+</span>
-            </summary>
-            <div class="mt-3 space-y-3 text-sm leading-7 text-ink-500">
-              <p>
-                Orders are packed with care and sent by courier within 3–5
-                working days. Free delivery in Nairobi on orders over KES
-                4,500.
-              </p>
-              <p>
-                If something is not right, contact us within 14 days of delivery
-                and we will help you exchange it or arrange a return.
-              </p>
-              <a href="/policies/#returns" class="font-semibold text-clay-600 underline underline-offset-4">
-                Read the full policy
-              </a>
-            </div>
-          </details>
         </div>
-      </div>
-    </div>
-  </section>
-
-  {related.length > 0 && (
-    <section class="border-t border-ink-900/10 bg-cream-100/50 py-14 sm:py-20">
-      <div class="container-page">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p class="eyebrow">Keep looking</p>
-            <h2 class="mt-2 font-display text-4xl leading-tight text-ink-900">
-              More from the shop
-            </h2>
-          </div>
-          <a href="/shop/" class="btn-secondary">Shop all</a>
-        </div>
-
-        <div class="mt-8 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-          {related.map((item) => (
-            <ProductCard product={item} />
-          ))}
-        </div>
-      </div>
     </section>
-  )}
+
+    {
+        related.length > 0 && (
+            <section class="border-t border-ink-900/10 bg-cream-100/50 py-14 sm:py-20">
+                <div class="container-page">
+                    <div class="flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                            <p class="eyebrow">Keep looking</p>
+                            <h2 class="mt-2 font-display text-4xl leading-tight text-ink-900">
+                                More from the shop
+                            </h2>
+                        </div>
+                        <a href="/shop/" class="btn-secondary">
+                            Shop all
+                        </a>
+                    </div>
+
+                    <div class="mt-8 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+                        {related.map((item) => (
+                            <ProductCard product={item} />
+                        ))}
+                    </div>
+                </div>
+            </section>
+        )
+    }
 </BaseLayout>
