@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
-import { getUpcomingWorkshops, getPastWorkshops } from '../../lib/workshops';
+import WorkshopSeats from '../../components/WorkshopSeats.astro';
+import { getUpcomingWorkshops, getPastWorkshops, isFullyBooked } from '../../lib/workshops';
 import { formatMoney } from '../../lib/format';
 
 const upcoming = await getUpcomingWorkshops();
@@ -75,18 +76,32 @@ const schema = {
               </div>
             </div>
 
+            <WorkshopSeats workshop={featured} tone="dark" />
+
             <div class="flex flex-wrap items-center gap-4 pt-2">
-              <a
-                href={`/workshops/${featured.slug}/`}
-                class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
-              >
-                {featured.isFree
-                  ? 'RSVP / Join meetup — free'
-                  : `Save my spot — ${formatMoney(featured.price.price, featured.price.currency_code, featured.price.currency_minor_unit)}`}
-              </a>
-              <span class="text-xs text-olive-100/80">
-                {featured.seatsLeft} seats left ({featured.capacity} max)
-              </span>
+              {isFullyBooked(featured) ? (
+                <>
+                  <span class="inline-flex items-center gap-2 rounded-full bg-cream-50/10 px-4 py-2 text-sm font-bold text-marigold-500">
+                    <Icon name="lucide:users-round" class="h-4 w-4" />
+                    Fully booked
+                  </span>
+                  <a
+                    href={`/workshops/${featured.slug}/`}
+                    class="text-sm font-bold text-cream-50 underline underline-offset-4 hover:text-marigold-500"
+                  >
+                    Join the waitlist
+                  </a>
+                </>
+              ) : (
+                <a
+                  href={`/workshops/${featured.slug}/`}
+                  class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                >
+                  {featured.isFree
+                    ? 'RSVP / Join meetup — free'
+                    : `Save my spot — ${formatMoney(featured.price.price, featured.price.currency_code, featured.price.currency_minor_unit)}`}
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -132,13 +147,17 @@ const schema = {
                   {workshop.isFree
                     ? 'Free'
                     : formatMoney(workshop.price.price, workshop.price.currency_code, workshop.price.currency_minor_unit)}
-                  <span class="ml-1 font-medium text-ink-400">· {workshop.seatsLeft} left</span>
+                  {isFullyBooked(workshop) ? (
+                    <span class="ml-1 font-bold text-poppy-600">· Fully booked</span>
+                  ) : (
+                    <span class="ml-1 font-medium text-ink-400">· {workshop.seatsLeft} left</span>
+                  )}
                 </span>
                 <a
                   href={`/workshops/${workshop.slug}/`}
                   class="inline-flex items-center gap-1 text-poppy-600 hover:underline"
                 >
-                  {workshop.isFree ? 'RSVP' : 'Book spot'}
+                  {isFullyBooked(workshop) ? 'Join waitlist' : workshop.isFree ? 'RSVP' : 'Book spot'}
                   <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
                 </a>
               </div>
