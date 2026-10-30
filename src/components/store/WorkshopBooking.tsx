@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { Check, Loader2, ShoppingBag } from "lucide-react";
+import { Check, Loader2, MessageCircle, ShoppingBag, UsersRound } from "lucide-react";
+import { getStoreUrl, hasWooCommerce } from "../../lib/cart-api";
 import { addItem } from "../../lib/cart-store";
 import { formatMoney } from "../../lib/format";
 
@@ -12,6 +13,7 @@ interface Props {
     currencyCode: string;
     minorUnit: number;
     seatsLeft: number;
+    title: string;
 }
 
 const RSVP_KEY = "craft-rsvps-v1";
@@ -44,16 +46,20 @@ export default function WorkshopBooking({
     currencyCode,
     minorUnit,
     seatsLeft,
+    title,
 }: Props) {
     const [busy, setBusy] = useState(false);
     const [added, setAdded] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
+    const [website, setWebsite] = useState("");
     const [rsvpDone, setRsvpDone] = useState(false);
+    // Also flips when the server says the last seat went while this page was open.
+    const [full, setFull] = useState(seatsLeft <= 0);
 
     const priceLabel = formatMoney(price, currencyCode, minorUnit);
-    const soldOut = seatsLeft <= 0 || !ticketProductId;
+    const soldOut = full || !ticketProductId;
 
     async function handleBook() {
         if (!ticketProductId || soldOut) return;
@@ -76,7 +82,7 @@ export default function WorkshopBooking({
         }
     }
 
-    function handleRsvp(event: FormEvent<HTMLFormElement>) {
+    async function handleRsvp(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setError(null);
 
@@ -88,14 +94,102 @@ export default function WorkshopBooking({
             return;
         }
 
-        saveRsvp({
-            workshopId,
-            slug,
-            name: trimmedName,
-            email: trimmedEmail,
-            createdAt: new Date().toISOString(),
-        });
-        setRsvpDone(true);
+        // Demo mode (no store connected): keep the RSVP on this device.
+        if (!hasWooCommerce) {
+            saveRsvp({
+                workshopId,
+                slug,
+                name: trimmedName,
+                email: trimmedEmail,
+                createdAt: new Date().toISOString(),
+            });
+            setRsvpDone(true);
+            return;
+        }
+
+        setBusy(true);
+
+        try {
+            const response = await fetch(
+                `${getStoreUrl()}/wp-json/craft/v1/rsvp`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "omit",
+                    body: JSON.stringify({
+                        workshop_id: workshopId,
+                        name: trimmedName,
+                        email: trimmedEmail,
+                        website,
+                    }),
+                },
+            );
+
+            const data = (await response.json().catch(() => null)) as
+                | { message?: string }
+                | null;
+
+            if (response.status === 409) {
+                setFull(true);
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data?.message || "Could not save your RSVP.");
+            }
+
+            setRsvpDone(true);
+        } catch (rsvpError) {
+            setError(
+                rsvpError instanceof Error
+                    ? rsvpError.message
+                    : "Could not save your RSVP. Please try again.",
+            );
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    if (full && !rsvpDone) {
+        const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
+        const waitlistHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+            `Hi! ${title} is fully booked. Please add me to the waitlist.`,
+        )}`;
+
+        return (
+            <div
+                role="status"
+                className="rounded-2xl border border-poppy-500/25 bg-poppy-500/10 p-5 text-ink-900"
+            >
+                <p className="flex items-center gap-2 font-display text-xl">
+                    <UsersRound
+                        className="h-5 w-5 shrink-0 text-poppy-600"
+                        aria-hidden="true"
+                    />
+                    Fully booked
+                </p>
+                <p className="mt-2 text-sm leading-6 text-ink-700">
+                    Every seat for this {isFree ? "meetup" : "workshop"} is
+                    taken. Join the waitlist and we&rsquo;ll message you if a
+                    place opens up.
+                </p>
+                <a
+                    href={waitlistHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink-900/20 bg-cream-50 px-6 py-3 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                >
+                    <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                    Join the waitlist on WhatsApp
+                </a>
+                <a
+                    href="/workshops/"
+                    className="mt-3 block text-center text-xs font-semibold text-ink-500 underline underline-offset-4 hover:text-ink-900"
+                >
+                    See other sessions
+                </a>
+            </div>
+        );
     }
 
     if (isFree) {
@@ -114,9 +208,11 @@ export default function WorkshopBooking({
                         We&rsquo;ll email {email.trim()} before the session with
                         everything you need to bring.
                     </p>
-                    <p className="mt-3 text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-ink-400">
-                        Demo RSVP — no email is sent yet
-                    </p>
+                    {!hasWooCommerce && (
+                        <p className="mt-3 text-[0.66rem] font-semibold uppercase tracking-[0.12em] text-ink-400">
+                            Demo RSVP — no email is sent yet
+                        </p>
+                    )}
                 </div>
             );
         }
@@ -151,6 +247,16 @@ export default function WorkshopBooking({
                     />
                 </div>
 
+                <label className="sr-only" aria-hidden="true">
+                    Website
+                    <input
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={website}
+                        onChange={(event) => setWebsite(event.target.value)}
+                    />
+                </label>
+
                 {error && (
                     <p role="alert" className="text-sm font-semibold text-clay-600">
                         {error}
@@ -159,9 +265,11 @@ export default function WorkshopBooking({
 
                 <button
                     type="submit"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                    disabled={busy}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    RSVP — free
+                    {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+                    {busy ? "Saving your seat…" : "RSVP — free"}
                 </button>
 
                 <p className="text-xs leading-5 text-ink-500">

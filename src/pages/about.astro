@@ -1,171 +1,230 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { getPage } from '../lib/wordpress';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import { getPage } from "../lib/wordpress";
+import shopImage from "../assets/images/art-and-craft-shop.jpeg";
+import modellingClay from "../assets/images/modelling-clay.png";
+import basketOfYarn from "../assets/images/basket-of-yarn.png";
+import craftTable from "../assets/images/craft-table.png";
+import { Image } from "astro:assets";
 
-const page = await getPage('about');
+const page = await getPage("about");
 
 const values = [
-  {
-    title: 'Good supplies',
-    copy: 'Paint that behaves, paper that takes water, yarn that feels good in your hands. We stock the things we actually use.',
-  },
-  {
-    title: 'Every level',
-    copy: 'Beginner-friendly workshops, free meetups and zero gatekeeping. You do not need to be good at it to start.',
-  },
-  {
-    title: 'Nairobi made',
-    copy: 'We work with local makers, teachers and small suppliers. A short list of people we know by name.',
-  },
-  {
-    title: 'Make it yours',
-    copy: 'We would rather help you finish a project than sell you three you will never open. Come in and ask us anything.',
-  },
+    {
+        title: "Good supplies",
+        copy: "Paint that behaves, paper that takes water, yarn that feels good in your hands. We stock the things we actually use.",
+    },
+    {
+        title: "Every level",
+        copy: "Beginner-friendly workshops, free meetups and zero gatekeeping. You do not need to be good at it to start.",
+    },
+    {
+        title: "Nairobi made",
+        copy: "We work with local makers, teachers and small suppliers. A short list of people we know by name.",
+    },
+    {
+        title: "Make it yours",
+        copy: "We would rather help you finish a project than sell you three you will never open. Come in and ask us anything.",
+    },
 ];
 ---
 
 <BaseLayout
-  title={page?.title ?? 'Our story'}
-  description="Craft & Colours is an art, craft and haberdashery shop at Village Market, Nairobi. Supplies, workshops and DIY kits for makers across East Africa."
+    title={page?.title ?? "Our story"}
+    description="Craft & Colours is an art, craft and haberdashery shop at Village Market, Nairobi. Supplies, workshops and DIY kits for makers across East Africa."
 >
-  <section class="border-b border-ink-900/10 bg-cream-100/50">
-    <div class="container-page py-12 sm:py-16">
-      <Breadcrumbs items={[{ label: 'Our story' }]} />
-      <div class="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-        <div>
-          <p class="eyebrow">Our story</p>
-          <h1 class="mt-3 text-balance text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl lg:text-7xl">
-            {page?.title ?? 'Made slowly, in small batches.'}
-          </h1>
+    <section class="border-b border-ink-900/10 bg-cream-100/50">
+        <div class="container-page py-12 sm:py-16">
+            <Breadcrumbs items={[{ label: "Our story" }]} />
+            <div
+                class="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end"
+            >
+                <div>
+                    <p class="eyebrow">Our story</p>
+                    <h1
+                        class="mt-3 text-balance text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl lg:text-7xl"
+                    >
+                        {page?.title ?? "Made slowly, in small batches."}
+                    </h1>
+                </div>
+                <p class="max-w-md text-sm leading-7 text-ink-500 lg:pb-3">
+                    A bright shop, a big making table, and a belief that
+                    everyone deserves good supplies and a friendly place to
+                    start.
+                </p>
+            </div>
         </div>
-        <p class="max-w-md text-sm leading-7 text-ink-500 lg:pb-3">
-          A bright shop, a big making table, and a belief that everyone
-          deserves good supplies and a friendly place to start.
-        </p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="container-page py-12 sm:py-16">
-    <div class="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:items-start lg:gap-16">
-      <div class="overflow-hidden rounded-[2rem]">
-        <img
-          src="https://placehold.co/800x1000/F4EFFF/211D19?text=The+Shop"
-          alt="The Craft & Colours shop, with shelves of art supplies and natural light"
-          class="h-full w-full object-cover"
-        />
-      </div>
+    <section class="container-page py-12 sm:py-16">
+        <div
+            class="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:items-start lg:gap-16"
+        >
+            <div class="overflow-hidden rounded-4xl">
+                <!-- Source is only 365px wide; Astro won't upscale, so swap in
+                     a ~1200px photo to make use of the larger widths. -->
+                <Image
+                    src={shopImage}
+                    alt="The Craft & Colours shop, with shelves of art supplies and natural light"
+                    widths={[365, 546, 800, 1100]}
+                    sizes="(min-width: 1280px) 546px, (min-width: 1024px) 44vw, (min-width: 640px) calc(100vw - 4rem), calc(100vw - 2.5rem)"
+                    loading="eager"
+                    class="h-full w-full object-cover"
+                />
+            </div>
 
-      <div class="lg:pt-4">
-        {page ? (
-          <div class="prose-craft" set:html={page.content} />
-        ) : (
-          <div class="prose-craft">
-            <p>
-              Craft &amp; Colours is an art, craft and haberdashery shop at
-              Village Market, Nairobi.
-            </p>
-            <p>
-              We stock paint, fabric, yarn, clay, sketchbooks and kids’ projects,
-              and we keep a big table free for anyone who wants to make
-              something.
-            </p>
-          </div>
-        )}
+            <div class="lg:pt-4">
+                {
+                    page ? (
+                        <div class="prose-craft" set:html={page.content} />
+                    ) : (
+                        <div class="prose-craft">
+                            <p>
+                                Craft &amp; Colours is an art, craft and
+                                haberdashery shop at Village Market, Nairobi.
+                            </p>
+                            <p>
+                                We stock paint, fabric, yarn, clay, sketchbooks
+                                and kids’ projects, and we keep a big table free
+                                for anyone who wants to make something.
+                            </p>
+                        </div>
+                    )
+                }
 
-        <div class="mt-8 border-l-2 border-clay-300 pl-5">
-          <p class="font-display text-2xl leading-snug text-ink-900">
-            “The best things in a home are the ones that get better with use.”
-          </p>
-          <p class="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-ink-300">
-            Our whole product brief, more or less
-          </p>
+                <div class="mt-8 border-l-2 border-clay-300 pl-5">
+                    <p class="font-display text-2xl leading-snug text-ink-900">
+                        “The best things in a home are the ones that get better
+                        with use.”
+                    </p>
+                    <p
+                        class="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-ink-300"
+                    >
+                        Our whole product brief, more or less
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="border-y border-ink-900/10 bg-olive-700 py-16 text-cream-50 sm:py-20">
-    <div class="container-page">
-      <p class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-olive-100/70">
-        What we care about
-      </p>
-      <h2 class="mt-3 max-w-2xl text-balance text-4xl leading-[1.05] tracking-tight sm:text-5xl">
-        Four things we keep coming back to.
-      </h2>
-
-      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {values.map((value, index) => (
-          <div class="border-t border-cream-50/20 pt-5">
-            <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-olive-100/50">
-              0{index + 1}
+    <section
+        class="border-y border-ink-900/10 bg-olive-700 py-16 text-cream-50 sm:py-20"
+    >
+        <div class="container-page">
+            <p
+                class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-olive-100/70"
+            >
+                What we care about
             </p>
-            <h3 class="mt-3 font-display text-2xl">{value.title}</h3>
-            <p class="mt-3 text-sm leading-7 text-cream-50/70">{value.copy}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+            <h2
+                class="mt-3 max-w-2xl text-balance text-4xl leading-[1.05] tracking-tight sm:text-5xl"
+            >
+                Four things we keep coming back to.
+            </h2>
 
-  <section class="container-page py-16 sm:py-20">
-    <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
-      <div>
-        <p class="eyebrow">The shop</p>
-        <h2 class="mt-3 text-balance font-display text-4xl leading-[1.06] tracking-tight text-ink-900 sm:text-5xl">
-          A bright shop, a big table, and a very good chai nearby.
-        </h2>
-        <p class="mt-5 text-base leading-8 text-ink-500">
-          Find us at Village Market, Nairobi. The shelves are full of supplies
-          we actually use, and the big table is always free for a project,
-          a workshop or a long conversation about the right brush.
-        </p>
-        <p class="mt-4 text-base leading-8 text-ink-500">
-          We run classes for every level, host free meetups, and keep the kettle
-          on. Bring a friend, bring a question, or bring the thing you have been
-          meaning to finish.
-        </p>
-        <p class="mt-4 text-base leading-8 text-ink-500">
-          No appointment needed to shop. Workshop places can be booked through
-          the shop or on WhatsApp.
-        </p>
-        <a href="/contact/" class="btn-secondary mt-7">Plan a visit</a>
-      </div>
+            <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {
+                    values.map((value, index) => (
+                        <div class="border-t border-cream-50/20 pt-5">
+                            <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-olive-100/50">
+                                0{index + 1}
+                            </p>
+                            <h3 class="mt-3 font-display text-2xl">
+                                {value.title}
+                            </h3>
+                            <p class="mt-3 text-sm leading-7 text-cream-50/70">
+                                {value.copy}
+                            </p>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
 
-      <div class="grid grid-cols-2 gap-4">
-        <img
-          src="https://placehold.co/800x1000/FFF9EB/211D19?text=Craft+Table"
-          alt="A colourful craft table with paint and paper"
-          loading="lazy"
-          class="col-span-2 h-56 w-full rounded-2xl object-cover sm:h-64"
-        />
-        <img
-          src="https://placehold.co/800x1000/EDF8F5/211D19?text=Clay"
-          alt="A handmade clay bowl resting on a shelf"
-          loading="lazy"
-          class="h-44 w-full rounded-2xl object-cover sm:h-52"
-        />
-        <img
-          src="https://placehold.co/800x1000/FFF1C7/211D19?text=Yarn"
-          alt="A basket of colourful yarn and craft supplies"
-          loading="lazy"
-          class="h-44 w-full rounded-2xl object-cover sm:h-52"
-        />
-      </div>
-    </div>
-  </section>
+    <section class="container-page py-16 sm:py-20">
+        <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <div>
+                <p class="eyebrow">The shop</p>
+                <h2
+                    class="mt-3 text-balance font-display text-4xl leading-[1.06] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    A bright shop, a big table, and a very good chai nearby.
+                </h2>
+                <p class="mt-5 text-base leading-8 text-ink-500">
+                    Find us at Village Market, Nairobi. The shelves are full of
+                    supplies we actually use, and the big table is always free
+                    for a project, a workshop or a long conversation about the
+                    right brush.
+                </p>
+                <p class="mt-4 text-base leading-8 text-ink-500">
+                    We run classes for every level, host free meetups, and keep
+                    the kettle on. Bring a friend, bring a question, or bring
+                    the thing you have been meaning to finish.
+                </p>
+                <p class="mt-4 text-base leading-8 text-ink-500">
+                    No appointment needed to shop. Workshop places can be booked
+                    through the shop or on WhatsApp.
+                </p>
+                <a href="/contact/" class="btn-secondary mt-7">Plan a visit</a>
+            </div>
 
-  <section class="container-page pb-16 sm:pb-20">
-    <div class="rounded-[2rem] bg-cream-100 px-6 py-14 text-center sm:px-12">
-      <p class="eyebrow">Come and see</p>
-      <h2 class="mx-auto mt-3 max-w-2xl text-balance font-display text-4xl leading-tight text-ink-900 sm:text-5xl">
-        The best way to find your next project is to come and touch the supplies.
-      </h2>
-      <div class="mt-7 flex flex-wrap justify-center gap-3">
-        <a href="/shop/" class="btn-primary">Shop supplies</a>
-        <a href="/contact/" class="btn-secondary">Contact the shop</a>
-      </div>
-    </div>
-  </section>
+            <div class="grid grid-cols-2 gap-4">
+                <Image
+                    src={craftTable}
+                    alt="A colourful craft table with paint and paper"
+                    widths={[400, 640, 900, 1200]}
+                    sizes="(min-width: 1280px) 572px, (min-width: 1024px) 45vw, (min-width: 640px) calc(100vw - 4rem), calc(100vw - 2.5rem)"
+                    class="col-span-2 h-56 w-full rounded-2xl object-cover sm:h-64"
+                />
+                <Image
+                    src={modellingClay}
+                    alt="Colourful clay models"
+                    widths={[300, 450, 600]}
+                    sizes="(min-width: 1280px) 278px, (min-width: 1024px) 22vw, (min-width: 640px) calc(50vw - 2.5rem), calc(50vw - 1.75rem)"
+                    class="h-44 w-full rounded-2xl object-cover sm:h-52"
+                />
+                <Image
+                    src={basketOfYarn}
+                    alt="A basket of colourful yarn and craft supplies"
+                    widths={[300, 450, 600]}
+                    sizes="(min-width: 1280px) 278px, (min-width: 1024px) 22vw, (min-width: 640px) calc(50vw - 2.5rem), calc(50vw - 1.75rem)"
+                    class="h-44 w-full rounded-2xl object-cover sm:h-52"
+                />
+            </div>
+        </div>
+    </section>
+
+    <section class="container-page pb-16 sm:pb-20">
+        <div
+            class="relative isolate overflow-hidden rounded-4xl bg-marigold-500 px-6 py-14 text-center sm:px-12"
+        >
+            <div
+                class="pointer-events-none absolute -left-16 -top-20 -z-10 h-56 w-56 rounded-full bg-bubblegum-500/35 blur-2xl"
+                aria-hidden="true"
+            >
+            </div>
+            <div
+                class="pointer-events-none absolute -bottom-24 -right-12 -z-10 h-64 w-64 rounded-full bg-poppy-500/30 blur-2xl"
+                aria-hidden="true"
+            >
+            </div>
+            <p class="eyebrow text-ink-900">Come and see</p>
+            <h2
+                class="mx-auto mt-3 max-w-2xl text-balance font-display text-4xl leading-tight text-ink-900 sm:text-5xl"
+            >
+                The best way to find your next project is to come and touch the
+                supplies.
+            </h2>
+            <div class="mt-7 flex flex-wrap justify-center gap-3">
+                <a href="/shop/" class="btn-primary">Shop supplies</a>
+                <a
+                    href="/contact/"
+                    class="btn-secondary border-ink-900/40 bg-cream-50/40 hover:border-ink-900 hover:bg-ink-900"
+                    >Contact the shop</a
+                >
+            </div>
+        </div>
+    </section>
 </BaseLayout>

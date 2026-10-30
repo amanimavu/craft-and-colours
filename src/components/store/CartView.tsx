@@ -1,5 +1,5 @@
 import { useState, type SyntheticEvent } from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { Gift, ShoppingBag, Trash2 } from 'lucide-react';
 import { hasWooCommerce } from '../../lib/cart-api';
 import {
   applyCoupon,
@@ -114,6 +114,14 @@ export default function CartView() {
                       <h3 className="truncate font-display text-lg text-ink-900">
                         {item.name}
                       </h3>
+                      {item.freeGift && (
+                        <p className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-full bg-olive-100 px-2.5 py-1 text-xs font-bold text-olive-700">
+                          <Gift size={13} strokeWidth={2.4} aria-hidden="true" className="shrink-0" />
+                          <span className="truncate">
+                            Free gift{item.giftFor ? ` · with ${item.giftFor}` : ''}
+                          </span>
+                        </p>
+                      )}
                       {variation && (
                         <p className="mt-1 text-xs font-semibold text-ink-500">
                           {variation}
@@ -121,52 +129,55 @@ export default function CartView() {
                       )}
                     </div>
                     <p className="shrink-0 text-sm font-bold text-ink-900">
-                      {money(item.totals.price)}
+                      {item.freeGift ? 'Free' : money(item.totals.price)}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="inline-flex items-center rounded-full border border-ink-900/15 bg-cream-50 px-1">
+                  {!item.freeGift && (
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="inline-flex items-center rounded-full border border-ink-900/15 bg-cream-50 px-1">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void updateItem(item.key, item.quantity - 1)
+                          }
+                          disabled={
+                            busy || item.quantity <= item.quantityLimits.minimum
+                          }
+                          className="grid h-8 w-8 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
+                          aria-label={`Decrease quantity of ${item.name}`}
+                        >
+                          −
+                        </button>
+                        <span className="w-8 text-center text-sm font-bold">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void updateItem(item.key, item.quantity + 1)
+                          }
+                          disabled={
+                            busy || item.quantity >= item.quantityLimits.maximum
+                          }
+                          className="grid h-8 w-8 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
+                          aria-label={`Increase quantity of ${item.name}`}
+                        >
+                          +
+                        </button>
+                      </div>
+
                       <button
                         type="button"
-                        onClick={() =>
-                          void updateItem(item.key, item.quantity - 1)
-                        }
-                        disabled={
-                          busy || item.quantity <= item.quantityLimits.minimum
-                        }
-                        className="grid h-8 w-8 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
-                        aria-label={`Decrease quantity of ${item.name}`}
+                        onClick={() => void removeItem(item.key)}
+                        disabled={busy}
+                        className="btn-remove px-3.5 py-2 text-xs"
                       >
-                        −
-                      </button>
-                      <span className="w-8 text-center text-sm font-bold">
-                        {item.quantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void updateItem(item.key, item.quantity + 1)
-                        }
-                        disabled={
-                          busy || item.quantity >= item.quantityLimits.maximum
-                        }
-                        className="grid h-8 w-8 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
-                        aria-label={`Increase quantity of ${item.name}`}
-                      >
-                        +
+                        <Trash2 size={13} strokeWidth={2.4} aria-hidden="true" className="btn-remove-icon" />
+                        Remove
                       </button>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => void removeItem(item.key)}
-                      disabled={busy}
-                      className="text-xs font-bold uppercase tracking-[0.12em] text-ink-500 underline underline-offset-4 transition hover:text-clay-600 disabled:opacity-40"
-                    >
-                      Remove
-                    </button>
-                  </div>
+                  )}
                 </div>
               </div>
             );

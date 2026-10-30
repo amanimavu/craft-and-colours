@@ -21,6 +21,10 @@ export interface CartItem {
   totals: Price;
   images: ProductImage[];
   variation: VariationAttribute[];
+  /** Automatic free craft gift (mu-plugin, Store API `extensions.craft`). */
+  freeGift?: boolean;
+  /** The cart line the gift was earned with, e.g. "Test Easel + 1 more". */
+  giftFor?: string;
 }
 
 export interface CartCoupon {

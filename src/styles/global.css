@@ -108,6 +108,10 @@
         @apply inline-flex items-center justify-center gap-2 rounded-full bg-clay-500 px-6 py-3 text-sm font-semibold tracking-wide text-cream-50 transition duration-200 ease-bounce hover:-translate-y-0.5 hover:bg-clay-600 hover:shadow-soft active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50;
     }
 
+    .btn-remove {
+        @apply inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-clay-300 bg-clay-100 font-bold uppercase tracking-[0.12em] text-clay-600 transition duration-200 ease-bounce hover:-translate-y-0.5 hover:border-clay-600 hover:bg-clay-600 hover:text-cream-50 hover:shadow-soft active:translate-y-0 active:scale-95 disabled:translate-y-0 disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-40;
+    }
+
     .field {
         @apply w-full rounded-xl border border-ink-900/15 bg-white/70 px-4 py-3 text-sm text-ink-900 shadow-sm outline-none transition placeholder:text-ink-300 focus:border-olive-500 focus:bg-white;
     }
@@ -234,6 +238,51 @@
     animation: marquee 34s linear infinite;
 }
 
+/* Smooth open/close for <details class="accordion">. Animates the height of
+   the content (::details-content + interpolate-size) and fades it in.
+   Browsers without ::details-content support fall back to the native
+   instant toggle. */
+.accordion {
+    interpolate-size: allow-keywords;
+}
+
+.accordion::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: clip;
+    transition:
+        block-size 320ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 240ms ease,
+        content-visibility 320ms allow-discrete;
+    transition-behavior: allow-discrete;
+}
+
+.accordion[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+}
+
+@keyframes trash-wiggle {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    25% {
+        transform: rotate(-16deg);
+    }
+    50% {
+        transform: rotate(12deg);
+    }
+    75% {
+        transform: rotate(-6deg);
+    }
+}
+
+.btn-remove:hover:not(:disabled) .btn-remove-icon {
+    transform-origin: 50% 85%;
+    animation: trash-wiggle 520ms var(--ease-bounce);
+}
+
 .marquee:hover .marquee-track {
     animation-play-state: paused;
 }
@@ -242,7 +291,16 @@
     .marquee-track,
     .drawer-panel,
     .drawer-backdrop,
-    .modal-pop {
-        animation: none;
+    .modal-pop,
+    .btn-remove-icon {
+        animation: none !important;
+    }
+
+    .btn-remove {
+        transform: none !important;
+    }
+
+    .accordion::details-content {
+        transition: none;
     }
 }

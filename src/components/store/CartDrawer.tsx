@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Gift, Minus, Plus, ShoppingBag, X } from 'lucide-react';
+import { Gift, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { DEMO_FREE_GIFT_THRESHOLD } from '../../lib/cart-api';
 import { useCart } from '../../lib/cart-store';
 import { formatMoney } from '../../lib/format';
@@ -184,6 +184,14 @@ export default function CartDrawer() {
                           <p className="truncate text-sm font-semibold text-ink-900">
                             {item.name}
                           </p>
+                          {item.freeGift && (
+                            <p className="mt-1 inline-flex max-w-full items-center gap-1 rounded-full bg-olive-100 px-2 py-0.5 text-[0.62rem] font-bold text-olive-700">
+                              <Gift size={11} strokeWidth={2.4} aria-hidden="true" className="shrink-0" />
+                              <span className="truncate">
+                                Free gift{item.giftFor ? ` · with ${item.giftFor}` : ''}
+                              </span>
+                            </p>
+                          )}
                           {variation && (
                             <p className="mt-0.5 text-[0.68rem] font-semibold text-ink-500">
                               {variation}
@@ -191,54 +199,57 @@ export default function CartDrawer() {
                           )}
                         </div>
                         <p className="shrink-0 text-sm font-bold text-ink-900">
-                          {money(item.totals.price)}
+                          {item.freeGift ? 'Free' : money(item.totals.price)}
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="inline-flex items-center rounded-full border border-ink-900/15 bg-cream-50 px-1">
+                      {!item.freeGift && (
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="inline-flex items-center rounded-full border border-ink-900/15 bg-cream-50 px-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                void updateItem(item.key, item.quantity - 1)
+                              }
+                              disabled={
+                                busy ||
+                                item.quantity <= item.quantityLimits.minimum
+                              }
+                              aria-label={`Decrease quantity of ${item.name}`}
+                              className="grid h-7 w-7 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
+                            >
+                              <Minus size={13} strokeWidth={2.4} aria-hidden="true" />
+                            </button>
+                            <span className="w-7 text-center text-xs font-bold">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                void updateItem(item.key, item.quantity + 1)
+                              }
+                              disabled={
+                                busy ||
+                                item.quantity >= item.quantityLimits.maximum
+                              }
+                              aria-label={`Increase quantity of ${item.name}`}
+                              className="grid h-7 w-7 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
+                            >
+                              <Plus size={13} strokeWidth={2.4} aria-hidden="true" />
+                            </button>
+                          </div>
+
                           <button
                             type="button"
-                            onClick={() =>
-                              void updateItem(item.key, item.quantity - 1)
-                            }
-                            disabled={
-                              busy ||
-                              item.quantity <= item.quantityLimits.minimum
-                            }
-                            aria-label={`Decrease quantity of ${item.name}`}
-                            className="grid h-7 w-7 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
+                            onClick={() => void removeItem(item.key)}
+                            disabled={busy}
+                            className="btn-remove px-3 py-1.5 text-[0.62rem]"
                           >
-                            <Minus size={13} strokeWidth={2.4} aria-hidden="true" />
-                          </button>
-                          <span className="w-7 text-center text-xs font-bold">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void updateItem(item.key, item.quantity + 1)
-                            }
-                            disabled={
-                              busy ||
-                              item.quantity >= item.quantityLimits.maximum
-                            }
-                            aria-label={`Increase quantity of ${item.name}`}
-                            className="grid h-7 w-7 place-items-center rounded-full text-ink-700 transition hover:bg-cream-200 disabled:opacity-40"
-                          >
-                            <Plus size={13} strokeWidth={2.4} aria-hidden="true" />
+                            <Trash2 size={12} strokeWidth={2.4} aria-hidden="true" className="btn-remove-icon" />
+                            Remove
                           </button>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => void removeItem(item.key)}
-                          disabled={busy}
-                          className="text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ink-500 underline underline-offset-4 transition hover:text-clay-600 disabled:opacity-40"
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      )}
                     </div>
                   </li>
                 );

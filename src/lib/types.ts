@@ -50,6 +50,8 @@ export interface Product {
   type: string;
   description: string;
   shortDescription: string;
+  /** "Good to know" HTML from the CMS (product box or site default). */
+  goodToKnow?: string;
   images: ProductImage[];
   prices: Price;
   isInStock: boolean;

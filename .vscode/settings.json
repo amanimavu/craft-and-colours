@@ -1,0 +1,5 @@
+{
+    // The WordPress / WooCommerce stubs in wordpress/vendor/php-stubs are
+    // ~5 MB single files; Intelephense skips anything over 1 MB by default.
+    "intelephense.files.maxSize": 10000000
+}
