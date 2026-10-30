@@ -1,0 +1,16 @@
+{
+    "name": "craft-and-colours/wordpress",
+    "description": "Editor support for the Craft & Colours mu-plugin. Dev only: type stubs so Intelephense knows WordPress and WooCommerce. Nothing here is deployed.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "php-stubs/wordpress-stubs": "^6.8",
+        "php-stubs/woocommerce-stubs": "^10.0"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

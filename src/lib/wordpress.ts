@@ -1,6 +1,6 @@
-import { demoPages, demoPosts } from './demo-data';
+import { demoPages, demoPosts, demoUgc } from './demo-data';
 import { stripHtml } from './format';
-import type { PageContent, Post, ProductImage } from './types';
+import type { PageContent, Post, ProductImage, UgcPost } from './types';
 
 const wpUrl = (import.meta.env.WP_URL || '').replace(/\/$/, '');
 export const hasWordPress = Boolean(wpUrl);
@@ -72,6 +72,38 @@ async function wpGet<T>(path: string): Promise<T> {
   }
 
   return (await response.json()) as T;
+}
+
+/**
+ * Custom endpoints from the Craft & Colours mu-plugin
+ * (wordpress/mu-plugins/craft-colours, see docs/store-data-contract.md).
+ */
+export async function craftGet<T>(path: string): Promise<T> {
+  const response = await fetch(`${wpUrl}/wp-json/craft/v1${path}`, {
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`WordPress request failed (${response.status}).`);
+  }
+
+  return (await response.json()) as T;
+}
+
+export async function getUgcPosts(limit = 6): Promise<UgcPost[]> {
+  if (!hasWordPress) return demoUgc.slice(0, limit);
+
+  try {
+    // With a CMS connected, show exactly what's there — even nothing. Demo
+    // posts are only a stand-in when WordPress is missing or unreachable.
+    return await craftGet<UgcPost[]>(`/ugc?limit=${limit}`);
+  } catch (error) {
+    console.warn(
+      `Could not load maker posts from ${wpUrl}; using demo content.`,
+      error,
+    );
+    return demoUgc.slice(0, limit);
+  }
 }
 
 export async function getPosts(limit = 12): Promise<Post[]> {

@@ -4,6 +4,7 @@ import Icon from '../components/ui/Icon.astro';
 import { getStoreUrl } from '../lib/cart-api';
 
 const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.ke';
+const whatsapp = (import.meta.env.PUBLIC_WHATSAPP || '+254700000000').replace(/[^0-9]/g, '');
 ---
 
 <BaseLayout
@@ -21,11 +22,41 @@ const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.
       <h1 class="mt-3 text-balance font-display text-5xl leading-[1.02] tracking-tight text-ink-900 sm:text-6xl">
         Thank you. It means a lot.
       </h1>
-      <p class="mx-auto mt-5 max-w-lg text-sm leading-8 text-ink-500">
+      <p id="order-intro" class="mx-auto mt-5 max-w-lg text-sm leading-8 text-ink-500">
         We have received your order and will begin preparing it by hand. You
         will get an email confirmation shortly with the details and tracking
         information once it is on its way.
       </p>
+
+      <!-- Shown for "Order now, pay on confirmation" orders (?pay=whatsapp): nothing was
+           charged online, so the next step is to message the shop. -->
+      <div
+        id="whatsapp-step"
+        hidden
+        data-whatsapp={whatsapp}
+        class="mx-auto mt-8 max-w-md rounded-3xl border border-olive-500/30 bg-olive-100 p-6 text-left"
+      >
+        <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-olive-700">
+          Next step · payment
+        </p>
+        <p class="mt-2 font-display text-2xl leading-snug text-ink-900">
+          Send us your order on WhatsApp
+        </p>
+        <p class="mt-2 text-sm leading-6 text-ink-700">
+          Your items are reserved. We’ll confirm delivery and send M-Pesa or
+          card payment details. Your order ships once it’s paid.
+        </p>
+        <a
+          id="whatsapp-link"
+          href={`https://wa.me/${whatsapp}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] px-6 py-3 text-sm font-bold text-ink-900 transition duration-200 ease-bounce hover:-translate-y-0.5 hover:shadow-soft"
+        >
+          <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+          Message us to pay
+        </a>
+      </div>
 
       <div class="mx-auto mt-8 max-w-md rounded-2xl border border-ink-900/10 bg-white/60 p-6">
         <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-ink-300">
@@ -58,6 +89,27 @@ const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.
   const target = document.getElementById('order-number');
   if (order && target) {
     target.textContent = order.startsWith('#') ? order : `#${order}`;
+  }
+
+  // "Order now, pay on confirmation": reveal the next-step card with a prefilled message.
+  const whatsappStep = document.getElementById('whatsapp-step');
+  if (params.get('pay') === 'whatsapp' && whatsappStep) {
+    const total = params.get('total');
+    const orderLabel = order ? `#${order.replace(/^#/, '')}` : 'my order';
+    const message = `Hi Craft & Colours! I've just placed order ${orderLabel}${
+      total ? ` (${total})` : ''
+    }. How do I pay?`;
+    const link = document.getElementById('whatsapp-link') as HTMLAnchorElement | null;
+    if (link) {
+      link.href = `https://wa.me/${whatsappStep.dataset.whatsapp}?text=${encodeURIComponent(message)}`;
+    }
+    whatsappStep.hidden = false;
+
+    const intro = document.getElementById('order-intro');
+    if (intro) {
+      intro.textContent =
+        'Your order is in and your items are set aside. One more step: message us on WhatsApp to pay, and we will start preparing it by hand.';
+    }
   }
 
   // One celebratory burst per order, skipped on reload and for reduced motion.
