@@ -394,7 +394,7 @@ const schema = [
             <div class="space-y-3">
                 {
                     faqs.map((faq) => (
-                        <details class="faq-item group rounded-2xl border border-ink-900/10 bg-white/60">
+                        <details class="accordion group rounded-2xl border border-ink-900/10 bg-white/60">
                             <summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-bold text-ink-900 [&::-webkit-details-marker]:hidden">
                                 {faq.question}
                                 <Icon
@@ -452,29 +452,3 @@ const schema = [
     </section>
 </BaseLayout>
 
-<style>
-    /* Smooth open/close for the FAQ. Browsers without ::details-content
-       support fall back to the native instant toggle. */
-    .faq-item {
-        interpolate-size: allow-keywords;
-    }
-
-    .faq-item::details-content {
-        block-size: 0;
-        overflow: clip;
-        transition:
-            block-size 300ms cubic-bezier(0.4, 0, 0.2, 1),
-            content-visibility 300ms allow-discrete;
-        transition-behavior: allow-discrete;
-    }
-
-    .faq-item[open]::details-content {
-        block-size: auto;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .faq-item::details-content {
-            transition: none;
-        }
-    }
-</style>
