@@ -66,6 +66,10 @@ export interface Product {
   hoverImage?: ProductImage;
   /** Values for CATEGORY_DYNAMIC_FILTERS keys (e.g. finish, material, clay_type). */
   attributes?: Record<string, string>;
+  /** Kept out of shop grids, search and category counts, but still purchasable. */
+  catalogHidden?: boolean;
+  /** Virtual products (e.g. workshop tickets) skip delivery. */
+  isVirtual?: boolean;
 }
 
 export interface Post {

@@ -172,8 +172,9 @@ async function fetchAllProducts(
 }
 
 function filterDemoCategory(category?: string): Product[] {
-  if (!category) return demoProducts;
-  return demoProducts.filter((product) =>
+  const visible = demoProducts.filter((product) => !product.catalogHidden);
+  if (!category) return visible;
+  return visible.filter((product) =>
     product.categories.some((item) => item.slug === category),
   );
 }
@@ -204,6 +205,7 @@ export async function getProducts(
 export async function getBestsellers(limit = 5): Promise<Product[]> {
   if (!hasStore) {
     return [...demoProducts]
+      .filter((product) => !product.catalogHidden)
       .sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0))
       .slice(0, limit);
   }
@@ -227,7 +229,9 @@ export async function getBestsellers(limit = 5): Promise<Product[]> {
 
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   if (!hasStore) {
-    return demoProducts.filter((product) => product.featured).slice(0, limit);
+    return demoProducts
+      .filter((product) => product.featured && !product.catalogHidden)
+      .slice(0, limit);
   }
 
   try {

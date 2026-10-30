@@ -403,12 +403,14 @@ function demoTotals(
 
 function buildDemoCart(state: DemoState): Cart {
   const items: CartItem[] = [];
+  let needsShipping = false;
 
   for (const line of state.lines) {
     const found = findDemoLine(line.id);
     if (!found) continue;
 
     const { product, variation } = found;
+    if (!product.isVirtual) needsShipping = true;
     const unitPrice = Number(
       variation?.prices.price ?? product.prices.price ?? '0',
     );
@@ -450,11 +452,11 @@ function buildDemoCart(state: DemoState): Cart {
   const selectedRate =
     state.shippingRate ?? (freeShipping ? 'free_shipping' : 'flat_rate');
   const shipping =
-    items.length === 0 || selectedRate === 'free_shipping' || freeShipping
+    !needsShipping || selectedRate === 'free_shipping' || freeShipping
       ? 0
       : DEMO_FLAT_SHIPPING;
 
-  const shippingPackages: ShippingPackage[] = items.length
+  const shippingPackages: ShippingPackage[] = needsShipping
     ? [
         {
           packageId: 0,
@@ -503,7 +505,7 @@ function buildDemoCart(state: DemoState): Cart {
     totals: demoTotals(subtotal, discount, shipping),
     shippingPackages,
     paymentMethods: items.length ? ['mpesa', 'card'] : [],
-    needsShipping: items.length > 0,
+    needsShipping,
     needsPayment: items.length > 0,
     billingAddress: state.billingAddress,
     shippingAddress: state.shippingAddress,
