@@ -21,7 +21,8 @@ const threshold = new Intl.NumberFormat("en-KE", {
     <div
         class="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-butter-50 to-transparent sm:h-28"
         aria-hidden="true"
-    />
+    >
+    </div>
     <div class="container-page">
         <div
             class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
@@ -80,8 +81,8 @@ const threshold = new Intl.NumberFormat("en-KE", {
                                                     name="lucide:star"
                                                     class="h-3.5 w-3.5 fill-marigold-500 text-marigold-500"
                                                 />
-                                                {rating.toFixed(1)} ·{" "}
-                                                {reviews} reviews
+                                                {rating.toFixed(1)} · {reviews}{" "}
+                                                reviews
                                             </span>
                                         )}
                                     </span>
@@ -99,11 +100,15 @@ const threshold = new Intl.NumberFormat("en-KE", {
                 }
             </ol>
 
-            <div class="rounded-3xl bg-butter-50 p-6 ring-1 ring-ink-900/10 sm:p-8">
+            <div
+                class="rounded-3xl bg-butter-50 p-6 ring-1 ring-ink-900/10 sm:p-8"
+            >
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <Badge tone="olive" size="sm">Bundles</Badge>
-                        <h3 class="mt-3 font-display text-2xl leading-tight text-ink-900">
+                        <h3
+                            class="mt-3 font-display text-2xl leading-tight text-ink-900"
+                        >
                             Skip the guesswork.
                         </h3>
                         <p class="mt-2 text-sm leading-6 text-ink-500">
@@ -153,13 +158,15 @@ const threshold = new Intl.NumberFormat("en-KE", {
                     }
                 </ul>
 
-                <p class="mt-6 flex items-start gap-2 border-t border-ink-900/10 pt-4 text-xs leading-5 text-ink-500">
+                <p
+                    class="mt-6 flex items-start gap-2 border-t border-ink-900/10 pt-4 text-xs leading-5 text-ink-500"
+                >
                     <Icon
                         name="lucide:sparkles"
-                        class="mt-0.5 h-4 w-4 shrink-0 text-olive-600"
+                        class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
                     />
-                    Every order over KES {threshold} gets a free craft gift
-                    tucked in.
+                    Every order over KES {threshold} gets a free craft gift tucked
+                    in.
                 </p>
             </div>
         </div>
