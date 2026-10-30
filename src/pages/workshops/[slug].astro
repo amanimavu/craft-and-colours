@@ -1,0 +1,317 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Breadcrumbs from "../../components/Breadcrumbs.astro";
+import Icon from "../../components/ui/Icon.astro";
+import Badge from "../../components/ui/Badge.astro";
+import WorkshopBooking from "../../components/store/WorkshopBooking";
+import { getWorkshops } from "../../lib/workshops";
+import { formatWorkshopDate, stripHtml } from "../../lib/format";
+import type { Workshop } from "../../lib/types";
+
+export async function getStaticPaths() {
+    const workshops = await getWorkshops();
+    return workshops.map((workshop) => ({
+        params: { slug: workshop.slug },
+        props: { workshop },
+    }));
+}
+
+interface Props {
+    workshop: Workshop;
+}
+
+const { workshop } = Astro.props as Props;
+
+const seatsPercent =
+    workshop.capacity > 0
+        ? Math.min(
+              100,
+              Math.max(
+                  0,
+                  Math.round((workshop.seatsLeft / workshop.capacity) * 100),
+              ),
+          )
+        : 0;
+
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+    `Hi! I have a question about ${workshop.title}.`,
+)}`;
+
+const offerPrice = workshop.isFree
+    ? "0"
+    : String(Number(workshop.price.price) / 10 ** workshop.price.currency_minor_unit);
+
+const schema = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: workshop.title,
+    description: stripHtml(workshop.description),
+    startDate: workshop.date,
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    eventStatus: "https://schema.org/EventScheduled",
+    image: workshop.image.src,
+    location: {
+        "@type": "Place",
+        name: "Craft & Colours",
+        address: {
+            "@type": "PostalAddress",
+            streetAddress: "Village Market, Limuru Road",
+            addressLocality: "Nairobi",
+            addressRegion: "Nairobi County",
+            addressCountry: "KE",
+        },
+    },
+    offers: {
+        "@type": "Offer",
+        price: offerPrice,
+        priceCurrency: "KES",
+        availability:
+            workshop.seatsLeft > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/SoldOut",
+        url: Astro.url.toString(),
+    },
+};
+---
+
+<BaseLayout
+    title={`${workshop.title} | Workshops & Meetups`}
+    description={workshop.excerpt}
+    type="article"
+    schema={schema}
+>
+    <div class="container-page py-10 sm:py-14">
+        <Breadcrumbs
+            items={[
+                { href: "/workshops/", label: "Workshops" },
+                { label: workshop.title },
+            ]}
+        />
+
+        <div
+            class="mt-8 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:gap-14"
+        >
+            <article>
+                <div class="flex flex-wrap items-center gap-2">
+                    <Badge tone={workshop.isFree ? "olive" : "clay"}>
+                        {workshop.isFree ? "Free meetup" : "Workshop"}
+                    </Badge>
+                    <span class="text-xs font-semibold text-ink-500">
+                        {workshop.seatsLeft} of {workshop.capacity} seats left
+                    </span>
+                </div>
+
+                <h1
+                    class="mt-4 text-balance font-display text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    {workshop.title}
+                </h1>
+
+                <p class="mt-4 max-w-2xl text-base leading-7 text-ink-500">
+                    {workshop.excerpt}
+                </p>
+
+                <div
+                    class="mt-8 aspect-[16/10] overflow-hidden rounded-3xl bg-cream-200"
+                >
+                    <img
+                        src={workshop.image.src}
+                        alt={workshop.image.alt}
+                        loading="eager"
+                        decoding="async"
+                        class="h-full w-full object-cover"
+                    />
+                </div>
+
+                <dl
+                    class="mt-8 grid gap-4 rounded-3xl border border-ink-900/10 bg-white/55 p-5 text-sm sm:grid-cols-2 sm:p-6"
+                >
+                    <div class="flex items-start gap-3">
+                        <Icon
+                            name="lucide:calendar-days"
+                            class="mt-0.5 h-4 w-4 shrink-0 text-clay-600"
+                        />
+                        <div>
+                            <dt
+                                class="text-[0.66rem] font-bold uppercase tracking-[0.14em] text-ink-400"
+                            >
+                                Date
+                            </dt>
+                            <dd class="mt-1 font-semibold text-ink-900">
+                                {formatWorkshopDate(workshop.date)}
+                            </dd>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <Icon
+                            name="lucide:clock"
+                            class="mt-0.5 h-4 w-4 shrink-0 text-clay-600"
+                        />
+                        <div>
+                            <dt
+                                class="text-[0.66rem] font-bold uppercase tracking-[0.14em] text-ink-400"
+                            >
+                                Time
+                            </dt>
+                            <dd class="mt-1 font-semibold text-ink-900">
+                                {workshop.time} · {workshop.duration}
+                            </dd>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <Icon
+                            name="lucide:map-pin"
+                            class="mt-0.5 h-4 w-4 shrink-0 text-clay-600"
+                        />
+                        <div>
+                            <dt
+                                class="text-[0.66rem] font-bold uppercase tracking-[0.14em] text-ink-400"
+                            >
+                                Where
+                            </dt>
+                            <dd class="mt-1 font-semibold text-ink-900">
+                                {workshop.location}
+                            </dd>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <Icon
+                            name="lucide:sparkles"
+                            class="mt-0.5 h-4 w-4 shrink-0 text-clay-600"
+                        />
+                        <div>
+                            <dt
+                                class="text-[0.66rem] font-bold uppercase tracking-[0.14em] text-ink-400"
+                            >
+                                Skill level
+                            </dt>
+                            <dd class="mt-1 font-semibold text-ink-900">
+                                {workshop.skill}
+                            </dd>
+                        </div>
+                    </div>
+                </dl>
+
+                <div
+                    class="prose-craft mt-10 max-w-2xl text-base leading-8 text-ink-600"
+                    set:html={workshop.description}
+                />
+
+                <div class="mt-10 max-w-2xl">
+                    <h2 class="font-display text-2xl text-ink-900">
+                        Good to know
+                    </h2>
+                    <ul class="mt-4 space-y-3 text-sm leading-6 text-ink-600">
+                        <li class="flex items-start gap-3">
+                            <Icon
+                                name="lucide:check"
+                                class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                            />
+                            All materials and tools are included — just bring
+                            yourself.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <Icon
+                                name="lucide:check"
+                                class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                            />
+                            Arrive five minutes early so we can get you settled
+                            at the big table.
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <Icon
+                                name="lucide:check"
+                                class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                            />
+                            {workshop.isFree
+                                ? "Free to attend, but please RSVP so we can save you a seat."
+                                : "Seats are limited to keep the group small and the guidance hands-on."}
+                        </li>
+                    </ul>
+                </div>
+            </article>
+
+            <aside class="lg:sticky lg:top-32">
+                <div
+                    class="rounded-3xl border border-ink-900/10 bg-butter-50 p-6 shadow-sm sm:p-7"
+                >
+                    <p class="eyebrow">Book your seat</p>
+                    <p class="mt-2 font-display text-2xl leading-tight text-ink-900">
+                        {formatWorkshopDate(workshop.date)}
+                    </p>
+                    <p class="mt-1 text-sm font-semibold text-ink-500">
+                        {workshop.time} · {workshop.duration}
+                    </p>
+
+                    <div class="mt-5">
+                        <div
+                            class="flex items-baseline justify-between gap-4 text-xs"
+                        >
+                            <span
+                                class="font-bold uppercase tracking-[0.12em] text-ink-400"
+                            >
+                                Seats left
+                            </span>
+                            <span class="font-semibold text-ink-900">
+                                {workshop.seatsLeft} of {workshop.capacity}
+                            </span>
+                        </div>
+                        <div
+                            class="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-900/10"
+                            role="progressbar"
+                            aria-label="Seats remaining"
+                            aria-valuemin="0"
+                            aria-valuemax={workshop.capacity}
+                            aria-valuenow={workshop.seatsLeft}
+                        >
+                            <div
+                                class="h-full rounded-full bg-clay-500"
+                                style={`width: ${seatsPercent}%`}
+                            />
+                        </div>
+                    </div>
+
+                    <div class="mt-6 border-t border-ink-900/10 pt-6">
+                        <WorkshopBooking
+                            client:load
+                            workshopId={workshop.id}
+                            slug={workshop.slug}
+                            isFree={workshop.isFree}
+                            ticketProductId={workshop.wooProductId}
+                            price={workshop.price.price}
+                            currencyCode={workshop.price.currency_code}
+                            minorUnit={workshop.price.currency_minor_unit}
+                            seatsLeft={workshop.seatsLeft}
+                        />
+                    </div>
+
+                    <div class="mt-6 border-t border-ink-900/10 pt-4">
+                        <a
+                            href={waHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-2 text-xs font-bold text-ink-700 transition hover:text-poppy-600"
+                        >
+                            <Icon
+                                name="simple-icons:whatsapp"
+                                class="h-4 w-4"
+                            />
+                            Ask us about this session
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="mt-16 border-t border-ink-900/10 pt-8">
+            <a
+                href="/workshops/"
+                class="inline-flex items-center gap-2 text-sm font-bold text-ink-900 underline decoration-poppy-500 decoration-2 underline-offset-4 transition hover:text-poppy-600"
+            >
+                <Icon name="lucide:arrow-left" class="h-4 w-4" />
+                All workshops &amp; meetups
+            </a>
+        </div>
+    </div>
+</BaseLayout>

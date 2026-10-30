@@ -6,6 +6,11 @@ export async function getWorkshops(): Promise<Workshop[]> {
   return demoWorkshops;
 }
 
+export async function getWorkshop(slug: string): Promise<Workshop | undefined> {
+  const workshops = await getWorkshops();
+  return workshops.find((workshop) => workshop.slug === slug);
+}
+
 export async function getUpcomingWorkshops(): Promise<Workshop[]> {
   const workshops = await getWorkshops();
   const now = new Date();

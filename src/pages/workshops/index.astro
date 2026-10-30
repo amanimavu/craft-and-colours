@@ -1,6 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getUpcomingWorkshops, getPastWorkshops } from '../lib/workshops';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { getUpcomingWorkshops, getPastWorkshops } from '../../lib/workshops';
+import { formatMoney } from '../../lib/format';
 
 const upcoming = await getUpcomingWorkshops();
 const past = await getPastWorkshops();
@@ -74,21 +76,14 @@ const schema = {
             </div>
 
             <div class="flex flex-wrap items-center gap-4 pt-2">
-              {featured.wooProductId ? (
-                <a
-                  href={`/shop/workshop-ticket-${featured.id}/`}
-                  class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
-                >
-                  Book workshop (KES {(featured.price.price ? Number(featured.price.price)/100 : 0).toLocaleString()})
-                </a>
-              ) : (
-                <a
-                  href="/contact/"
-                  class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
-                >
-                  {featured.isFree ? 'RSVP / Join meetup' : 'Book via contact'}
-                </a>
-              )}
+              <a
+                href={`/workshops/${featured.slug}/`}
+                class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+              >
+                {featured.isFree
+                  ? 'RSVP / Join meetup — free'
+                  : `Save my spot — ${formatMoney(featured.price.price, featured.price.currency_code, featured.price.currency_minor_unit)}`}
+              </a>
               <span class="text-xs text-olive-100/80">
                 {featured.seatsLeft} seats left ({featured.capacity} max)
               </span>
@@ -124,16 +119,27 @@ const schema = {
                   </span>
                 </div>
                 <h3 class="mt-3 font-display text-xl leading-tight text-ink-900">
-                  {workshop.title}
+                  <a href={`/workshops/${workshop.slug}/`} class="hover:text-clay-600">
+                    {workshop.title}
+                  </a>
                 </h3>
                 <p class="mt-2 text-sm leading-6 text-ink-500">
                   {workshop.excerpt}
                 </p>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-ink-900/10 pt-4 text-xs font-semibold">
-                <span class="text-ink-500">{workshop.seatsLeft} seats left</span>
-                <a href="/contact/" class="text-poppy-600 hover:underline">
-                  {workshop.isFree ? 'Join us →' : 'Book spot →'}
+              <div class="mt-6 flex items-center justify-between gap-3 border-t border-ink-900/10 pt-4 text-xs font-semibold">
+                <span class="text-ink-900">
+                  {workshop.isFree
+                    ? 'Free'
+                    : formatMoney(workshop.price.price, workshop.price.currency_code, workshop.price.currency_minor_unit)}
+                  <span class="ml-1 font-medium text-ink-400">· {workshop.seatsLeft} left</span>
+                </span>
+                <a
+                  href={`/workshops/${workshop.slug}/`}
+                  class="inline-flex items-center gap-1 text-poppy-600 hover:underline"
+                >
+                  {workshop.isFree ? 'RSVP' : 'Book spot'}
+                  <Icon name="lucide:arrow-right" class="h-3.5 w-3.5" />
                 </a>
               </div>
             </article>

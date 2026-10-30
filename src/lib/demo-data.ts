@@ -756,6 +756,67 @@ export const demoProducts: Product[] = [
         reviewCount: 27,
         attributes: { age: "Ages 6–9", bundle_type: "Gift Box" },
     },
+    // Workshop tickets mirror the WooCommerce virtual products behind each paid
+    // session. They are purchasable, but hidden from the catalogue and search.
+    {
+        id: 501,
+        name: "Paint & Sip: Nairobi Sunset — Workshop ticket",
+        slug: "workshop-ticket-202",
+        type: "simple",
+        description:
+            "<p>One seat at Paint & Sip: Nairobi Sunset. Includes a 30 × 30 cm canvas, all paints, brushes and step-by-step guidance.</p>",
+        shortDescription:
+            "One seat at the Paint & Sip workshop on 14 November.",
+        images: [image("paint-action", "A bright sunset painting in progress")],
+        prices: makePrice(350000),
+        isInStock: true,
+        isPurchasable: true,
+        hasOptions: false,
+        categories: [],
+        stockQuantity: 6,
+        catalogHidden: true,
+        isVirtual: true,
+    },
+    {
+        id: 502,
+        name: "Kids Craft Hour: Paper & Pom Poms — Workshop ticket",
+        slug: "workshop-ticket-203",
+        type: "simple",
+        description:
+            "<p>One child's place at Kids Craft Hour. Includes all materials, safe tools and a project to take home.</p>",
+        shortDescription:
+            "One child's place at the Kids Craft Hour on 21 November.",
+        images: [
+            image("kids-action", "Children making a colourful craft project"),
+        ],
+        prices: makePrice(150000),
+        isInStock: true,
+        isPurchasable: true,
+        hasOptions: false,
+        categories: [],
+        stockQuantity: 9,
+        catalogHidden: true,
+        isVirtual: true,
+    },
+    {
+        id: 503,
+        name: "Beginner Embroidery Circle — Workshop ticket",
+        slug: "workshop-ticket-204",
+        type: "simple",
+        description:
+            "<p>One seat at the Beginner Embroidery Circle. Includes a hoop, fabric, threads and five beginner stitches to take home.</p>",
+        shortDescription:
+            "One seat at the Beginner Embroidery Circle on 28 November.",
+        images: [image("stitch-action", "A floral embroidery hoop in progress")],
+        prices: makePrice(280000),
+        isInStock: true,
+        isPurchasable: true,
+        hasOptions: false,
+        categories: [],
+        stockQuantity: 8,
+        catalogHidden: true,
+        isVirtual: true,
+    },
 ];
 
 export const demoWorkshops: Workshop[] = [
@@ -1041,11 +1102,5 @@ export const demoPages: Record<string, PageContent> = {
         title: "Come say hello at Village Market",
         content:
             "<p>Questions about a product, a workshop or a custom order? Send us a note, call in, or message us on WhatsApp. We are a small team and we actually read every message.</p>",
-    },
-    studio: {
-        slug: "studio",
-        title: "The studio at Village Market",
-        content:
-            "<p>The Craft &amp; Colours studio is the big, bright room behind the shop. It is where we run workshops, host free meetups and occasionally cover every surface in paint, clay or glitter.</p><p>You can book a class, join a free club, or simply sit at the big table with your own project. Come as you are. No experience required.</p>",
     },
 };
