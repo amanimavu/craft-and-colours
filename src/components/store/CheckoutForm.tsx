@@ -7,59 +7,15 @@ import {
   useCart,
 } from '../../lib/cart-store';
 import { formatMoney } from '../../lib/format';
+import {
+  SHIPPING_COUNTRIES,
+  getShippingCountry,
+  regionName,
+} from '../../lib/regions';
 import type { BillingAddress, PostalAddress } from '../../lib/types';
 
-const counties = [
-  { code: '001', name: 'Mombasa' },
-  { code: '002', name: 'Kwale' },
-  { code: '003', name: 'Kilifi' },
-  { code: '004', name: 'Tana River' },
-  { code: '005', name: 'Lamu' },
-  { code: '006', name: 'Taita Taveta' },
-  { code: '007', name: 'Garissa' },
-  { code: '008', name: 'Wajir' },
-  { code: '009', name: 'Mandera' },
-  { code: '010', name: 'Marsabit' },
-  { code: '011', name: 'Isiolo' },
-  { code: '012', name: 'Meru' },
-  { code: '013', name: 'Tharaka-Nithi' },
-  { code: '014', name: 'Embu' },
-  { code: '015', name: 'Kitui' },
-  { code: '016', name: 'Machakos' },
-  { code: '017', name: 'Makueni' },
-  { code: '018', name: 'Nyandarua' },
-  { code: '019', name: 'Nyeri' },
-  { code: '020', name: 'Kirinyaga' },
-  { code: '021', name: "Murang'a" },
-  { code: '022', name: 'Kiambu' },
-  { code: '023', name: 'Turkana' },
-  { code: '024', name: 'West Pokot' },
-  { code: '025', name: 'Samburu' },
-  { code: '026', name: 'Trans Nzoia' },
-  { code: '027', name: 'Uasin Gishu' },
-  { code: '028', name: 'Elgeyo-Marakwet' },
-  { code: '029', name: 'Nandi' },
-  { code: '030', name: 'Baringo' },
-  { code: '031', name: 'Laikipia' },
-  { code: '032', name: 'Nakuru' },
-  { code: '033', name: 'Narok' },
-  { code: '034', name: 'Kajiado' },
-  { code: '035', name: 'Kericho' },
-  { code: '036', name: 'Bomet' },
-  { code: '037', name: 'Kakamega' },
-  { code: '038', name: 'Vihiga' },
-  { code: '039', name: 'Bungoma' },
-  { code: '040', name: 'Busia' },
-  { code: '041', name: 'Siaya' },
-  { code: '042', name: 'Kisumu' },
-  { code: '043', name: 'Homa Bay' },
-  { code: '044', name: 'Migori' },
-  { code: '045', name: 'Kisii' },
-  { code: '046', name: 'Nyamira' },
-  { code: '047', name: 'Nairobi' },
-];
-
 const paymentLabels: Record<string, string> = {
+  craft_whatsapp: 'Order now, pay on confirmation',
   mpesa: 'M-Pesa',
   card: 'Card payment',
   bacs: 'Direct bank transfer',
@@ -80,6 +36,7 @@ interface FormFields {
   city: string;
   state: string;
   postcode: string;
+  country: string;
   note: string;
 }
 
@@ -92,8 +49,9 @@ const initialFields: FormFields = {
   address1: '',
   address2: '',
   city: '',
-  state: '047',
+  state: 'KE30',
   postcode: '',
+  country: 'KE',
   note: '',
 };
 
@@ -109,8 +67,11 @@ function toAddresses(fields: FormFields): {
     address_2: fields.address2.trim(),
     city: fields.city.trim(),
     state: fields.state,
-    postcode: fields.postcode.trim(),
-    country: 'KE',
+    postcode:
+      getShippingCountry(fields.country).postcode === 'hidden'
+        ? ''
+        : fields.postcode.trim(),
+    country: fields.country,
     phone: fields.phone.trim(),
     email: fields.email.trim(),
   };
@@ -129,6 +90,20 @@ function toAddresses(fields: FormFields): {
   };
 
   return { billing, shipping };
+}
+
+// Heading for a group of fields: short rule, title, rule to the edge. Set in
+// the display serif so it can't be mistaken for the uppercase input labels.
+function SectionDivider({ title }: { title: string }) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      <span className="h-px w-5 bg-ink-900/20" aria-hidden="true" />
+      <h3 className="shrink-0 font-display text-lg leading-none text-ink-900">
+        {title}
+      </h3>
+      <span className="h-px flex-1 bg-ink-900/20" aria-hidden="true" />
+    </div>
+  );
 }
 
 export default function CheckoutForm() {
@@ -167,6 +142,17 @@ export default function CheckoutForm() {
   function update<K extends keyof FormFields>(key: K, value: FormFields[K]) {
     setFields((current) => ({ ...current, [key]: value }));
   }
+
+  // Region codes are per country, so switching country resets the region.
+  function changeCountry(code: string) {
+    setFields((current) => ({
+      ...current,
+      country: code,
+      state: getShippingCountry(code).defaultRegion,
+    }));
+  }
+
+  const country = getShippingCountry(fields.country);
 
   async function chooseRate(packageId: number, rateId: string) {
     setSelectedRate(rateId);
@@ -251,7 +237,17 @@ export default function CheckoutForm() {
         expected_total: latestCart.totals.totalPrice,
       });
 
-      if (result.redirectUrl) {
+      if (paymentMethod === 'craft_whatsapp') {
+        // Paid later on WhatsApp: always land on the storefront confirmation
+        // (never WooCommerce's own thank-you page on the CMS domain).
+        const params = new URLSearchParams({
+          order: result.orderId,
+          key: result.orderKey,
+          pay: 'whatsapp',
+          total: money(latestCart.totals.totalPrice),
+        });
+        window.location.assign(`/order-confirmation/?${params.toString()}`);
+      } else if (result.redirectUrl) {
         window.location.assign(result.redirectUrl);
       } else {
         window.location.assign(
@@ -310,9 +306,9 @@ export default function CheckoutForm() {
         </ol>
 
         {step === 'address' ? (
-          <div className="space-y-5">
+          <div className="space-y-8">
             <div>
-              <p className="field-label">Contact</p>
+              <SectionDivider title="Contact" />
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="sm:col-span-2">
                   <span className="field-label">Email address</span>
@@ -362,7 +358,7 @@ export default function CheckoutForm() {
             </div>
 
             <div>
-              <p className="field-label">Delivery address</p>
+              <SectionDivider title="Delivery address" />
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="sm:col-span-2">
                   <span className="field-label">Street address</span>
@@ -395,7 +391,7 @@ export default function CheckoutForm() {
                   />
                 </label>
                 <label>
-                  <span className="field-label">County</span>
+                  <span className="field-label">{country.regionLabel}</span>
                   <select
                     required
                     autoComplete="address-level1"
@@ -403,29 +399,45 @@ export default function CheckoutForm() {
                     onChange={(event) => update('state', event.target.value)}
                     className="field"
                   >
-                    {counties.map((county) => (
-                      <option key={county.code} value={county.code}>
-                        {county.name}
+                    {!country.defaultRegion && (
+                      <option value="" disabled>
+                        Choose a {country.regionLabel.toLowerCase()}
+                      </option>
+                    )}
+                    {country.regions.map((region) => (
+                      <option key={region.code} value={region.code}>
+                        {region.name}
                       </option>
                     ))}
                   </select>
                 </label>
+                {country.postcode === 'optional' && (
+                  <label>
+                    <span className="field-label">Postal code (optional)</span>
+                    <input
+                      autoComplete="postal-code"
+                      value={fields.postcode}
+                      onChange={(event) => update('postcode', event.target.value)}
+                      className="field"
+                    />
+                  </label>
+                )}
                 <label>
-                  <span className="field-label">Postal code</span>
-                  <input
-                    required
-                    autoComplete="postal-code"
-                    value={fields.postcode}
-                    onChange={(event) => update('postcode', event.target.value)}
-                    className="field"
-                  />
-                </label>
-                <div>
                   <span className="field-label">Country</span>
-                  <p className="field flex items-center bg-cream-100/60 text-ink-500">
-                    Kenya
-                  </p>
-                </div>
+                  <select
+                    required
+                    autoComplete="country"
+                    value={fields.country}
+                    onChange={(event) => changeCountry(event.target.value)}
+                    className="field"
+                  >
+                    {SHIPPING_COUNTRIES.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
             </div>
 
@@ -457,7 +469,8 @@ export default function CheckoutForm() {
                     {billing.address_1}
                     {billing.address_2 ? `, ${billing.address_2}` : ''}
                     <br />
-                    {billing.city}, {billing.state} {billing.postcode}
+                    {billing.city}, {regionName(billing.country, billing.state)}
+                    {billing.postcode ? ` ${billing.postcode}` : ''}, {country.name}
                     <br />
                     {billing.email} · {billing.phone}
                   </p>
@@ -474,7 +487,7 @@ export default function CheckoutForm() {
 
             {rates.length > 0 && (
               <div>
-                <p className="field-label">Delivery option</p>
+                <SectionDivider title="Delivery option" />
                 <div className="space-y-3">
                   {rates.map((rate) => (
                     <label
@@ -515,7 +528,7 @@ export default function CheckoutForm() {
             )}
 
             <div>
-              <p className="field-label">Payment method</p>
+              <SectionDivider title="Payment method" />
               {cart.paymentMethods.length > 0 ? (
                 <div className="space-y-3">
                   {cart.paymentMethods.map((method) => (
@@ -540,7 +553,9 @@ export default function CheckoutForm() {
                           {paymentLabels[method] ?? method}
                         </span>
                         <span className="mt-1 block text-xs leading-5 text-ink-500">
-                          {method === 'mpesa'
+                          {method === 'craft_whatsapp'
+                            ? 'Place your order now. We’ll confirm delivery and send payment details (M-Pesa or card) on WhatsApp — nothing is charged here.'
+                            : method === 'mpesa'
                             ? 'You will receive an M-Pesa payment request on your phone.'
                             : method === 'cod'
                               ? 'Pay the courier when your order arrives.'
@@ -583,7 +598,11 @@ export default function CheckoutForm() {
                 disabled={disabled || cart.paymentMethods.length === 0}
                 className="btn-primary flex-1"
               >
-                {submitting ? 'Placing order…' : 'Place order'}
+                {submitting
+                  ? 'Placing order…'
+                  : paymentMethod === 'craft_whatsapp'
+                    ? 'Place order — pay on confirmation'
+                    : 'Place order'}
               </button>
               <button
                 type="button"
@@ -627,10 +646,16 @@ export default function CheckoutForm() {
                   <p className="truncate text-sm font-semibold text-ink-900">
                     {item.name}
                   </p>
-                  <p className="text-xs text-ink-500">Qty {item.quantity}</p>
+                  {item.freeGift ? (
+                    <p className="truncate text-xs font-semibold text-olive-700">
+                      Free gift{item.giftFor ? ` · with ${item.giftFor}` : ''}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-ink-500">Qty {item.quantity}</p>
+                  )}
                 </div>
                 <p className="text-sm font-semibold text-ink-900">
-                  {money(item.totals.price)}
+                  {item.freeGift ? 'Free' : money(item.totals.price)}
                 </p>
               </li>
             );

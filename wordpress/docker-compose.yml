@@ -1,0 +1,83 @@
+# Local WordPress + WooCommerce for testing the Craft & Colours mu-plugin.
+# Throwaway stack — not production. Full walkthrough: docs/wordpress-local.md
+#
+#   docker compose -f wordpress/docker-compose.yml up -d           # start
+#   docker compose -f wordpress/docker-compose.yml run --rm -T cli wp --info
+#   docker compose -f wordpress/docker-compose.yml down -v         # wipe everything
+#
+#   WordPress  http://localhost:8080   (wp-admin: admin / admin after setup)
+#   Mailpit    http://localhost:8025   (every email WordPress sends lands here)
+
+# Shared by the web server and wp-cli: the official image's wp-config.php
+# reads these at runtime, so both containers must see the same values.
+x-wp-env: &wp-env
+    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_USER: wordpress
+    WORDPRESS_DB_PASSWORD: wordpress
+    WORDPRESS_DB_NAME: wordpress
+    WORDPRESS_CONFIG_EXTRA: |
+        define('WP_ENVIRONMENT_TYPE', 'local');
+        define('CRAFT_FRONTEND_URL', 'http://localhost:4321');
+        define('CRAFT_ALLOWED_ORIGINS', 'http://127.0.0.1:4321');
+        define('CRAFT_CONTACT_EMAIL', 'hello@craftandcolours.test');
+        define('CRAFT_WHATSAPP', '+254700000000');
+        // Uncomment to test the rebuild hook against a real repo:
+        // define('CRAFT_GITHUB_REPO', 'owner/repo');
+        // define('CRAFT_GITHUB_TOKEN', 'github_pat_...');
+        // define('CRAFT_REBUILD_DELAY', 60);
+
+# The whole mu-plugins folder is mounted (read-only), so edits in the repo
+# apply on the next request. Mount folders, not single files: a single-file
+# bind mount pins the file's inode, and editors/tools that save by replacing
+# the file leave the container reading the old version.
+x-wp-volumes: &wp-volumes
+    - wordpress:/var/www/html
+    - ./mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+
+name: craft-wordpress
+
+services:
+    db:
+        image: mariadb:11
+        environment:
+            MARIADB_DATABASE: wordpress
+            MARIADB_USER: wordpress
+            MARIADB_PASSWORD: wordpress
+            MARIADB_RANDOM_ROOT_PASSWORD: "1"
+        volumes:
+            - db:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 5s
+            retries: 20
+
+    wordpress:
+        image: wordpress:php8.3-apache
+        depends_on:
+            db:
+                condition: service_healthy
+        ports:
+            - "8080:80"
+        environment: *wp-env
+        volumes: *wp-volumes
+
+    mailpit:
+        image: axllent/mailpit
+        ports:
+            - "8025:8025"
+
+    # wp-cli shares the WordPress files. Only runs on demand
+    # (`docker compose run`), never with `up`. Runs as www-data (uid 33, the
+    # owner inside the wordpress image) so files it writes stay editable.
+    cli:
+        image: wordpress:cli-php8.3
+        profiles: ["tools"]
+        user: "33:33"
+        depends_on:
+            - wordpress
+        environment: *wp-env
+        volumes: *wp-volumes
+
+volumes:
+    db:
+    wordpress:

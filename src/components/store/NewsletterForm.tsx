@@ -1,21 +1,58 @@
 import { useState, type SyntheticEvent } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Loader2 } from 'lucide-react';
+import { getStoreUrl, hasWooCommerce } from '../../lib/cart-api';
 
-type Status = 'idle' | 'error' | 'done';
+type Status = 'idle' | 'busy' | 'error' | 'done';
 
-export default function NewsletterForm() {
+const INVALID_EMAIL = 'That email doesn’t look right. Try again?';
+
+export default function NewsletterForm({ source = 'footer' }: { source?: string }) {
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState('');
   const [status, setStatus] = useState<Status>('idle');
+  const [error, setError] = useState(INVALID_EMAIL);
 
-  const submit = (event: SyntheticEvent<HTMLFormElement>) => {
+  const submit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError(INVALID_EMAIL);
       setStatus('error');
       return;
     }
 
-    // Newsletter provider is not connected yet; keep the confirmation local.
-    setStatus('done');
+    // Without a connected store (demo mode) the confirmation stays local.
+    if (!hasWooCommerce) {
+      setStatus('done');
+      return;
+    }
+
+    setStatus('busy');
+
+    try {
+      const response = await fetch(`${getStoreUrl()}/wp-json/craft/v1/newsletter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'omit',
+        body: JSON.stringify({ email: email.trim(), source, website }),
+      });
+
+      const data = (await response.json().catch(() => null)) as
+        | { message?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'We could not add you just now.');
+      }
+
+      setStatus('done');
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : 'We could not add you just now. Please try again.',
+      );
+      setStatus('error');
+    }
   };
 
   if (status === 'done') {
@@ -60,15 +97,29 @@ export default function NewsletterForm() {
           aria-describedby={status === 'error' ? 'newsletter-error' : undefined}
           className="field flex-1"
         />
-        <button type="submit" className="btn-primary shrink-0">
-          Join the list
-          <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
+        <button type="submit" disabled={status === 'busy'} className="btn-primary shrink-0">
+          {status === 'busy' ? 'Joining…' : 'Join the list'}
+          {status === 'busy' ? (
+            <Loader2 size={15} strokeWidth={2.2} className="animate-spin" aria-hidden="true" />
+          ) : (
+            <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
+          )}
         </button>
       </div>
 
+      <label className="sr-only" aria-hidden="true">
+        Website
+        <input
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(event) => setWebsite(event.target.value)}
+        />
+      </label>
+
       {status === 'error' ? (
         <p id="newsletter-error" className="mt-2 text-xs font-semibold text-clay-600">
-          That email doesn’t look right. Try again?
+          {error}
         </p>
       ) : (
         <p className="mt-2 text-xs leading-5 text-ink-500">
