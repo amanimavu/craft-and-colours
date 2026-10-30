@@ -1,0 +1,67 @@
+name: QA
+
+# Lighthouse CI against a production-like static build.
+#
+# This build intentionally runs WITHOUT the CMS env vars (demo data) so pull
+# request runs are deterministic, fast, and never touch production content.
+# The production build is still guarded by `npm run verify` in deploy.yml.
+
+on:
+    pull_request:
+    push:
+        branches: [develop]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: qa-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    NODE_VERSION: "24"
+    SITE_URL: https://craftandcolors.africa
+
+jobs:
+    lighthouse:
+        name: Lighthouse
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        steps:
+            - name: Check out
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Type check
+              run: npm run check
+
+            - name: Build
+              run: npm run build
+              env:
+                  SITE_URL: ${{ env.SITE_URL }}
+                  WP_URL: ""
+                  PUBLIC_WC_STORE_URL: ""
+
+            - name: Verify static build
+              run: npm run verify
+              env:
+                  SITE_URL: ${{ env.SITE_URL }}
+                  WP_URL: ""
+                  PUBLIC_WC_STORE_URL: ""
+                  # Demo build by design: relax the CMS/contact-variable checks.
+                  ALLOW_UNREACHABLE_CMS: "1"
+
+            - name: Run Lighthouse CI
+              uses: treosh/lighthouse-ci-action@v12
+              with:
+                  configPath: ./lighthouserc.json
+                  uploadArtifacts: true

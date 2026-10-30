@@ -1,0 +1,162 @@
+name: Deploy storefront
+
+# Production deploy: build the static site, guard against a demo-data build,
+# mirror dist/ to Host Africa over FTPS, then smoke-test the live site.
+#
+# Required repository secrets:   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD
+# Required repository variables: FTP_SERVER_DIR, SITE_URL, WP_URL,
+#                                PUBLIC_WC_STORE_URL, PUBLIC_CONTACT_EMAIL,
+#                                PUBLIC_WHATSAPP, PUBLIC_INSTAGRAM,
+#                                PUBLIC_FACEBOOK_URL
+# See docs/deploy-hostafrica.md.
+
+on:
+    push:
+        branches: [master]
+    workflow_dispatch:
+        inputs:
+            clean_deploy:
+                description: "Delete every file in FTP_SERVER_DIR before uploading (orphan cleanup)"
+                type: boolean
+                default: false
+    repository_dispatch:
+        types: [wordpress_update]
+
+permissions:
+    contents: read
+
+# Never run two deploys at once. A WordPress rebuild queued during a deploy
+# waits for it instead of being cancelled.
+concurrency:
+    group: deploy-production
+    cancel-in-progress: false
+
+env:
+    NODE_VERSION: "24"
+
+jobs:
+    build:
+        name: Build & verify
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - name: Check out
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Type check
+              run: npm run check
+
+            - name: Build
+              run: npm run build
+              env:
+                  SITE_URL: ${{ vars.SITE_URL }}
+                  WP_URL: ${{ vars.WP_URL }}
+                  PUBLIC_WC_STORE_URL: ${{ vars.PUBLIC_WC_STORE_URL }}
+                  PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
+                  PUBLIC_WHATSAPP: ${{ vars.PUBLIC_WHATSAPP }}
+                  PUBLIC_INSTAGRAM: ${{ vars.PUBLIC_INSTAGRAM }}
+                  PUBLIC_FACEBOOK_URL: ${{ vars.PUBLIC_FACEBOOK_URL }}
+
+            # Fails the run if the CMS is unreachable (so demo data can't ship),
+            # if required files are missing, or if localhost leaked into the HTML.
+            - name: Verify build
+              run: npm run verify
+              env:
+                  SITE_URL: ${{ vars.SITE_URL }}
+                  WP_URL: ${{ vars.WP_URL }}
+                  PUBLIC_WC_STORE_URL: ${{ vars.PUBLIC_WC_STORE_URL }}
+                  PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
+                  PUBLIC_WHATSAPP: ${{ vars.PUBLIC_WHATSAPP }}
+                  PUBLIC_INSTAGRAM: ${{ vars.PUBLIC_INSTAGRAM }}
+                  PUBLIC_FACEBOOK_URL: ${{ vars.PUBLIC_FACEBOOK_URL }}
+
+            - name: Upload build artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dist
+                  path: dist/
+                  retention-days: 30
+
+    deploy:
+        name: Deploy over FTPS
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        environment:
+            name: production
+            url: ${{ vars.SITE_URL }}
+        steps:
+            - name: Check FTP configuration
+              env:
+                  FTP_SERVER: ${{ secrets.FTP_SERVER }}
+                  FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+                  FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+                  FTP_SERVER_DIR: ${{ vars.FTP_SERVER_DIR }}
+              run: |
+                  missing=0
+                  for name in FTP_SERVER FTP_USERNAME FTP_PASSWORD FTP_SERVER_DIR; do
+                      if [ -z "${!name}" ]; then
+                          echo "::error::Missing repository configuration: $name"
+                          missing=1
+                      fi
+                  done
+                  case "$FTP_SERVER_DIR" in
+                      */) ;;
+                      "") ;;
+                      *) echo "::error::FTP_SERVER_DIR must end with a trailing slash (got '$FTP_SERVER_DIR')"; missing=1 ;;
+                  esac
+                  [ "$missing" -eq 0 ] || exit 1
+
+            - name: Download build artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: dist
+                  path: dist
+
+            # The sync state lets the action upload only what changed. Losing it
+            # is safe (everything is re-uploaded) — never destructive.
+            - name: Restore FTP sync state
+              uses: actions/cache@v4
+              with:
+                  path: .ftp-deploy-sync-state.json
+                  key: ftp-state-${{ github.ref_name }}-${{ github.run_id }}
+                  restore-keys: |
+                      ftp-state-${{ github.ref_name }}-
+
+            - name: Upload to Host Africa
+              uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+              with:
+                  server: ${{ secrets.FTP_SERVER }}
+                  username: ${{ secrets.FTP_USERNAME }}
+                  password: ${{ secrets.FTP_PASSWORD }}
+                  protocol: ftps
+                  port: 21
+                  security: strict
+                  local-dir: ./dist/
+                  server-dir: ${{ vars.FTP_SERVER_DIR }}
+                  dangerous-clean-slate: ${{ github.event_name == 'workflow_dispatch' && inputs.clean_deploy }}
+                  log-level: standard
+                  timeout: 60000
+
+    smoke:
+        name: Smoke test live site
+        needs: deploy
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        steps:
+            - name: Check out
+              uses: actions/checkout@v4
+
+            - name: Check live site
+              env:
+                  SITE_URL: ${{ vars.SITE_URL }}
+              run: bash scripts/smoke-test.sh

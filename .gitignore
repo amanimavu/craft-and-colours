@@ -8,6 +8,7 @@ dist/
 *.log
 .vercel/
 .netlify/
+.lighthouseci/
 
 # WordPress/WooCommerce editor stubs (composer install in wordpress/)
 wordpress/vendor/

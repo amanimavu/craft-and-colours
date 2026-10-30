@@ -1,7 +1,7 @@
 # Craft & Colours — Project Memory
 
 > Persistent context for this repository. Read this first when resuming work.
-> **Last updated:** 2026-10-30
+> **Last updated:** 2026-10-31
 > **Source:** reconstructed from the plan-mode transcript + repository inspection.
 
 ---
@@ -26,7 +26,7 @@
 | Backend (target) | Headless WordPress + WooCommerce (Store API) |
 | Hosting (target) | Host Africa (shared/Passenger), GitHub Actions deploy |
 | Repo | `/home/amani-mavu/Projects/craft_and_colours` |
-| Git | Only one commit (`f8cb6a5 chore: inital commit`); **the whole app is currently untracked/uncommitted** |
+| Git | GitHub `amanimavu/craft-and-colours` (public). Default/production branch **`master`**; day-to-day work on **`develop`**. Deploys run from `master` only. |
 | Last verified | User ran `npm run check` + `npm run build` themselves, confirmed passing (2026-10-28). **Note:** per user instruction, the assistant no longer runs these commands proactively — it flags when something is ready to verify and the user runs them. |
 
 **Pages that exist:** `/`, `/shop/`, `/shop/[slug]/`, `/journal/`, `/journal/[slug]/`, `/about/`, `/contact/`, `/cart/`, `/checkout/`, `/order-confirmation/`, `/workshops/`, `/workshops/[slug]/`, `/diy-kits/`, `/wishlist/`, `/policies/`, `404`, `/robots.txt`, plus internal `/styleguide/`. `/shop/category/[slug]/` was **removed 2026-10-28** — category browsing is now `/shop/?category=<slug>` on the main shop page. `cart`, `checkout`, `order-confirmation`, `wishlist`, and `styleguide` are excluded from the sitemap; the latter two are also `noindex`.
@@ -92,7 +92,7 @@ Original plan message: phases **0–9**, each ending in a **review stop**. This 
 | **6 — Workshops + DIY kits** | workshops index/detail + "Save My Spot", paid→cart / free→RSVP, DIY kits landing | ✅ **Done (2026-10-28)** — `/workshops/` listing, `/workshops/[slug]/` detail, paid ticket → cart and free RSVP flow, plus `/diy-kits/` landing page. `/studio/` was **cancelled** — the business has no studio/private-hire offering. |
 | **7 — Commerce flows** | cart page + drawer sync, checkout, confirmation, address fields, shipping, wishlist, search, policies, 404, robots, favicon, confetti | ✅ **Done — user confirmed (2026-10-30)** — `/policies/`, `404.astro`, `robots.txt` endpoint, `public/favicon.svg`, `og:locale` fix, order-confirmation confetti. Policy copy still a draft for owner sign-off. |
 | **8 — WordPress integration** | `mu-plugin` (CORS, contact, newsletter, RSVP, UGC CPT, free-gift logic, low-stock widget, security headers, rebuild hook) + docs | ✅ **Done — verified by user against the local Docker WordPress (2026-10-30).** Plugin in `wordpress/mu-plugins/` (+ later additions: product "Good to know", "Order now, pay on confirmation" gateway, KE/UG/TZ address rules), frontend wired, local stack + 3 docs. |
-| **9 — Deployment + QA** | GitHub Actions build/deploy, Host Africa guide, check/build, responsive/a11y/Lighthouse, RC report | ❌ **Not started** (`.github/` is empty) |
+| **9 — Deployment + QA** | GitHub Actions build/deploy, Host Africa guide, check/build, responsive/a11y/Lighthouse, RC report | 🟡 **Built 2026-10-31 — awaiting first live deploy + QA pass.** `deploy.yml` (FTPS), `qa.yml` (Lighthouse), `scripts/verify-build.mjs`, `scripts/smoke-test.sh`, `public/.htaccess`, `lighthouserc.json`, three docs. Needs GitHub secrets/variables, a merge to `master`, the first deploy, then the manual QA pass + filled RC report. |
 
 ### Phase detail / acceptance criteria
 
@@ -105,7 +105,7 @@ Original plan message: phases **0–9**, each ending in a **review stop**. This 
 - **Phase 6:** booking/RSVP flows; DIY kits landing. *(Complete 2026-10-28; Studio page cancelled by user — no such offering.)*
 - **Phase 7:** end-to-end purchase + policies + 404/robots/favicon + confetti. *(Built 2026-10-30; not browser-verified — dev server blocked by root-owned `.astro/`, see Known issues.)*
 - **Phase 8:** plugin + setup docs; store data contract documented. *(Complete 2026-10-30, user-verified.)*
-- **Phase 9:** deploy workflow + launch QA.
+- **Phase 9:** deploy workflow + launch QA. *(Built 2026-10-31: deploy workflow, build guard, `.htaccess`, Lighthouse CI, Host Africa + QA docs. Not yet deployed — see Current work state.)*
 
 ### Legacy task tracker (pre-redesign scaffold)
 The session to-do list still holds six older tasks; it is **stale** relative to the phase plan:
@@ -122,6 +122,16 @@ The session to-do list still holds six older tasks; it is **stale** relative to 
 ---
 
 ## 5. Current work state
+
+### Phase 9 — Deployment + QA (built 2026-10-31, awaiting first deploy)
+- **`.github/workflows/deploy.yml`** — triggers on `push` to `master`, `workflow_dispatch` (optional `clean_deploy` boolean) and `repository_dispatch: wordpress_update`. Jobs: `build` (`npm ci` → `check` → `build` → `verify`, uploads `dist` artifact, 30-day retention), `deploy` (FTPS mirror via `SamKirkland/FTP-Deploy-Action@v4.4.0`, explicit FTPS port 21, `security: strict`, cached sync state), `smoke` (`scripts/smoke-test.sh`). `concurrency: deploy-production` (no cancel-in-progress), GitHub environment `production`. Build env comes from repo **variables** (`SITE_URL`, `WP_URL`, `PUBLIC_*`); only `FTP_SERVER`/`FTP_USERNAME`/`FTP_PASSWORD` are secrets.
+- **`scripts/verify-build.mjs`** (`npm run verify`) — post-build deploy guard. Requires `SITE_URL` (https, not localhost), pings `WP_URL/wp-json/` + `craft/v1/workshops` and Store API products, requires zero products to fail, checks `dist/` for `index.html`, `404.html`, `robots.txt`, `sitemap-index.xml`, `sitemap-0.xml`, `favicon.svg`, `.htaccess`, `_astro/` + a CSS bundle, scans every HTML file for `localhost`/`127.0.0.1`/`http://cms.`/insecure own-domain links, and fails if the "Demo catalogue" banner ships while a store URL is set. Loads `.env` like Astro (existing env wins). `ALLOW_UNREACHABLE_CMS=1` relaxes the network, required-env and SITE_URL checks for local builds only — never set in CI.
+- **`scripts/smoke-test.sh`** (`npm run smoke`) — 200s for 11 routes, unknown path → 404, HTTP → HTTPS and `www` → apex redirects, `x-content-type-options`/`referrer-policy`/`strict-transport-security`, HTML `no-cache`, and no "Demo catalogue" banner.
+- **`public/.htaccess`** — copied to `dist/` by Astro (Vite copies dotfiles). HTTPS + `www`→apex 301s, `ErrorDocument 404 /404.html`, HSTS (HTTPS only), `nosniff`/`Referrer-Policy`/`X-Frame-Options`/`Permissions-Policy`, `_astro/*` immutable (via `RewriteRule … [E=HASHED_ASSET:1]`), HTML `no-cache, must-revalidate`, 7-day default for other assets, deflate, `IndexIgnore *`, dotfile/source-file denial. Deliberately no CSP (inline Astro scripts + `placehold.co` images). `Options -Indexes` avoided to reduce shared-hosting 500 risk.
+- **`lighthouserc.json` + `.github/workflows/qa.yml`** — Lighthouse CI on `pull_request`, push to `develop`, and manual. Builds **without** CMS env (demo data, deterministic), runs `verify` with `ALLOW_UNREACHABLE_CMS=1`, then tests 11 representative URLs with LHCI's built-in static server (`staticDistDir: ./dist`; the canonical audit is skipped because the origin is local). Gates: a11y ≥ 0.95 and SEO ≥ 0.90 **error**; performance ≥ 0.80, best-practices ≥ 0.90, LCP ≤ 4 s, TBT ≤ 500 ms **warn**; CLS ≤ 0.10 **error**. Reports uploaded as artifacts + temporary public storage.
+- **Docs** — `docs/deploy-hostafrica.md` (FTP path verification, secrets/variables tables, first deploy, rebuild hook, rollback, caching, troubleshooting), `docs/qa-launch.md` (local commands + full functional/responsive/a11y/SEO/perf/security checklist), `docs/release-candidate.md` (RC template with automated + manual result tables, accepted risks, rollback, sign-off). `README.md` expanded with quick start, commands and doc links. `.gitignore` now ignores `.lighthouseci/`.
+- **Still to do:** add the 3 secrets + 8 variables, commit/merge `develop` → `master`, run the first deploy, then the manual QA pass and fill in the RC report. `favicon.ico`/`apple-touch-icon.png` deliberately deferred (user, 2026-10-31).
+- **Not verified yet:** workflow YAML parses and the guard runs correctly against the stale Oct-28 `dist` (caught the missing `404.html`/`robots.txt`/`favicon.svg`/`.htaccess` and the demo banner), but no `npm run check`/`build`, no FTPS run, no live Lighthouse run. Per user instruction those are left for the user / first CI run.
 
 ### Phase 3 — Global shell (built 2026-10-27, awaiting review)
 - **Header** (`Header.astro`): ticker, shop mega-menu (opens on hover with a short intent delay, plus click/keyboard; category cards, icons, blurbs, olive count badges, DIY-kit promo and delivery info), ⌘K/Ctrl+K search trigger, wishlist heart + count, cart trigger (`data-cart-open`, `/cart/` no-JS fallback), WhatsApp pill (`xl+`), and a rich mobile menu (`lg-`). Main nav appears at `lg` to avoid tablet overflow; the heart is hidden below `sm` because the mobile menu carries wishlist.
@@ -223,6 +233,8 @@ All in `src/components/ui/`:
 | Wishlist is device-local | `wishlist-store.ts` | localStorage only; no account sync |
 | Maker wall falls back to demo | `getUgcPosts()` in `wordpress.ts` | Reads `craft/v1/ugc`; returns `demoUgc` only when `WP_URL` is unset or the request fails. Connected + zero posts → empty → home UGC section hidden. Posts without a featured image are never returned. |
 | Sale-detection inconsistency | `ShopFilters.tsx` sidebar filter vs. card badge | See "Filter limitations" above — two different on-sale conditions coexist. |
+| Deploy not yet exercised | `.github/workflows/deploy.yml` | Needs the 3 FTP secrets + 8 repo variables, a merge to `master`, and the first run. Workflow only triggers on the default branch. |
+| `www` DNS required | Host Africa | `smoke-test.sh` fails if `www.craftandcolors.africa` does not resolve or 301s; set the CNAME before the first deploy. |
 
 ---
 
@@ -233,7 +245,7 @@ All in `src/components/ui/`:
 3. Harmonize the sale-detection inconsistency noted above (sidebar checkbox vs. card badge use different conditions — currently harmless but structurally duplicated).
 4. ~~Add policies page, 404, robots.txt, favicon, fix `og:locale`~~ — done 2026-10-30 (Phase 7); policy copy awaiting sign-off.
 5. ~~Build Phase 6 leftovers (`/diy-kits/`, `/studio/`)~~ — done 2026-10-28: `/diy-kits/` built; `/studio/` cancelled (no studio offering).
-6. ~~Phase 8 WordPress mu-plugin + docs~~ — done 2026-10-30 (user-verified). **Next: Phase 9** deploy/QA (workflow must listen for `repository_dispatch` `wordpress_update`).
+6. ~~Phase 8 WordPress mu-plugin + docs~~ — done 2026-10-30 (user-verified). ~~Phase 9 deploy/QA~~ — **workflow + guard + docs built 2026-10-31; blocked on GitHub secrets/variables, a merge to `master`, and the first live deploy + QA pass.**
 7. Map live Store API product fields (`attributes`, `isNew`) in `normalizeProduct()` — see Known issues.
 8. Replace placeholder photography/contact details before launch.
 9. Consider whether `getBestsellers()`'s demo sort (by `reviewCount`) is good enough long-term, or should factor in `rating` too.
@@ -341,8 +353,20 @@ docs/
   wordpress-local.md                  # step-by-step local test guide + curl checklist
   wordpress-setup.md                  # production CMS setup (Host Africa, wp-config, Woo settings, cron, SMTP)
   store-data-contract.md              # env vars, Store API usage, craft/v1 endpoint shapes, rebuild event
+  deploy-hostafrica.md                # Phase 9: FTPS deploy, secrets/variables, rollback, troubleshooting
+  qa-launch.md                        # Phase 9: launch QA checklist (functional/responsive/a11y/SEO/security)
+  release-candidate.md                # Phase 9: RC report template, filled after the first deploy
+scripts/
+  verify-build.mjs                    # `npm run verify` — post-build deploy guard
+  smoke-test.sh                       # `npm run smoke` — post-deploy live-site checks
+.github/workflows/
+  deploy.yml                          # build → verify → FTPS → smoke (master / dispatch / wordpress_update)
+  qa.yml                              # Lighthouse CI on PRs + develop
+lighthouserc.json                     # Lighthouse CI URLs, budgets and assertions
+public/.htaccess                      # copied into dist/ — redirects, 404, caching, security headers
 ```
-Empty/skeleton: `.github/workflows/` (Phase 9), `public/images/` (empty).
+
+Empty: `public/images/` (empty).
 
 ---
 
@@ -356,10 +380,10 @@ Empty/skeleton: `.github/workflows/` (Phase 9), `public/images/` (empty).
 
 ### Environment (`.env.example`)
 ```
-SITE_URL=https://craftandcolours.co.ke
-PUBLIC_WC_STORE_URL=https://cms.craftandcolours.co.ke
-WP_URL=https://cms.craftandcolours.co.ke
-PUBLIC_CONTACT_EMAIL=hello@craftandcolours.co.ke
+SITE_URL=https://craftandcolors.africa
+PUBLIC_WC_STORE_URL=https://cms.craftandcolors.africa
+WP_URL=https://cms.craftandcolors.africa
+PUBLIC_CONTACT_EMAIL=hello@craftandcolors.africa
 PUBLIC_WHATSAPP=+254700000000
 PUBLIC_INSTAGRAM=craftandcolours
 PUBLIC_FACEBOOK_URL=https://www.facebook.com/craft.colours.ke
@@ -412,6 +436,10 @@ Gotchas:
 ---
 
 ## 13. Change log
+
+- **2026-10-31 (later)** — **Production domain corrected to `craftandcolors.africa`.** User confirmed the live storefront is the `.africa` domain on the Host Africa DirectAdmin account (American spelling `colors`, not `colours`). Replaced every `craftandcolours.co.ke` reference with `craftandcolors.africa` across `astro.config.mjs` (SITE_URL default), `.env.example`, `scripts/smoke-test.sh`, `.github/workflows/qa.yml`, the three Phase 9 docs, `docs/wordpress-setup.md`, `docs/store-data-contract.md`, `README.md`, `MEMORY.md`, and the hardcoded email fallbacks in `contact.astro`, `order-confirmation.astro`, `policies.astro`, `Footer.astro` and the mu-plugin header comment. Brand spelling stays "Craft & Colours" and the Instagram/TikTok handles stay `craftandcolours`; only the domain changes. `docs/deploy-hostafrica.md` §2–3 rewritten for DirectAdmin with the confirmed FTP facts: server `craftandcolors.africa`, username `craftan1`, password = panel login, explicit TLS on 21 (implicit 990 closed), `FTP_SERVER_DIR=/domains/craftandcolors.africa/public_html/`. CMS subdomain assumed `cms.craftandcolors.africa` — unconfirmed.
+
+- **2026-10-31** — **Phase 9 built (awaiting first deploy).** Added `.github/workflows/deploy.yml` (build → `npm run verify` → FTPS mirror to Host Africa → live smoke test; `master` + manual + `repository_dispatch: wordpress_update`; environment `production`; cached FTP sync state; optional `clean_deploy`), `.github/workflows/qa.yml` (Lighthouse CI on PR/`develop`, demo build, 11 URLs, a11y/SEO hard gates, perf/BP warnings), `lighthouserc.json`, `scripts/verify-build.mjs` (`npm run verify` — fails the deploy if the CMS is unreachable or demo data would ship, checks required files and localhost/mixed-content leaks), `scripts/smoke-test.sh` (`npm run smoke`), and `public/.htaccess` (HTTPS + `www`→apex 301s, `404.html`, HSTS + security headers, `_astro` immutable, HTML `no-cache`, deflate, dotfile denial; no CSP on purpose). Docs: `docs/deploy-hostafrica.md`, `docs/qa-launch.md`, `docs/release-candidate.md`; `README.md` expanded; `.gitignore` ignores `.lighthouseci/`; `package.json` gained `verify` and `smoke`. Decisions (user): FTPS via the existing DirectAdmin FTP account, deploy from `master`, full hardening scope, Lighthouse CI + manual QA, apex canonical (`www` redirects in). **No `favicon.ico`/`apple-touch-icon`** — deferred by user. Not yet run: `check`/`build`, first FTPS deploy, live Lighthouse. Guard tested against the stale Oct-28 `dist` (correctly failed on missing `404.html`, `robots.txt`, `favicon.svg`, `.htaccess` and the demo banner).
 
 - **2026-10-30** — **Phase 8 marked done** — user verified it against the local Docker WordPress. Next up: Phase 9 (deployment + QA).
 

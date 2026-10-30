@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 import icon from "astro-icon";
 
-const site = process.env.SITE_URL || "https://craftandcolours.co.ke";
+const site = process.env.SITE_URL || "https://craftandcolors.africa";
 
 export default defineConfig({
     site,

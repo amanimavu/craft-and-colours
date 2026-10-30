@@ -12,7 +12,7 @@ interface Props {
 const { mobileBarSpace = false } = Astro.props;
 
 const email =
-    import.meta.env.PUBLIC_CONTACT_EMAIL || "hello@craftandcolours.co.ke";
+    import.meta.env.PUBLIC_CONTACT_EMAIL || "hello@craftandcolors.africa";
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
 const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
     "Hi Craft & Colours! I have a question about a product.",

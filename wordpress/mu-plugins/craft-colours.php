@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Craft & Colours
- * Description: Headless storefront support for craftandcolours.co.ke — CORS, security headers, contact/newsletter/RSVP endpoints, workshops and maker-post types, free-gift logic, low-stock widget and static-site rebuild hook.
+ * Description: Headless storefront support for craftandcolors.africa — CORS, security headers, contact/newsletter/RSVP endpoints, workshops and maker-post types, free-gift logic, low-stock widget and static-site rebuild hook.
  * Version: 1.0.0
  * Requires PHP: 8.1
  * Author: Craft & Colours

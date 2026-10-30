@@ -5,7 +5,7 @@ import ContactForm from '../components/store/ContactForm';
 import { getPage } from '../lib/wordpress';
 
 const page = await getPage('contact');
-const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.ke';
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolors.africa';
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
 const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
 ---

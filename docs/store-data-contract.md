@@ -176,7 +176,8 @@ Triggers:
 
 Batched: one dispatch at most every `CRAFT_REBUILD_DELAY` seconds (default 300).
 
-The deploy workflow must listen for it:
+The deploy workflow ([`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml))
+listens for it:
 
 ```yaml
 on:
