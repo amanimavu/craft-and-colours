@@ -1,0 +1,480 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Breadcrumbs from "../components/Breadcrumbs.astro";
+import ProductCard from "../components/ProductCard.astro";
+import Icon from "../components/ui/Icon.astro";
+import Badge from "../components/ui/Badge.astro";
+import { getProducts } from "../lib/woocommerce";
+import { formatMoney } from "../lib/format";
+
+const kits = await getProducts({ category: "diy-kits" });
+
+const startingPriceMinor = kits.length
+    ? Math.min(...kits.map((kit) => Number(kit.prices.price)))
+    : 0;
+const startingPrice = formatMoney(
+    startingPriceMinor,
+    kits[0]?.prices.currency_code ?? "KES",
+    kits[0]?.prices.currency_minor_unit ?? 2,
+);
+
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
+const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
+    "Hi! I need help choosing a DIY kit.",
+)}`;
+
+const faqs = [
+    {
+        question: "Do I need to buy anything else?",
+        answer:
+            "No. Each kit includes the materials and tools for the project. You might need basics like water, a pair of scissors or newspaper to cover the table — the guide tells you before you start.",
+    },
+    {
+        question: "Is a kit suitable for a complete beginner?",
+        answer:
+            "Yes. Every kit is built around a first project, with a step-by-step guide written for someone who has never tried it before. The skill level is shown on each kit.",
+    },
+    {
+        question: "Can I give a kit as a gift?",
+        answer:
+            "That is what they are made for. Kits arrive in a gift-ready box with the project list inside, and you can add a note at checkout.",
+    },
+    {
+        question: "How long does a kit take to make?",
+        answer:
+            "Most kits take an afternoon. Bigger ones, like the weekend workshop kit, are designed to spread across a couple of sittings so nothing feels rushed.",
+    },
+    {
+        question: "Can I buy a kit in the shop?",
+        answer:
+            "Yes — come to Level 2 at Village Market. Stock moves quickly, so message us on WhatsApp first if you are making a special trip for a particular kit.",
+    },
+];
+
+const schema = [
+    {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "DIY Craft Kits in Nairobi",
+        description:
+            "Beginner-friendly DIY craft kits with all materials, tools and a step-by-step guide included.",
+        url: Astro.url.toString(),
+        mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: kits.length,
+            itemListElement: kits.map((kit, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: kit.name,
+                url: new URL(
+                    `/shop/${kit.slug}/`,
+                    Astro.site ?? Astro.url,
+                ).toString(),
+            })),
+        },
+    },
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+            "@type": "Question",
+            name: faq.question,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+            },
+        })),
+    },
+];
+---
+
+<BaseLayout
+    title="DIY Craft Kits in Nairobi"
+    description="Beginner-friendly DIY craft kits from Village Market, Nairobi. Paint, crochet and embroidery kits with all materials, tools and a step-by-step guide included."
+    schema={schema}
+>
+    <section class="border-b border-ink-900/10 bg-butter-50">
+        <div class="container-page py-12 sm:py-16">
+            <Breadcrumbs items={[{ label: "DIY kits" }]} />
+
+            <div
+                class="mt-8 grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16"
+            >
+                <div>
+                    <p class="eyebrow">DIY kits</p>
+                    <h1
+                        class="mt-3 text-balance font-display text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl"
+                    >
+                        Start with a kit.<br />Finish with something you made.
+                    </h1>
+                    <p class="mt-5 max-w-xl text-base leading-8 text-ink-500">
+                        Everything you need for a first project, packed in one
+                        box. Paint, crochet, embroidery or a whole weekend of
+                        making — no extra shopping trip, no guesswork, no drawer
+                        full of half-finished ideas.
+                    </p>
+
+                    <div class="mt-7 flex flex-wrap items-center gap-3">
+                        <a href="#kits" class="btn-primary">
+                            Shop the kits
+                            <Icon
+                                name="lucide:arrow-down"
+                                class="h-4 w-4"
+                                aria-hidden="true"
+                            />
+                        </a>
+                        <a href="#how-it-works" class="btn-secondary">
+                            How it works
+                        </a>
+                    </div>
+
+                    <p
+                        class="mt-5 flex items-center gap-2 text-xs font-semibold text-ink-500"
+                    >
+                        <Icon
+                            name="lucide:package-check"
+                            class="h-4 w-4 text-olive-700"
+                        />
+                        Kits from {startingPrice} · all materials included
+                    </p>
+                </div>
+
+                <div class="relative">
+                    <div
+                        class="rounded-[2rem] border border-ink-900/10 bg-cream-50 p-6 shadow-soft sm:p-8"
+                    >
+                        <Badge tone="olive">Everything included</Badge>
+                        <p class="mt-4 font-display text-2xl text-ink-900">
+                            Inside the box
+                        </p>
+                        <ul class="mt-5 space-y-3.5 text-sm text-ink-600">
+                            <li class="flex items-start gap-3">
+                                <Icon
+                                    name="lucide:check"
+                                    class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                                />
+                                Materials for the whole project
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <Icon
+                                    name="lucide:check"
+                                    class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                                />
+                                The tools you would otherwise borrow
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <Icon
+                                    name="lucide:check"
+                                    class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                                />
+                                A step-by-step guide for beginners
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <Icon
+                                    name="lucide:check"
+                                    class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
+                                />
+                                A box that is genuinely nice to gift
+                            </li>
+                        </ul>
+                        <p
+                            class="mt-6 border-t border-ink-900/10 pt-4 text-xs leading-5 text-ink-400"
+                        >
+                            Pick a kit, open the box, make the thing. That is the
+                            whole idea.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="kits" class="bg-butter-50 py-16 sm:py-20">
+        <div class="container-page">
+            <div
+                class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+            >
+                <div class="max-w-2xl">
+                    <p class="eyebrow">The kits</p>
+                    <h2
+                        class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                    >
+                        Pick your kind of making.
+                    </h2>
+                </div>
+                <p class="max-w-sm text-sm leading-7 text-ink-500">
+                    Paint a sunset, learn a crochet stitch, stitch your first
+                    hoop, or take on a whole weekend of slow craft.
+                </p>
+            </div>
+
+            <div
+                class="mt-10 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+            >
+                {kits.map((kit) => <ProductCard product={kit} />)}
+            </div>
+
+            <div class="mt-10 flex flex-wrap items-center gap-4">
+                <a href="/shop/?category=diy-kits" class="btn-secondary">
+                    See all kits in the shop
+                    <Icon
+                        name="lucide:arrow-right"
+                        class="h-4 w-4"
+                        aria-hidden="true"
+                    />
+                </a>
+                <p class="text-xs text-ink-400">
+                    Every kit counts toward the free craft gift over KES 5,000.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section
+        class="border-y border-ink-900/10 bg-cream-100/50 py-16 sm:py-20"
+    >
+        <div class="container-page">
+            <div class="max-w-2xl">
+                <p class="eyebrow">Why a kit</p>
+                <h2
+                    class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    A whole project in one box.
+                </h2>
+            </div>
+
+            <div class="mt-10 grid gap-5 md:grid-cols-3">
+                <article
+                    class="rounded-3xl border border-ink-900/10 bg-white/60 p-6"
+                >
+                    <span
+                        class="grid h-11 w-11 place-items-center rounded-full bg-clay-100 text-clay-600"
+                    >
+                        <Icon name="lucide:package" class="h-5 w-5" />
+                    </span>
+                    <h3 class="mt-4 font-display text-2xl text-ink-900">
+                        Nothing missing
+                    </h3>
+                    <p class="mt-2 text-sm leading-7 text-ink-500">
+                        No last-minute trip for one more tube of paint. The kit
+                        is checked before it leaves the shop.
+                    </p>
+                </article>
+
+                <article
+                    class="rounded-3xl border border-ink-900/10 bg-white/60 p-6"
+                >
+                    <span
+                        class="grid h-11 w-11 place-items-center rounded-full bg-olive-100 text-olive-700"
+                    >
+                        <Icon name="lucide:sprout" class="h-5 w-5" />
+                    </span>
+                    <h3 class="mt-4 font-display text-2xl text-ink-900">
+                        Beginner-first
+                    </h3>
+                    <p class="mt-2 text-sm leading-7 text-ink-500">
+                        Written for someone who has never tried the craft. The
+                        guide explains the why, not just the steps.
+                    </p>
+                </article>
+
+                <article
+                    class="rounded-3xl border border-ink-900/10 bg-white/60 p-6"
+                >
+                    <span
+                        class="grid h-11 w-11 place-items-center rounded-full bg-marigold-500/20 text-clay-600"
+                    >
+                        <Icon name="lucide:gift" class="h-5 w-5" />
+                    </span>
+                    <h3 class="mt-4 font-display text-2xl text-ink-900">
+                        Gift-ready
+                    </h3>
+                    <p class="mt-2 text-sm leading-7 text-ink-500">
+                        A good present for the person who says they are not
+                        creative, and the one who already is.
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="bg-butter-50 py-16 sm:py-20">
+        <div class="container-page">
+            <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+                <div>
+                    <p class="eyebrow">How it works</p>
+                    <h2
+                        class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                    >
+                        Three steps, one good afternoon.
+                    </h2>
+                    <p class="mt-4 text-sm leading-7 text-ink-500">
+                        No account, no subscription, no cupboard of unused
+                        supplies. Just pick the project you want to try.
+                    </p>
+                </div>
+
+                <ol class="grid gap-4 sm:grid-cols-3">
+                    <li
+                        class="rounded-3xl border border-ink-900/10 bg-cream-50 p-6"
+                    >
+                        <span class="font-display text-3xl text-clay-500">
+                            01
+                        </span>
+                        <h3 class="mt-3 font-display text-xl text-ink-900">
+                            Choose a kit
+                        </h3>
+                        <p class="mt-2 text-sm leading-6 text-ink-500">
+                            Pick the thing you want to make. Every kit lists its
+                            skill level and what is inside.
+                        </p>
+                    </li>
+                    <li
+                        class="rounded-3xl border border-ink-900/10 bg-cream-50 p-6"
+                    >
+                        <span class="font-display text-3xl text-clay-500">
+                            02
+                        </span>
+                        <h3 class="mt-3 font-display text-xl text-ink-900">
+                            Open the box
+                        </h3>
+                        <p class="mt-2 text-sm leading-6 text-ink-500">
+                            Materials, tools and the guide are all there. Clear
+                            the table and you are ready.
+                        </p>
+                    </li>
+                    <li
+                        class="rounded-3xl border border-ink-900/10 bg-cream-50 p-6"
+                    >
+                        <span class="font-display text-3xl text-clay-500">
+                            03
+                        </span>
+                        <h3 class="mt-3 font-display text-xl text-ink-900">
+                            Make it yours
+                        </h3>
+                        <p class="mt-2 text-sm leading-6 text-ink-500">
+                            Follow the guide or ignore it. Keep the result, gift
+                            it, or come back for the next kit.
+                        </p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section
+        class="border-y border-ink-900/10 bg-cream-100/50 py-16 sm:py-20"
+    >
+        <div class="container-page grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+            <div>
+                <p class="eyebrow">Good to know</p>
+                <h2
+                    class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    Kit questions, answered.
+                </h2>
+                <p class="mt-4 text-sm leading-7 text-ink-500">
+                    Still unsure which kit fits? Message us on WhatsApp and tell
+                    us who it is for — we will point you at the right one.
+                </p>
+                <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-ink-900 underline decoration-poppy-500 decoration-2 underline-offset-4 transition hover:text-poppy-600"
+                >
+                    <Icon
+                        name="simple-icons:whatsapp"
+                        class="h-4 w-4"
+                    />
+                    Ask about a kit
+                </a>
+            </div>
+
+            <div class="space-y-3">
+                {
+                    faqs.map((faq) => (
+                        <details class="faq-item group rounded-2xl border border-ink-900/10 bg-white/60">
+                            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-bold text-ink-900 [&::-webkit-details-marker]:hidden">
+                                {faq.question}
+                                <Icon
+                                    name="lucide:plus"
+                                    class="h-4 w-4 shrink-0 text-ink-400 transition duration-300 group-open:rotate-45"
+                                />
+                            </summary>
+                            <p class="px-5 pb-5 text-sm leading-7 text-ink-500">
+                                {faq.answer}
+                            </p>
+                        </details>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="container-page py-16 sm:py-20">
+        <div
+            class="relative overflow-hidden rounded-[2rem] bg-olive-700 px-6 py-12 text-center text-cream-50 sm:px-12 sm:py-16"
+        >
+            <p
+                class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-olive-100/80"
+            >
+                Not sure where to start?
+            </p>
+            <h2
+                class="mx-auto mt-3 max-w-2xl text-balance font-display text-4xl leading-tight sm:text-5xl"
+            >
+                Tell us what you want to make.
+            </h2>
+            <p class="mx-auto mt-4 max-w-xl text-sm leading-7 text-cream-50/75">
+                We will match you to a kit, or put one together if nothing fits.
+                The kettle is usually on.
+            </p>
+            <div class="mt-7 flex flex-wrap justify-center gap-3">
+                <a
+                    href="/shop/?category=diy-kits"
+                    class="inline-flex items-center gap-2 rounded-full bg-cream-50 px-6 py-3 text-sm font-bold text-ink-900 transition hover:bg-marigold-500"
+                >
+                    Shop all kits
+                    <Icon name="lucide:arrow-right" class="h-4 w-4" />
+                </a>
+                <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-2 rounded-full border border-cream-50/40 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-cream-50/10"
+                >
+                    <Icon name="simple-icons:whatsapp" class="h-4 w-4" />
+                    WhatsApp us
+                </a>
+            </div>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    /* Smooth open/close for the FAQ. Browsers without ::details-content
+       support fall back to the native instant toggle. */
+    .faq-item {
+        interpolate-size: allow-keywords;
+    }
+
+    .faq-item::details-content {
+        block-size: 0;
+        overflow: clip;
+        transition:
+            block-size 300ms cubic-bezier(0.4, 0, 0.2, 1),
+            content-visibility 300ms allow-discrete;
+        transition-behavior: allow-discrete;
+    }
+
+    .faq-item[open]::details-content {
+        block-size: auto;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .faq-item::details-content {
+            transition: none;
+        }
+    }
+</style>
