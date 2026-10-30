@@ -15,7 +15,8 @@ import mustardYarnDecorator from "../assets/images/mustard-yarn.png";
 import ugcBackground from "../assets/images/ugc_bg.png";
 import ugcBackgroundTablet from "../assets/images/ugc_bg_3_to_2.png";
 import ugcBackgroundMobile from "../assets/images/ugc_bg_9_to_16.png";
-import { formatDate } from "../lib/format";
+import lavenderPaperTexture from "../assets/images/textured-lavendar-paper.png";
+import { formatDate, formatMoney } from "../lib/format";
 import { demoUgc, demoVibes } from "../lib/demo-data";
 import { DEMO_FREE_GIFT_THRESHOLD } from "../lib/cart-api";
 import { getBestsellers, getProducts } from "../lib/woocommerce";
@@ -60,6 +61,8 @@ const ugcBackgroundTabletOptimized = await getImage({
 const ugcBackgroundMobileOptimized = await getImage({
     src: ugcBackgroundMobile,
 });
+
+const lavenderPaper = await getImage({ src: lavenderPaperTexture });
 
 const marqueeItems = [
     "Free delivery in Nairobi over KES 4,500",
@@ -411,30 +414,20 @@ const schema = {
                             </div>
 
                             <div class="flex flex-wrap items-center gap-4 pt-2">
-                                {featuredWorkshop.wooProductId ? (
-                                    <a
-                                        href={`/shop/workshop-ticket-${featuredWorkshop.id}/`}
-                                        class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
-                                    >
-                                        Book workshop (KES{" "}
-                                        {(featuredWorkshop.price.price
-                                            ? Number(
-                                                  featuredWorkshop.price.price,
-                                              ) / 100
-                                            : 0
-                                        ).toLocaleString()}
-                                        )
-                                    </a>
-                                ) : (
-                                    <a
-                                        href="/contact/"
-                                        class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
-                                    >
-                                        {featuredWorkshop.isFree
-                                            ? "RSVP / Join meetup"
-                                            : "Book via contact"}
-                                    </a>
-                                )}
+                                <a
+                                    href={`/workshops/${featuredWorkshop.slug}/`}
+                                    class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
+                                >
+                                    {featuredWorkshop.isFree
+                                        ? "RSVP / Join meetup"
+                                        : `Save my spot — ${formatMoney(
+                                              featuredWorkshop.price.price,
+                                              featuredWorkshop.price
+                                                  .currency_code,
+                                              featuredWorkshop.price
+                                                  .currency_minor_unit,
+                                          )}`}
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -443,69 +436,48 @@ const schema = {
         </div>
     </section>
 
-    <section
-        class="relative overflow-hidden border-y border-ink-900/10 bg-cream-100/60 py-16 sm:py-20"
-    >
-        <div
-            class="pointer-events-none absolute -right-10 top-0 w-56 select-none sm:-right-20 sm:top-4 sm:w-96 lg:w-[32rem]"
-        >
-            <Image
-                src={mustardYarnDecorator}
-                alt=""
-                aria-hidden="true"
-                widths={[224, 350, 512]}
-                sizes="(max-width: 640px) 224px, (max-width: 1024px) 350px, 512px"
-                class="h-auto w-full"
-            />
-        </div>
-        <div class="container-page relative">
-            <SectionHeading
-                eyebrow="From the journal"
-                title="Notes on colour, making and very good messes"
-                link={{ href: "/journal/", label: "All stories" }}
-            />
-
-            <div class="mt-10 grid gap-6 md:grid-cols-3">
-                {
-                    posts.map((post) => (
-                        <article class="group">
-                            <a
-                                href={`/journal/${post.slug}/`}
-                                class="block overflow-hidden rounded-2xl"
-                            >
-                                <div class="aspect-[3/2] overflow-hidden bg-cream-200">
-                                    {post.image ? (
-                                        <img
-                                            src={post.image.src}
-                                            alt={post.image.alt}
-                                            loading="lazy"
-                                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div class="h-full w-full bg-cream-200" />
-                                    )}
-                                </div>
-                            </a>
-                            <p class="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-300">
-                                {post.categories[0] ?? "Journal"} ·{" "}
-                                {formatDate(post.date)}
-                            </p>
-                            <h3 class="mt-2 font-display text-2xl leading-tight text-ink-900">
-                                <a
-                                    href={`/journal/${post.slug}/`}
-                                    class="hover:text-clay-600"
-                                >
-                                    {post.title}
-                                </a>
-                            </h3>
-                            <p class="mt-3 text-sm leading-7 text-ink-500">
-                                {post.excerpt}
-                            </p>
-                        </article>
-                    ))
-                }
+    <section class="container-page py-16 sm:py-20 relative">
+        <div class="grid items-center gap-10 lg:grid-cols-2">
+            <div class="lg:pl-8">
+                <p class="eyebrow">The shop</p>
+                <h2
+                    class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
+                >
+                    A bright shop, a big table and a very good excuse to make
+                    something.
+                </h2>
+                <p class="mt-5 text-base leading-8 text-ink-500">
+                    We are at Village Market, Nairobi, with shelves full of
+                    supplies we actually use and a table that is always free for
+                    a project. Come in with a question, leave with a new hobby.
+                </p>
+                <p class="mt-4 text-base leading-8 text-ink-500">
+                    We run workshops for every level, host free meetups, and
+                    stock the good pencils. No gatekeeping. No made-up rules.
+                    Just a friendly place to start.
+                </p>
+                <a href="/about/" class="btn-secondary mt-7">Read our story</a>
+            </div>
+            <div
+                class="aspect-[4/3] overflow-hidden rounded-4xl sm:aspect-[3/2] lg:aspect-auto"
+            >
+                <Image
+                    src="https://placehold.co/800x1000/EDF8F5/211D19?text=The+Shop"
+                    alt="A sunlit studio with shelves of handmade ceramics"
+                    width={800}
+                    height={1000}
+                    class="h-full w-full object-cover"
+                />
             </div>
         </div>
+        <Image
+            width={250}
+            widths={[80, 120, 200, 250, 300]}
+            sizes="(max-width: 640px) 80px, (max-width: 1024px) 120px, 250px"
+            src={heartPastel}
+            alt="heart decorative element with pastel texture"
+            class="absolute -bottom-1 left-2 z-10 w-16 rotate-30 sm:-left-6 sm:w-24 lg:-left-12 lg:-z-1 lg:w-[250px]"
+        />
     </section>
 
     <section
@@ -600,48 +572,70 @@ const schema = {
         </div>
     </section>
 
-    <section class="container-page py-16 sm:py-20 relative">
-        <div class="grid items-center gap-10 lg:grid-cols-2">
-            <div class="lg:pl-8">
-                <p class="eyebrow">The shop</p>
-                <h2
-                    class="mt-3 text-balance text-4xl leading-[1.05] tracking-tight text-ink-900 sm:text-5xl"
-                >
-                    A bright shop, a big table and a very good excuse to make
-                    something.
-                </h2>
-                <p class="mt-5 text-base leading-8 text-ink-500">
-                    We are at Village Market, Nairobi, with shelves full of
-                    supplies we actually use and a table that is always free for
-                    a project. Come in with a question, leave with a new hobby.
-                </p>
-                <p class="mt-4 text-base leading-8 text-ink-500">
-                    We run workshops for every level, host free meetups, and
-                    stock the good pencils. No gatekeeping. No made-up rules.
-                    Just a friendly place to start.
-                </p>
-                <a href="/about/" class="btn-secondary mt-7">Read our story</a>
-            </div>
-            <div
-                class="aspect-[4/3] overflow-hidden rounded-4xl sm:aspect-[3/2] lg:aspect-auto"
-            >
-                <Image
-                    src="https://placehold.co/800x1000/EDF8F5/211D19?text=The+Shop"
-                    alt="A sunlit studio with shelves of handmade ceramics"
-                    width={800}
-                    height={1000}
-                    class="h-full w-full object-cover"
-                />
+    <section
+        class="relative overflow-hidden border-y border-ink-900/10 bg-[#bea0c4] bg-cover bg-center py-16 sm:py-20 [&_.eyebrow]:text-ink-900"
+        style={`background-image: url('${lavenderPaper.src}');`}
+    >
+        <div
+            class="pointer-events-none absolute -right-10 top-0 w-56 select-none sm:-right-20 sm:top-4 sm:w-96 lg:w-[32rem]"
+        >
+            <Image
+                src={mustardYarnDecorator}
+                alt=""
+                aria-hidden="true"
+                widths={[224, 350, 512]}
+                sizes="(max-width: 640px) 224px, (max-width: 1024px) 350px, 512px"
+                class="h-auto w-full"
+            />
+        </div>
+        <div class="container-page relative">
+            <SectionHeading
+                eyebrow="From the journal"
+                title="Notes on colour, making and very good messes"
+                link={{ href: "/journal/", label: "All stories" }}
+            />
+
+            <div class="mt-10 grid gap-6 md:grid-cols-3">
+                {
+                    posts.map((post) => (
+                        <article class="group">
+                            <a
+                                href={`/journal/${post.slug}/`}
+                                class="block overflow-hidden rounded-2xl"
+                            >
+                                <div class="aspect-[3/2] overflow-hidden bg-cream-200">
+                                    {post.image ? (
+                                        <img
+                                            src={post.image.src}
+                                            alt={post.image.alt}
+                                            loading="lazy"
+                                            class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div class="h-full w-full bg-cream-200" />
+                                    )}
+                                </div>
+                            </a>
+                            <p class="mt-4 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-800">
+                                {post.categories[0] ?? "Journal"} ·{" "}
+                                {formatDate(post.date)}
+                            </p>
+                            <h3 class="mt-2 font-display text-2xl leading-tight text-ink-900">
+                                <a
+                                    href={`/journal/${post.slug}/`}
+                                    class="decoration-poppy-500 decoration-2 underline-offset-4 hover:underline"
+                                >
+                                    {post.title}
+                                </a>
+                            </h3>
+                            <p class="mt-3 text-sm leading-7 text-ink-800">
+                                {post.excerpt}
+                            </p>
+                        </article>
+                    ))
+                }
             </div>
         </div>
-        <Image
-            width={250}
-            widths={[80, 120, 200, 250, 300]}
-            sizes="(max-width: 640px) 80px, (max-width: 1024px) 120px, 250px"
-            src={heartPastel}
-            alt="heart decorative element with pastel texture"
-            class="absolute -bottom-1 left-2 z-10 w-16 rotate-30 sm:-left-6 sm:w-24 lg:-left-12 lg:-z-1 lg:w-[250px]"
-        />
     </section>
 </BaseLayout>
 
