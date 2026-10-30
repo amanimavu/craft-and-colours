@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/ui/Icon.astro';
+
+const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolours.co.ke';
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
+const waHref = `https://wa.me/${whatsapp.replace(/\D/g, '')}`;
+
+const sections = [
+  { id: 'shipping', label: 'Shipping & delivery', icon: 'lucide:truck' },
+  { id: 'returns', label: 'Returns & exchanges', icon: 'lucide:rotate-ccw' },
+  { id: 'workshops', label: 'Workshop bookings', icon: 'lucide:ticket' },
+  { id: 'privacy', label: 'Privacy', icon: 'lucide:shield-check' },
+  { id: 'terms', label: 'Terms of sale', icon: 'lucide:file-text' },
+];
+
+const updated = '30 October 2026';
+---
+
+<BaseLayout
+  title="Shipping, returns & policies"
+  description="Delivery across Nairobi and East Africa, returns, workshop bookings, privacy and terms of sale at Craft & Colours, Village Market."
+>
+  <section class="border-b border-ink-900/10 bg-cream-100/50">
+    <div class="container-page py-12 sm:py-16">
+      <Breadcrumbs items={[{ label: 'Policies' }]} />
+      <div class="mt-8 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <div>
+          <p class="eyebrow">The small print</p>
+          <h1 class="mt-3 text-balance text-5xl leading-[0.98] tracking-tight text-ink-900 sm:text-6xl">
+            Shipping, returns &amp; the fair stuff.
+          </h1>
+        </div>
+        <p class="max-w-md text-sm leading-7 text-ink-500 lg:pb-3">
+          Plain-language policies for shopping and booking with us. If anything
+          is unclear, message us and a real person will answer.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page py-12 sm:py-16">
+    <div class="grid gap-10 lg:grid-cols-[16rem_1fr] lg:gap-16">
+      <nav aria-label="Policy sections" class="lg:sticky lg:top-28 lg:self-start">
+        <ul class="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
+          {sections.map((section) => (
+            <li class="shrink-0">
+              <a
+                href={`#${section.id}`}
+                class="flex items-center gap-3 rounded-full border border-ink-900/10 bg-white/60 px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-ink-900 hover:text-ink-900"
+              >
+                <Icon name={section.icon} class="h-4 w-4 text-clay-600" />
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="mt-6 hidden text-xs leading-6 text-ink-300 lg:block">
+          Last updated {updated}
+        </p>
+      </nav>
+
+      <div class="max-w-3xl">
+        <div class="prose-craft">
+          <h2 id="shipping" class="mt-0 scroll-mt-28">Shipping &amp; delivery</h2>
+          <ul>
+            <li>
+              <strong>Nairobi:</strong> KES 300 flat rate. Free on orders over
+              KES 4,500.
+            </li>
+            <li>
+              <strong>Rest of Kenya &amp; East Africa:</strong> courier rates
+              are quoted at checkout based on your address and parcel size.
+            </li>
+            <li>
+              <strong>Free craft gift:</strong> orders from KES 5,000 get a
+              small surprise from the shop, while stocks last.
+            </li>
+          </ul>
+          <p>
+            Orders are packed by hand and sent by courier within 3–5 working
+            days. You will get tracking details by email once your parcel
+            leaves the shop. Workshop tickets and other digital items are not
+            shipped and carry no delivery charge.
+          </p>
+          <p>
+            Prefer to collect? Choose your order and message us, and we will
+            have it ready at Village Market.
+          </p>
+
+
+          <h2 id="returns" class="scroll-mt-28">Returns &amp; exchanges</h2>
+          <p>
+            If something is not right, contact us within <strong>14 days of
+            delivery</strong> and we will help you exchange it or arrange a
+            return.
+          </p>
+          <ul>
+            <li>Items must be unused and in their original packaging.</li>
+            <li>
+              Fabric, ribbon and yarn cut to length, opened paint and clay, and
+              personalised items cannot be returned unless faulty.
+            </li>
+            <li>
+              Faulty or damaged on arrival? Send us a photo and we will replace
+              it or refund you, including delivery.
+            </li>
+            <li>
+              Change-of-mind returns can be dropped at the shop, or sent back at
+              your own cost.
+            </li>
+          </ul>
+          <p>
+            Refunds go back to the original payment method (M-Pesa or card)
+            within 7 working days of us receiving the item.
+          </p>
+
+
+          <h2 id="workshops" class="scroll-mt-28">Workshop bookings</h2>
+          <ul>
+            <li>
+              <strong>Paid workshops:</strong> cancel at least 48 hours before
+              the session for a full refund or a free move to another date.
+            </li>
+            <li>
+              Inside 48 hours we cannot refund, but you are welcome to send a
+              friend in your place.
+            </li>
+            <li>
+              If we have to cancel or reschedule, you choose between a new date
+              and a full refund.
+            </li>
+            <li>
+              <strong>Free meetups:</strong> no ticket needed beyond your RSVP.
+              If plans change, let us know so someone else can take your seat.
+            </li>
+          </ul>
+
+
+          <h2 id="privacy" class="scroll-mt-28">Privacy</h2>
+          <p>
+            We collect only what we need to fulfil your order, booking or
+            message: your name, contact details, delivery address and order
+            history. We handle it in line with Kenya’s Data Protection Act,
+            2019.
+          </p>
+          <ul>
+            <li>
+              Card and M-Pesa payments are handled by our payment provider. We
+              never see or store your full card details.
+            </li>
+            <li>
+              We share your address only with the courier delivering your order.
+            </li>
+            <li>
+              Newsletter emails are opt-in, and every email has an unsubscribe
+              link.
+            </li>
+            <li>
+              Your wishlist and cart are stored in your own browser, not on our
+              servers.
+            </li>
+          </ul>
+          <p>
+            To see, correct or delete the details we hold about you, email
+            <a href={`mailto:${email}`}>{email}</a>.
+          </p>
+
+
+          <h2 id="terms" class="scroll-mt-28">Terms of sale</h2>
+          <ul>
+            <li>All prices are in Kenya Shillings (KES).</li>
+            <li>
+              We accept M-Pesa, Visa and Mastercard. Orders are confirmed once
+              payment is received.
+            </li>
+            <li>
+              Colours on screen can vary slightly from the real thing, especially
+              with hand-dyed yarn and handmade pieces.
+            </li>
+            <li>
+              If an item sells out after you order, we will offer a swap or a
+              full refund.
+            </li>
+            <li>
+              We may update these policies from time to time. The version on
+              this page applies to orders placed today.
+            </li>
+          </ul>
+        </div>
+
+        <div class="mt-14 rounded-3xl border border-clay-300/60 bg-clay-100 p-6 sm:p-8">
+          <p class="font-display text-2xl leading-snug text-ink-900">
+            Still have a question?
+          </p>
+          <p class="mt-2 text-sm leading-7 text-ink-700">
+            We are a small team and we read every message.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href={waHref} class="btn-primary" target="_blank" rel="noopener">
+              <Icon name="simple-icons:whatsapp" />
+              WhatsApp us
+            </a>
+            <a href="/contact/" class="btn-secondary">Contact the shop</a>
+          </div>
+        </div>
+
+        <p class="mt-6 text-xs leading-6 text-ink-300 lg:hidden">Last updated {updated}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
