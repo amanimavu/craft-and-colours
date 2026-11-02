@@ -241,6 +241,11 @@ async function main() {
                 "Store API returned zero catalogue products — publish at least one product before deploying.",
             );
         }
+
+        await fetchJson(
+            `${storeUrl}/wp-json/craft/v1/category-filters`,
+            "Category filters endpoint",
+        );
     }
 
     if (cmsProblems.length > 0) {

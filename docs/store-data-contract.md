@@ -70,15 +70,18 @@ does not yet fill these `Product` fields from the Store API:
 
 | Field | Used by | Effect with a live store |
 |---|---|---|
-| `attributes` | Shop dynamic filters | Filters match nothing. |
 | `isNew` | "Fresh arrivals" filter | Filter matches nothing. |
 | `isVirtual` | Demo cart only | No effect: Woo itself skips shipping for virtual items. |
 
 Proposed mapping:
-- `attributes`: global attribute taxonomy `pa_<key>` → `<key>`, first term name.
 - `isNew`: a `new` product tag, or created within the last N days.
 
 Decide before launch.
+
+**Shop filters:** `normalizeProduct()` fills `Product.attributes` from
+`extensions.craft.filter_attributes`, e.g. `{ "finish": ["matte", "satin"] }`:
+global attribute slug (no `pa_`) → term slugs. Custom per-product attributes
+aren't included. The filter's options come from `GET /category-filters` below.
 
 ## Plugin endpoints (`/wp-json/craft/v1`)
 
@@ -127,6 +130,37 @@ Read by `getUgcPosts()` in `src/lib/wordpress.ts`. Only maker posts with a
 featured image are returned, ordered by menu order, then newest.
 Each item: `{ id, handle: "@name", caption, image: { id, src, alt } }`.
 
+### `GET /category-filters` → `CategoryFilters`
+
+Read by `getCategoryFilters()` in `src/lib/woocommerce.ts`. Set on the product
+category edit screen (`includes/category-filters.php`). Only shown filters are
+returned, sorted by position then label. Options are limited to terms used by
+catalogue products directly in that category, and a filter with none is left out.
+
+```jsonc
+{
+  "paint": [
+    {
+      "key": "finish",            // attribute slug, also the URL parameter
+      "label": "Finish",          // the category's label, else the attribute's name
+      "mode": "many",             // or "one"
+      "options": [{ "value": "matte", "label": "Matte" }]   // term slug + name
+    }
+  ]
+}
+```
+
+The storefront picks the input (`getFilterInput()` in `src/lib/filters.ts`):
+
+| Mode | Up to 6 options | More than 6 |
+|---|---|---|
+| `many` | Checkboxes | Multi-select |
+| `one` | Radio buttons | Single select |
+
+Selections are OR within a filter and AND across filters. Attributes named
+`category`, `fresh`, `sale` or `max` can't be filters, because `/shop/` already
+uses those URL parameters.
+
 ### `POST /contact`
 
 Sent by `ContactForm.tsx`.
@@ -170,7 +204,8 @@ The plugin sends a `repository_dispatch` to `CRAFT_GITHUB_REPO`:
 Triggers:
 - Publishing, updating or unpublishing a post, page, product, workshop or maker post.
 - Stock changes.
-- Category or tag edits.
+- Category or tag edits, including a category's shop filters.
+- Product attribute or attribute term edits.
 - A new RSVP.
 - The manual **Rebuild site** button.
 
