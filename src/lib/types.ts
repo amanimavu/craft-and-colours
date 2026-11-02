@@ -43,6 +43,25 @@ export interface Category {
   image?: ProductImage;
 }
 
+export type CategoryFilterMode = 'one' | 'many';
+
+export interface CategoryFilterOption {
+  /** Term slug: what products and the URL carry. */
+  value: string;
+  label: string;
+}
+
+export interface CategoryFilter {
+  /** Attribute slug, also used as the URL parameter. */
+  key: string;
+  label: string;
+  mode: CategoryFilterMode;
+  options: CategoryFilterOption[];
+}
+
+/** Category slug → its filters, already in display order. */
+export type CategoryFilters = Record<string, CategoryFilter[]>;
+
 export interface Product {
   id: number;
   name: string;
@@ -66,8 +85,8 @@ export interface Product {
   reviewCount?: number;
   badge?: string;
   hoverImage?: ProductImage;
-  /** Values for CATEGORY_DYNAMIC_FILTERS keys (e.g. finish, material, clay_type). */
-  attributes?: Record<string, string>;
+  /** Option values per CategoryFilter key, e.g. { finish: ['matte'] }. */
+  attributes?: Record<string, string[]>;
   /** Kept out of shop grids, search and category counts, but still purchasable. */
   catalogHidden?: boolean;
   /** Virtual products (e.g. workshop tickets) skip delivery. */

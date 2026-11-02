@@ -2,11 +2,16 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ShopFilters from "../../components/store/ShopFilters";
-import { getCategories, getProducts } from "../../lib/woocommerce";
+import {
+    getCategories,
+    getCategoryFilters,
+    getProducts,
+} from "../../lib/woocommerce";
 
-const [products, categories] = await Promise.all([
+const [products, categories, categoryFilters] = await Promise.all([
     getProducts(),
     getCategories(),
+    getCategoryFilters(),
 ]);
 const formattedCategories = categories.map((c) => ({
     name: c.name,
@@ -66,6 +71,7 @@ const formattedCategories = categories.map((c) => ({
             client:load
             products={products}
             categories={formattedCategories}
+            categoryFilters={categoryFilters}
         />
     </section>
 </BaseLayout>

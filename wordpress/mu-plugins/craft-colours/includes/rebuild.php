@@ -108,7 +108,7 @@ foreach (['created_term', 'edited_term', 'delete_term'] as $craft_term_hook) {
     add_action(
         $craft_term_hook,
         static function (int $term_id, int $tt_id, string $taxonomy): void {
-            if (in_array($taxonomy, ['category', 'product_cat', 'product_tag'], true)) {
+            if (in_array($taxonomy, ['category', 'product_cat', 'product_tag'], true) || str_starts_with($taxonomy, 'pa_')) {
                 craft_schedule_rebuild("{$taxonomy} updated");
             }
         },
@@ -117,6 +117,12 @@ foreach (['created_term', 'edited_term', 'delete_term'] as $craft_term_hook) {
     );
 }
 unset($craft_term_hook);
+
+// Attribute names are the default shop filter labels.
+foreach (['woocommerce_attribute_added', 'woocommerce_attribute_updated', 'woocommerce_attribute_deleted'] as $craft_attribute_hook) {
+    add_action($craft_attribute_hook, static fn () => craft_schedule_rebuild('product attribute updated'));
+}
+unset($craft_attribute_hook);
 
 /* -------------------------------------------------------------------------
  * Manual "Rebuild site" button in the admin bar

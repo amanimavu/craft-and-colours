@@ -176,6 +176,23 @@ API=http://localhost:8080/wp-json
 | 13 | `curl -si $API/wp/v2/users \| head -1` | `401`. |
 | 14 | `curl -sI $API/craft/v1/workshops \| grep -iE 'nosniff\|referrer'` | Security headers present. |
 
+### Shop filters
+
+```zsh
+wpcli wc product_attribute create --user=admin --name=Finish --slug=finish
+wpcli term create pa_finish Matte
+wpcli term create product_cat Paint --slug=paint
+```
+
+In wp-admin, add **Finish → Matte** and the **Paint** category to the Test Easel.
+Then edit **Paint** under **Products → Categories**, tick **Show** for Finish and
+click **Update**.
+
+- `curl -s $API/craft/v1/category-filters | jq` → `paint` has a `finish` filter
+  with the option `{ "value": "matte", "label": "Matte" }`.
+- `curl -s "$API/wc/store/v1/products?slug=test-easel" | jq '.[0].extensions.craft.filter_attributes'`
+  → `{ "finish": ["matte"] }`.
+
 Hit the newsletter endpoint 11 times in an hour and you get `429` — the
 rate limit. Restart the stack (or wait) to reset it.
 

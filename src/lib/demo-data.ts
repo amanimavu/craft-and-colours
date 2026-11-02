@@ -1,5 +1,8 @@
 import type {
     Category,
+    CategoryFilter,
+    CategoryFilterMode,
+    CategoryFilters,
     PageContent,
     Post,
     Price,
@@ -9,6 +12,7 @@ import type {
     Vibe,
     Workshop,
 } from "./types";
+import { slugify } from "./format";
 
 const placeholders: Record<string, { label: string; background: string }> = {
     "paint-pack": { label: "Paint Pack Shot", background: "F4EFFF" },
@@ -142,6 +146,100 @@ const kids = demoCategories[4]!;
 const diy = demoCategories[5]!;
 const bundles = demoCategories[6]!;
 
+function demoFilter(
+    key: string,
+    label: string,
+    mode: CategoryFilterMode,
+    options: string[],
+): CategoryFilter {
+    return {
+        key,
+        label,
+        mode,
+        options: options.map((option) => ({
+            value: slugify(option),
+            label: option,
+        })),
+    };
+}
+
+// Between them these show all four inputs. Material and Craft Type list options
+// no demo product has, to pass the 6-option limit. A live store only lists
+// options that its products use.
+export const demoCategoryFilters: CategoryFilters = {
+    paint: [
+        demoFilter("finish", "Finish", "many", [
+            "Matte",
+            "Gloss",
+            "Satin",
+            "Metallic",
+        ]),
+        demoFilter("size", "Set Size", "one", [
+            "Single Tube",
+            "6-Set",
+            "12-Set",
+            "24-Set",
+        ]),
+    ],
+    "stitch-sew": [
+        demoFilter("material", "Material", "many", [
+            "Cotton",
+            "Wool",
+            "Linen",
+            "Blend",
+            "Silk",
+            "Bamboo",
+            "Acrylic",
+        ]),
+        demoFilter("skill", "Skill Level", "one", [
+            "Beginner",
+            "Intermediate",
+            "Advanced",
+        ]),
+    ],
+    clay: [
+        demoFilter("clay_type", "Clay Type", "many", [
+            "Air-Dry",
+            "Polymer",
+            "Ceramic",
+            "Pottery Tool",
+        ]),
+    ],
+    sketch: [
+        demoFilter("medium", "Medium", "many", [
+            "Graphite",
+            "Ink",
+            "Charcoal",
+            "Mixed Media",
+        ]),
+    ],
+    kids: [
+        demoFilter("age", "Age Group", "one", [
+            "Ages 3–5",
+            "Ages 6–9",
+            "Ages 10+",
+        ]),
+    ],
+    "diy-kits": [
+        demoFilter("craft_type", "Craft Type", "one", [
+            "Crochet",
+            "Painting",
+            "Embroidery",
+            "Pottery",
+            "Sewing",
+            "Knitting",
+            "Origami",
+        ]),
+    ],
+    bundles: [
+        demoFilter("bundle_type", "Bundle Type", "many", [
+            "Gift Box",
+            "Workshop Kit",
+            "Starter Stash",
+        ]),
+    ],
+};
+
 export const demoProducts: Product[] = [
     {
         id: 101,
@@ -176,7 +274,7 @@ export const demoProducts: Product[] = [
         rating: 4.8,
         reviewCount: 126,
         badge: "Village Market Fave",
-        attributes: { finish: "Matte", size: "12-Set" },
+        attributes: { finish: ["matte"], size: ["12-set"] },
     },
     {
         id: 102,
@@ -209,7 +307,7 @@ export const demoProducts: Product[] = [
         rating: 4.9,
         reviewCount: 84,
         badge: "Beginner Friendly",
-        attributes: { finish: "Satin", size: "24-Set" },
+        attributes: { finish: ["satin"], size: ["24-set"] },
     },
     {
         id: 103,
@@ -304,7 +402,7 @@ export const demoProducts: Product[] = [
         rating: 4.9,
         reviewCount: 73,
         badge: "New",
-        attributes: { material: "Cotton", skill: "Beginner" },
+        attributes: { material: ["cotton"], skill: ["beginner"] },
     },
     {
         id: 106,
@@ -339,7 +437,7 @@ export const demoProducts: Product[] = [
         rating: 4.8,
         reviewCount: 61,
         badge: "Beginner Friendly",
-        attributes: { material: "Cotton", skill: "Beginner" },
+        attributes: { material: ["cotton"], skill: ["beginner"] },
     },
     {
         id: 107,
@@ -367,9 +465,9 @@ export const demoProducts: Product[] = [
         rating: 4.7,
         reviewCount: 44,
         attributes: {
-            material: "Cotton",
-            skill: "Beginner",
-            craft_type: "Embroidery",
+            material: ["cotton"],
+            skill: ["beginner"],
+            craft_type: ["embroidery"],
         },
     },
     {
@@ -399,7 +497,7 @@ export const demoProducts: Product[] = [
         isNew: true,
         rating: 4.8,
         reviewCount: 90,
-        attributes: { material: "Cotton", skill: "Beginner" },
+        attributes: { material: ["cotton"], skill: ["beginner"] },
         variations: [
             {
                 id: 801,
@@ -478,7 +576,7 @@ export const demoProducts: Product[] = [
         featured: true,
         rating: 4.6,
         reviewCount: 35,
-        attributes: { clay_type: "Air-Dry" },
+        attributes: { clay_type: ["air-dry"] },
     },
     {
         id: 110,
@@ -505,7 +603,7 @@ export const demoProducts: Product[] = [
         stockQuantity: 24,
         rating: 4.5,
         reviewCount: 28,
-        attributes: { clay_type: "Pottery Tool" },
+        attributes: { clay_type: ["pottery-tool"] },
     },
     {
         id: 111,
@@ -537,7 +635,7 @@ export const demoProducts: Product[] = [
         isNew: true,
         rating: 4.8,
         reviewCount: 67,
-        attributes: { medium: "Mixed Media" },
+        attributes: { medium: ["mixed-media"] },
     },
     {
         id: 112,
@@ -567,7 +665,7 @@ export const demoProducts: Product[] = [
         stockQuantity: 32,
         rating: 4.7,
         reviewCount: 49,
-        attributes: { medium: "Graphite" },
+        attributes: { medium: ["graphite"] },
     },
     {
         id: 113,
@@ -599,7 +697,7 @@ export const demoProducts: Product[] = [
         rating: 4.9,
         reviewCount: 58,
         badge: "Weekend Workshop",
-        attributes: { age: "Ages 6–9" },
+        attributes: { age: ["ages-6-9"] },
     },
     {
         id: 114,
@@ -626,9 +724,9 @@ export const demoProducts: Product[] = [
         reviewCount: 41,
         badge: "Beginner Friendly",
         attributes: {
-            craft_type: "Crochet",
-            material: "Cotton",
-            skill: "Beginner",
+            craft_type: ["crochet"],
+            material: ["cotton"],
+            skill: ["beginner"],
         },
     },
     {
@@ -661,7 +759,7 @@ export const demoProducts: Product[] = [
         rating: 4.9,
         reviewCount: 36,
         badge: "Village Market Fave",
-        attributes: { craft_type: "Painting", finish: "Gloss", size: "6-Set" },
+        attributes: { craft_type: ["painting"], finish: ["gloss"], size: ["6-set"] },
     },
     {
         id: 116,
@@ -696,7 +794,7 @@ export const demoProducts: Product[] = [
         rating: 5,
         reviewCount: 22,
         badge: "Best Value",
-        attributes: { bundle_type: "Starter Stash" },
+        attributes: { bundle_type: ["starter-stash"] },
     },
     {
         id: 117,
@@ -727,7 +825,7 @@ export const demoProducts: Product[] = [
         isNew: true,
         rating: 4.8,
         reviewCount: 19,
-        attributes: { bundle_type: "Workshop Kit", craft_type: "Pottery" },
+        attributes: { bundle_type: ["workshop-kit"], craft_type: ["pottery"] },
     },
     {
         id: 118,
@@ -754,7 +852,7 @@ export const demoProducts: Product[] = [
         stockQuantity: 14,
         rating: 4.9,
         reviewCount: 27,
-        attributes: { age: "Ages 6–9", bundle_type: "Gift Box" },
+        attributes: { age: ["ages-6-9"], bundle_type: ["gift-box"] },
     },
     // Workshop tickets mirror the WooCommerce virtual products behind each paid
     // session. They are purchasable, but hidden from the catalogue and search.

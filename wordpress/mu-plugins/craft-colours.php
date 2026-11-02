@@ -27,6 +27,7 @@ foreach (
         'ugc',
         'free-gift',
         'product-content',
+        'category-filters',
         'whatsapp-payment',
         'address-fields',
         'low-stock',

@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Check, ShoppingBag } from "lucide-react";
-import type { Product } from "../../lib/types";
-import { CATEGORY_DYNAMIC_FILTERS } from "../../lib/filters";
+import type { CategoryFilters, Product } from "../../lib/types";
+import { keepValidSelections } from "../../lib/filters";
+import CategoryFilterInput from "./CategoryFilterInput";
 import { formatCardPrice, formatMoney } from "../../lib/format";
 import { addItem } from "../../lib/cart-store";
 
 interface ShopFiltersProps {
     products: Product[];
     categories: { name: string; slug: string; count: number }[];
+    categoryFilters: CategoryFilters;
 }
 
 const DEFAULT_MAX_PRICE = 15000;
@@ -39,6 +41,7 @@ function readParamsFromUrl() {
 export default function ShopFilters({
     products,
     categories,
+    categoryFilters,
 }: ShopFiltersProps) {
     // SSR-safe neutral defaults. These must be identical on the server render
     // and the first client render — the real values are only known on the
@@ -52,9 +55,7 @@ export default function ShopFilters({
         Record<string, string[]>
     >({});
 
-    const dynamicFilterConfigs = category
-        ? CATEGORY_DYNAMIC_FILTERS[category] || []
-        : [];
+    const dynamicFilterConfigs = categoryFilters[category] ?? [];
 
     // Hydrate the real filter values from the URL once, right after mount.
     // This runs strictly after hydration, so it's an ordinary state update
@@ -65,7 +66,12 @@ export default function ShopFilters({
         setFresh(parsed.fresh);
         setOnSale(parsed.onSale);
         setMaxPrice(parsed.maxPrice);
-        setDynamicFilters(parsed.dynamicFilters);
+        setDynamicFilters(
+            keepValidSelections(
+                parsed.dynamicFilters,
+                categoryFilters[parsed.category] ?? [],
+            ),
+        );
         setMounted(true);
     }, []);
 
@@ -103,20 +109,12 @@ export default function ShopFilters({
         setDynamicFilters({});
     };
 
-    const handleDynamicChange = (key: string, option: string) => {
+    const handleDynamicChange = (key: string, selected: string[]) => {
         setDynamicFilters((prev) => {
-            const current = prev[key] || [];
-            if (current.includes(option)) {
-                const next = current.filter((item) => item !== option);
-                if (next.length === 0) {
-                    const copy = { ...prev };
-                    delete copy[key];
-                    return copy;
-                }
-                return { ...prev, [key]: next };
-            } else {
-                return { ...prev, [key]: [...current, option] };
-            }
+            const next = { ...prev };
+            if (selected.length > 0) next[key] = selected;
+            else delete next[key];
+            return next;
         });
     };
 
@@ -170,8 +168,9 @@ export default function ShopFilters({
 
         for (const [key, selectedOptions] of Object.entries(dynamicFilters)) {
             if (selectedOptions.length === 0) continue;
-            const value = product.attributes?.[key];
-            if (!value || !selectedOptions.includes(value)) return false;
+            const values = product.attributes?.[key] ?? [];
+            if (!values.some((value) => selectedOptions.includes(value)))
+                return false;
         }
 
         return true;
@@ -290,39 +289,18 @@ export default function ShopFilters({
                             <h4 className="text-xs font-bold uppercase tracking-[0.16em] text-ink-400">
                                 Category Filters
                             </h4>
-                            {dynamicFilterConfigs.map((group) => (
-                                <div key={group.key} className="space-y-3">
-                                    <p className="text-xs font-bold text-ink-700">
-                                        {group.name}
-                                    </p>
-                                    <div className="space-y-2">
-                                        {group.options.map((opt) => {
-                                            const isChecked =
-                                                dynamicFilters[
-                                                    group.key
-                                                ]?.includes(opt) || false;
-                                            return (
-                                                <label
-                                                    key={opt}
-                                                    className="flex items-center gap-2.5 text-xs text-ink-600 cursor-pointer"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isChecked}
-                                                        onChange={() =>
-                                                            handleDynamicChange(
-                                                                group.key,
-                                                                opt,
-                                                            )
-                                                        }
-                                                        className="h-3.5 w-3.5 rounded border-ink-900/25 text-poppy-500 focus:ring-poppy-500"
-                                                    />
-                                                    {opt}
-                                                </label>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
+                            {dynamicFilterConfigs.map((filter) => (
+                                <CategoryFilterInput
+                                    key={filter.key}
+                                    filter={filter}
+                                    selected={dynamicFilters[filter.key] ?? []}
+                                    onChange={(selected) =>
+                                        handleDynamicChange(
+                                            filter.key,
+                                            selected,
+                                        )
+                                    }
+                                />
                             ))}
                         </div>
                     )}

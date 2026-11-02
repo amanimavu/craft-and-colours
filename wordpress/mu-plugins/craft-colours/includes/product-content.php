@@ -96,11 +96,18 @@ add_action(
             'namespace' => 'craft',
             'data_callback' => static fn (WC_Product $product): array => [
                 'good_to_know' => craft_good_to_know_html($product->get_parent_id() ?: $product->get_id()),
+                'filter_attributes' => craft_product_filter_attributes($product),
             ],
             'schema_callback' => static fn (): array => [
                 'good_to_know' => [
                     'description' => 'HTML for the "Good to know" section (product value or site default).',
                     'type' => 'string',
+                    'context' => ['view', 'edit'],
+                    'readonly' => true,
+                ],
+                'filter_attributes' => [
+                    'description' => 'Attribute term slugs for the shop filters, keyed by attribute slug.',
+                    'type' => 'object',
                     'context' => ['view', 'edit'],
                     'readonly' => true,
                 ],

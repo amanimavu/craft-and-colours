@@ -1,7 +1,7 @@
 # Craft & Colours — Project Memory
 
 > Persistent context for this repository. Read this first when resuming work.
-> **Last updated:** 2026-10-30
+> **Last updated:** 2026-11-02
 > **Source:** reconstructed from the plan-mode transcript + repository inspection.
 
 ---
@@ -17,17 +17,17 @@
 
 ## 2. Project snapshot
 
-| Item | Value |
-|---|---|
-| Project | Craft & Colours — art, craft & haberdashery shop + workshop space |
-| Location | Village Market, Limuru Road, Nairobi, Kenya |
-| Market | Nairobi first, East Africa delivery |
-| Stack | Astro 7 (`output: static`), React 19 islands, Tailwind CSS 4, TypeScript |
-| Backend (target) | Headless WordPress + WooCommerce (Store API) |
-| Hosting (target) | Host Africa (shared/Passenger), GitHub Actions deploy |
-| Repo | `/home/amani-mavu/Projects/craft_and_colours` |
-| Git | Only one commit (`f8cb6a5 chore: inital commit`); **the whole app is currently untracked/uncommitted** |
-| Last verified | User ran `npm run check` + `npm run build` themselves, confirmed passing (2026-10-28). **Note:** per user instruction, the assistant no longer runs these commands proactively — it flags when something is ready to verify and the user runs them. |
+| Item             | Value                                                                                                                                                                                                                                               |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project          | Craft & Colours — art, craft & haberdashery shop + workshop space                                                                                                                                                                                   |
+| Location         | Village Market, Limuru Road, Nairobi, Kenya                                                                                                                                                                                                         |
+| Market           | Nairobi first, East Africa delivery                                                                                                                                                                                                                 |
+| Stack            | Astro 7 (`output: static`), React 19 islands, Tailwind CSS 4, TypeScript                                                                                                                                                                            |
+| Backend (target) | Headless WordPress + WooCommerce (Store API)                                                                                                                                                                                                        |
+| Hosting (target) | Host Africa (shared/Passenger), GitHub Actions deploy                                                                                                                                                                                               |
+| Repo             | `/home/amani-mavu/Projects/craft_and_colours`                                                                                                                                                                                                       |
+| Git              | Only one commit (`f8cb6a5 chore: inital commit`); **the whole app is currently untracked/uncommitted**                                                                                                                                              |
+| Last verified    | User ran `npm run check` + `npm run build` themselves, confirmed passing (2026-10-28). **Note:** per user instruction, the assistant no longer runs these commands proactively — it flags when something is ready to verify and the user runs them. |
 
 **Pages that exist:** `/`, `/shop/`, `/shop/[slug]/`, `/journal/`, `/journal/[slug]/`, `/about/`, `/contact/`, `/cart/`, `/checkout/`, `/order-confirmation/`, `/workshops/`, `/workshops/[slug]/`, `/diy-kits/`, `/wishlist/`, `/policies/`, `404`, `/robots.txt`, plus internal `/styleguide/`. `/shop/category/[slug]/` was **removed 2026-10-28** — category browsing is now `/shop/?category=<slug>` on the main shop page. `cart`, `checkout`, `order-confirmation`, `wishlist`, and `styleguide` are excluded from the sitemap; the latter two are also `noindex`.
 
@@ -38,19 +38,21 @@
 ## 3. Locked decisions
 
 ### Brand & design
+
 - Direction: playful **"dopamine design"** (inspired by ban.do), high-converting storefront.
 - Palette (Tailwind tokens in `src/styles/global.css`):
-  - cream `#fbf7ef / #f6efe2 / #ecdfcd / #ddcbb2`
-  - ink `#211d19 / #332d27 / #4a423b / #6f655b / #a79c91`
-  - clay `#f4ddd1 / #d99a7b / #b45f3f / #984a2f`
-  - **olive `#e8ebd8 / #6f7d3f / #3e4a24`** ← replaced teal everywhere
-  - butter `#fff9eb`, poppy `#ff5e36 / #e84a24`, bubblegum `#ff6584`, marigold `#ffaa00`, cobalt `#2354e6`
-  - sand `#ead9c0 / #d9c3a5`
+    - cream `#fbf7ef / #f6efe2 / #ecdfcd / #ddcbb2`
+    - ink `#211d19 / #332d27 / #4a423b / #6f655b / #a79c91`
+    - clay `#f4ddd1 / #d99a7b / #b45f3f / #984a2f`
+    - **olive `#e8ebd8 / #6f7d3f / #3e4a24`** ← replaced teal everywhere
+    - butter `#fff9eb`, poppy `#ff5e36 / #e84a24`, bubblegum `#ff6584`, marigold `#ffaa00`, cobalt `#2354e6`
+    - sand `#ead9c0 / #d9c3a5`
 - Type: **Fraunces Variable** (SOFT/WONK) display + **Manrope** body (`@fontsource-variable/*`).
 - Icons: `astro-icon` with `lucide` and `simple-icons`; `src/assets/icons` for local SVGs.
 - Buttons are pills, cards have 16px+ radii, soft chunky shadows, bouncy hovers.
 
 ### UX / layout
+
 - **Footer:** flat cream background, **no texture**.
 - **Texture:** `brush-stroke-texture.jpg` is used only on the workshop/meetups section; `textured-lavendar-paper.png` only on the home journal section (2026-10-30). Footer stays flat cream — lavender was considered for the footer and rejected (locked decision + muted text fails contrast on lilac, shows site-wide).
 - **Text on lavender:** `ink-500`, `ink-700`, `ink-300` and `clay-600` all fail AA on the lilac texture; use `ink-800`/`ink-900`.
@@ -62,6 +64,7 @@
 - Prefer Astro `<Image />` for local assets; raw `<img>` only for dynamic/remote URLs where `<Image />` is not applicable.
 
 ### Commerce
+
 - Currency **KES**, locale `en-KE`.
 - Shipping: Nairobi KES 300, free over KES 4,500; East Africa quoted at checkout.
 - Free craft gift from KES 5,000.
@@ -71,6 +74,7 @@
 - Reviews cadence: stop after each phase / sub-step and wait for approval.
 
 ### Engineering
+
 - Node **>= 22.23.4** (Astro 7 requirement). Known-good: `v24.14.0`.
 - Path alias-free relative imports; Astro pages fetch via `src/lib/woocommerce.ts`.
 - Static output; no SSR adapter yet (Host Africa deployment approach still TBD).
@@ -81,33 +85,34 @@
 
 Original plan message: phases **0–9**, each ending in a **review stop**. This is the authoritative roadmap; statuses below are the current reconstruction.
 
-| Phase | Scope | Status |
-|---|---|---|
-| **0 — Baseline + asset intake** | install, `check`, `build`, fix baseline blockers, confirm assets/contact/payments/schedule | ✅ **Done** |
-| **1 — Content & data model** | Nairobi catalogue (7 categories), KES pricing, workshops/posts types, shipping + SEO location data | ✅ **Done** |
-| **2 — Design foundation** | palette/typography in `global.css`, icon setup, shared components (`Logo`, `Icon`, `Sticker`, `WavyDivider`, `Ticker`, `Badge`), replace inline SVGs | ✅ **Done (awaiting style review)** — tokens, fonts, icon wrapper, 6 shared components, bouncy buttons, `/styleguide/` preview; all page-level inline SVGs replaced |
-| **3 — Global shell** | animated ticker, header (mega-menu, search pill, wishlist, cart drawer trigger, WhatsApp pill, mobile menu), cart drawer w/ free-gift bar, mobile sticky bar, footer | ✅ **Done — reviewed and approved by user (2026-10-28)** — ticker, mega-menu, ⌘K search overlay, wishlist, cart drawer, WhatsApp pills, mobile menu, mobile bottom bar, newsletter band |
-| **4 — Home page** | hero, featured workshop, "Creative Vibes" bubbles, bestsellers/bundles, UGC wall, newsletter CTA | ✅ **Done (2026-10-28)** — hero, featured-workshop block (single `upcomingWorkshops[0]` detail card — **not a carousel, by deliberate choice**, see change log), journal, CTA banner, vibes bubbles (`demoVibes`), UGC wall (`demoUgc`, pinboard collage w/ photo bg, user-reviewed), and `Bestsellers.astro` (wired into `index.astro`) all live. Newsletter CTA section was built then removed same day at user request ("remove 'Stay in the loop' banner") — footer newsletter band (`Footer.astro`) is untouched and still the only newsletter signup on the site. |
-| **5 — Shop + product** | shop index w/ filters + search + quick-add + wishlist, category pages, product page (gallery, swatches, ratings, WhatsApp, related) | ✅ **Done (2026-10-28)** — filters now really filter (shared + per-category dynamic attributes, see below), quick-add-to-cart button on shop-grid cards (simple in-stock products only — variable products route to the product page instead), search + wishlist done, category pages replaced with query-param filtering on `/shop/`; product page has gallery, true color swatches (not just text pills), star rating + review count, a WhatsApp contact link, and related products. |
-| **6 — Workshops + DIY kits** | workshops index/detail + "Save My Spot", paid→cart / free→RSVP, DIY kits landing | ✅ **Done (2026-10-28)** — `/workshops/` listing, `/workshops/[slug]/` detail, paid ticket → cart and free RSVP flow, plus `/diy-kits/` landing page. `/studio/` was **cancelled** — the business has no studio/private-hire offering. |
-| **7 — Commerce flows** | cart page + drawer sync, checkout, confirmation, address fields, shipping, wishlist, search, policies, 404, robots, favicon, confetti | ✅ **Done — user confirmed (2026-10-30)** — `/policies/`, `404.astro`, `robots.txt` endpoint, `public/favicon.svg`, `og:locale` fix, order-confirmation confetti. Policy copy still a draft for owner sign-off. |
-| **8 — WordPress integration** | `mu-plugin` (CORS, contact, newsletter, RSVP, UGC CPT, free-gift logic, low-stock widget, security headers, rebuild hook) + docs | ✅ **Done — verified by user against the local Docker WordPress (2026-10-30).** Plugin in `wordpress/mu-plugins/` (+ later additions: product "Good to know", "Order now, pay on confirmation" gateway, KE/UG/TZ address rules), frontend wired, local stack + 3 docs. |
-| **9 — Deployment + QA** | GitHub Actions build/deploy, Host Africa guide, check/build, responsive/a11y/Lighthouse, RC report | ❌ **Not started** (`.github/` is empty) |
+| Phase                           | Scope                                                                                                                                                                | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **0 — Baseline + asset intake** | install, `check`, `build`, fix baseline blockers, confirm assets/contact/payments/schedule                                                                           | ✅ **Done**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **1 — Content & data model**    | Nairobi catalogue (7 categories), KES pricing, workshops/posts types, shipping + SEO location data                                                                   | ✅ **Done**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **2 — Design foundation**       | palette/typography in `global.css`, icon setup, shared components (`Logo`, `Icon`, `Sticker`, `WavyDivider`, `Ticker`, `Badge`), replace inline SVGs                 | ✅ **Done (awaiting style review)** — tokens, fonts, icon wrapper, 6 shared components, bouncy buttons, `/styleguide/` preview; all page-level inline SVGs replaced                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **3 — Global shell**            | animated ticker, header (mega-menu, search pill, wishlist, cart drawer trigger, WhatsApp pill, mobile menu), cart drawer w/ free-gift bar, mobile sticky bar, footer | ✅ **Done — reviewed and approved by user (2026-10-28)** — ticker, mega-menu, ⌘K search overlay, wishlist, cart drawer, WhatsApp pills, mobile menu, mobile bottom bar, newsletter band                                                                                                                                                                                                                                                                                                                                                                                 |
+| **4 — Home page**               | hero, featured workshop, "Creative Vibes" bubbles, bestsellers/bundles, UGC wall, newsletter CTA                                                                     | ✅ **Done (2026-10-28)** — hero, featured-workshop block (single `upcomingWorkshops[0]` detail card — **not a carousel, by deliberate choice**, see change log), journal, CTA banner, vibes bubbles (`demoVibes`), UGC wall (`demoUgc`, pinboard collage w/ photo bg, user-reviewed), and `Bestsellers.astro` (wired into `index.astro`) all live. Newsletter CTA section was built then removed same day at user request ("remove 'Stay in the loop' banner") — footer newsletter band (`Footer.astro`) is untouched and still the only newsletter signup on the site. |
+| **5 — Shop + product**          | shop index w/ filters + search + quick-add + wishlist, category pages, product page (gallery, swatches, ratings, WhatsApp, related)                                  | ✅ **Done (2026-10-28)** — filters now really filter (shared + per-category dynamic attributes, see below), quick-add-to-cart button on shop-grid cards (simple in-stock products only — variable products route to the product page instead), search + wishlist done, category pages replaced with query-param filtering on `/shop/`; product page has gallery, true color swatches (not just text pills), star rating + review count, a WhatsApp contact link, and related products.                                                                                  |
+| **6 — Workshops + DIY kits**    | workshops index/detail + "Save My Spot", paid→cart / free→RSVP, DIY kits landing                                                                                     | ✅ **Done (2026-10-28)** — `/workshops/` listing, `/workshops/[slug]/` detail, paid ticket → cart and free RSVP flow, plus `/diy-kits/` landing page. `/studio/` was **cancelled** — the business has no studio/private-hire offering.                                                                                                                                                                                                                                                                                                                                  |
+| **7 — Commerce flows**          | cart page + drawer sync, checkout, confirmation, address fields, shipping, wishlist, search, policies, 404, robots, favicon, confetti                                | ✅ **Done — user confirmed (2026-10-30)** — `/policies/`, `404.astro`, `robots.txt` endpoint, `public/favicon.svg`, `og:locale` fix, order-confirmation confetti. Policy copy still a draft for owner sign-off.                                                                                                                                                                                                                                                                                                                                                         |
+| **8 — WordPress integration**   | `mu-plugin` (CORS, contact, newsletter, RSVP, UGC CPT, free-gift logic, low-stock widget, security headers, rebuild hook) + docs                                     | ✅ **Done — verified by user against the local Docker WordPress (2026-10-30).** Plugin in `wordpress/mu-plugins/` (+ later additions: product "Good to know", "Order now, pay on confirmation" gateway, KE/UG/TZ address rules), frontend wired, local stack + 3 docs.                                                                                                                                                                                                                                                                                                  |
+| **9 — Deployment + QA**         | GitHub Actions build/deploy, Host Africa guide, check/build, responsive/a11y/Lighthouse, RC report                                                                   | ❌ **Not started** (`.github/` is empty)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Phase detail / acceptance criteria
 
-- **Phase 0:** clean `npm install`, `check`, `build`; asset request list confirmed. *(Complete; fixed `FormEvent`, duplicate `lines` key, unreachable `??`, unused import, engines.)*
+- **Phase 0:** clean `npm install`, `check`, `build`; asset request list confirmed. _(Complete; fixed `FormEvent`, duplicate `lines` key, unreachable `??`, unused import, engines.)_
 - **Phase 1:** categories Paint, Stitch & Sew, Clay, Sketch, Kids, DIY Kits, Bundles; products with KES prices, ratings, stock, swatches, pack shot + hands-in-action; `Workshop`/`Vibe`/`UGC` types; KES formatting and Kenyan address fields.
-- **Phase 2:** all visual primitives reusable; no inline SVG left; style tile approved. *(Components + style guide built; awaiting user approval.)*
-- **Phase 3:** shell fully interactive; free-gift progress bar; mobile bottom bar. *(Built; awaiting review.)*
+- **Phase 2:** all visual primitives reusable; no inline SVG left; style tile approved. _(Components + style guide built; awaiting user approval.)_
+- **Phase 3:** shell fully interactive; free-gift progress bar; mobile bottom bar. _(Built; awaiting review.)_
 - **Phase 4a:** hero uses the provided collage banner with correct aspect + copy below. **4b:** full home sections.
-- **Phase 5:** filters actually filter (shared + per-category attributes); quick-add; wishlist. *(Complete 2026-10-28.)*
-- **Phase 6:** booking/RSVP flows; DIY kits landing. *(Complete 2026-10-28; Studio page cancelled by user — no such offering.)*
-- **Phase 7:** end-to-end purchase + policies + 404/robots/favicon + confetti. *(Built 2026-10-30; not browser-verified — dev server blocked by root-owned `.astro/`, see Known issues.)*
-- **Phase 8:** plugin + setup docs; store data contract documented. *(Complete 2026-10-30, user-verified.)*
+- **Phase 5:** filters actually filter (shared + per-category attributes); quick-add; wishlist. _(Complete 2026-10-28.)_
+- **Phase 6:** booking/RSVP flows; DIY kits landing. _(Complete 2026-10-28; Studio page cancelled by user — no such offering.)_
+- **Phase 7:** end-to-end purchase + policies + 404/robots/favicon + confetti. _(Built 2026-10-30; not browser-verified — dev server blocked by root-owned `.astro/`, see Known issues.)_
+- **Phase 8:** plugin + setup docs; store data contract documented. _(Complete 2026-10-30, user-verified.)_
 - **Phase 9:** deploy workflow + launch QA.
 
 ### Legacy task tracker (pre-redesign scaffold)
+
 The session to-do list still holds six older tasks; it is **stale** relative to the phase plan:
 
 1. Scaffold Astro 7 project config, styles, demo data — `in_progress` (effectively done)
@@ -124,6 +129,7 @@ The session to-do list still holds six older tasks; it is **stale** relative to 
 ## 5. Current work state
 
 ### Phase 3 — Global shell (built 2026-10-27, awaiting review)
+
 - **Header** (`Header.astro`): ticker, shop mega-menu (opens on hover with a short intent delay, plus click/keyboard; category cards, icons, blurbs, olive count badges, DIY-kit promo and delivery info), ⌘K/Ctrl+K search trigger, wishlist heart + count, cart trigger (`data-cart-open`, `/cart/` no-JS fallback), WhatsApp pill (`xl+`), and a rich mobile menu (`lg-`). Main nav appears at `lg` to avoid tablet overflow; the heart is hidden below `sm` because the mobile menu carries wishlist.
 - **Search** (`SearchOverlay.tsx`): body-level portal, live filtering by name/category, category shortcuts when empty, `Enter` opens the first result, `Esc`/backdrop close, scroll lock, focus return. Triggers on `[data-search-open]`, `search:open`, and ⌘K/Ctrl+K.
 - **Cart drawer** (`CartDrawer.tsx`): mounted once in `BaseLayout`; opens from `[data-cart-open]` or `cart:open`; quantity/remove controls; free-gift progress uses `DEMO_FREE_GIFT_THRESHOLD` (KES 5,000); `Esc`/backdrop close; focus returns to trigger.
@@ -135,6 +141,7 @@ The session to-do list still holds six older tasks; it is **stale** relative to 
 - **Verified:** `check` 0/0/0; build 39 pages; headless screenshots at 390/768/1024/1280/1440 with no horizontal overflow; added-to-cart → drawer, search, wishlist, newsletter success, mobile menu/bar all exercised.
 
 ### Phase 7 — Policies, 404, robots, favicon, confetti (2026-10-30)
+
 - **`/policies/`** (`src/pages/policies.astro`): hero + sticky side nav (horizontal scroll pills on mobile) with anchors `#shipping`, `#returns`, `#workshops`, `#privacy`, `#terms` (ids on the `h2`s, `scroll-mt-28`; kept as direct `.prose-craft` children so its `> * + *` spacing applies). Copy reflects locked decisions: Nairobi KES 300 / free over KES 4,500, East Africa quoted at checkout, free gift from KES 5,000, dispatch 3–5 working days, 14-day returns (matches `contact.astro` + product page), refunds to M-Pesa/card in 7 working days, workshop cancel ≥48h for refund/transfer, Kenya Data Protection Act 2019, KES pricing. **Draft copy — workshop 48h rule, cut-to-length/opened-item exclusions and 7-day refund window were assumed, need user confirmation.** Ends with WhatsApp + contact CTA card.
 - **`404.astro`**: noindex, big "4 0 4" (tilted marigold 0), "This page unravelled like a loose stitch", search button (`data-search-open` → existing overlay), home link, 4 shortcut cards (shop, workshops, DIY kits, contact). @astrojs/sitemap excludes 404 by default.
 - **`src/pages/robots.txt.ts`**: static endpoint; `Allow: /`, disallows cart/checkout/order-confirmation/wishlist/styleguide, `Sitemap:` built from `site` (`SITE_URL`).
@@ -143,47 +150,54 @@ The session to-do list still holds six older tasks; it is **stale** relative to 
 - **Confetti** on `/order-confirmation/`: dependency-free canvas burst (160 pieces from both lower corners, brand colours, ~3.6s fade, canvas removed after). Skipped under `prefers-reduced-motion`; fires once per order via `sessionStorage` key `craft-confetti-<order>` so reloads don't re-fire.
 
 ### Phase 6 — Workshop detail + booking (2026-10-28)
+
 - `src/pages/workshops.astro` moved to `src/pages/workshops/index.astro` so `[slug].astro` can sit beside it; route URLs unchanged.
 - **`/workshops/[slug]/`** (new): breadcrumbs, badges, date/time/where/skill grid, image, description, "Good to know", sticky booking card with seats bar, WhatsApp question link, and `Event` JSON-LD.
 - **`WorkshopBooking.tsx`** (new React island):
-  - Paid: calls `addItem` with the workshop's ticket product ID, then dispatches `cart:open` so the cart drawer opens. Button shows the real price ("Save my spot — Ksh 3,500").
-  - Free: name/email RSVP form, stores submissions in localStorage under `craft-rsvps-v1`, shows a confirmation. Demo mode only — with `PUBLIC_WC_STORE_URL` set it POSTs to `craft/v1/rsvp` instead (Phase 8, 2026-10-30).
+    - Paid: calls `addItem` with the workshop's ticket product ID, then dispatches `cart:open` so the cart drawer opens. Button shows the real price ("Save my spot — Ksh 3,500").
+    - Free: name/email RSVP form, stores submissions in localStorage under `craft-rsvps-v1`, shows a confirmation. Demo mode only — with `PUBLIC_WC_STORE_URL` set it POSTs to `craft/v1/rsvp` instead (Phase 8, 2026-10-30).
 - **Workshop tickets** (`demoProducts` IDs 501–503, slugs `workshop-ticket-202/203/204`): match each paid workshop's `wooProductId`, prices KES 3,500 / 1,500 / 2,800, stock mirroring seats left. New `Product.catalogHidden` keeps them out of `/shop/`, search, category counts and sitemap; `Product.isVirtual` makes the demo cart skip delivery for ticket-only carts.
 - **Listing fixes:** `/workshops/` cards now show the price (`Ksh 3,500 · 6 left` / `Free · 18 left`) and link to the detail page; the featured CTA and home workshop CTA now open `/workshops/<slug>/` instead of 404ing `/shop/workshop-ticket-<id>/` links.
 - **Verified against the running dev server (headless Chrome):** detail page 200, paid add-to-cart opens the drawer with the ticket, `/cart/` shows it with free delivery, free RSVP confirms; screenshots at 1440 and 390 look correct. `check`/`build` left for the user to run.
 
 ### Phase 6 — DIY kits landing + studio cancellation (2026-10-28)
+
 - **`/diy-kits/`** (new): evergreen commercial landing page — hero with "Inside the box" panel, kit grid from `getProducts({ category: "diy-kits" })` (4 kits: Embroidery Hoop, Crochet Starter, Paint & Sip at Home, Weekend Workshop), "Why a kit", three-step "How it works", FAQ accordions (`<details>`) and a closing olive CTA. Carries `CollectionPage` + `FAQPage` JSON-LD.
 - Header mega-menu "Shop DIY kits" promo now points at `/diy-kits/` (the category card and shop links still use `/shop/?category=diy-kits`).
 - **`/studio/` cancelled.** No studio/private-hire offering exists, so the page was dropped rather than built. Removed `demoPages.studio`; changed "studio visits" copy in `contact.astro`, `about.astro`, `order-confirmation.astro`, and "From the studio" on the journal index/back link. Product names, journal copy and UGC handles that happen to mention "studio" are untouched.
 - Verified `/diy-kits/` on the dev server: 200, 4 kit cards, 5 FAQ accordions (first opens), header link `/diy-kits/`, no horizontal overflow at 1440/390; only console error is the known missing `/favicon.svg`.
 
 ### Shop filters + categories (rebuilt 2026-10-28 — query params, no dynamic routes)
+
 - `src/pages/shop/category/[slug].astro` **deleted**. There is now only `src/pages/shop/index.astro`; category browsing is `/shop/?category=<slug>` (client-side filtered, not a separate static page/SSG route — no per-category `<title>`/meta anymore, a conscious tradeoff).
 - `src/components/store/ShopFilters.tsx` now owns **both** the category pill row and the sidebar filters (moved out of the `.astro` pages). On mount it reads `category`/`fresh`/`sale`/`max`/dynamic-filter keys from `location.search`; every state change writes back via `history.replaceState` — filter state is shareable/bookmarkable.
 - Category pills are real `<a href="/shop/?category=...">` (new-tab/middle-click still work) with `onClick` `preventDefault` + local state update for same-page filtering. Sticky at `top-18` (= header height), full-width toolbar look, `z-40` (header is `z-50`).
 - Sidebar: `lg:sticky lg:top-38` — **user-verified working** (2026-10-28).
 - All 9 internal links that pointed at `/shop/category/<slug>/` (Header mega-menu + mobile menu, `SearchOverlay.tsx`, home page vibes/category links, product page breadcrumb + category chip, `demoVibes` hrefs) now point at `/shop/?category=<slug>`.
 - **Shared filters:** Fresh arrivals, Items on sale, Max price slider (KES 500–15,000).
-- **Dynamic filters:** driven by `CATEGORY_DYNAMIC_FILTERS` in `src/lib/filters.ts` (paint→Finish/Set Size, stitch-sew→Material/Skill Level, clay→Clay Type, sketch→Medium, kids→Age Group, diy-kits→Craft Type, bundles→Bundle Type).
+- **Dynamic filters:** set per product category in WordPress (show/hide, position, label, pick one/many) and read at build time by `getCategoryFilters()`; `demoCategoryFilters` in `demo-data.ts` is the demo-mode version. Input follows from the mode and option count (`getFilterInput()` in `src/lib/filters.ts`): many ≤6 checkboxes, many >6 multi-select, one ≤6 radios, one >6 select.
 - **Product card** (shop grid) now matches the same visual language as `ProductCard.astro` (home page): image, "Sale"/"Sold out" badge chips (not a custom `-N%` pill), hover arrow-reveal button, category label + title left / price right. Shop grid keeps its own `rounded-3xl border p-4 shadow-sm` card frame (user asked this back after the borderless home-style felt squeezed with 18 items in a 3-col grid) — home's `ProductCard.astro` stays borderless.
 
 ### Price formatting (2026-10-28)
+
 - `formatMoney()` in `src/lib/format.ts` now always renders **0 decimal places** (no more `.00`) — this is the single source every price display routes through, so the change applies site-wide in one place.
 - New `formatCardPrice()` — for any card/row context (shop grid, home featured grid, `Bestsellers.astro`), a price range or multi-variation product shows as `From Ksh 1,350` instead of a long `Ksh 1,350.00 – Ksh 1,450.00` string that was overflowing card width. `formatProductPrice()` (full range) is kept for anywhere with more room, e.g. product detail page.
 - Card text sizes were also reduced (category label, title, price) to cut overflow risk with longer product names.
 
 ### Filters now fully functional (2026-10-28)
-- **Dynamic category filters now actually match products.** `Product` type (`types.ts`) gained `attributes?: Record<string, string>` and `isNew?: boolean`. All 16 of 18 demo products that plausibly have one got hand-assigned attribute values matching `CATEGORY_DYNAMIC_FILTERS` keys/options in `filters.ts` (e.g. `{ finish: "Matte", size: "12-Set" }` for paint products, `{ material: "Cotton", skill: "Beginner" }` for stitch-sew, etc. — multi-category products like the Embroidery Hoop Kit carry attribute keys for *each* category they belong to). Two products (Studio Brush Set, Canvas Trio) deliberately carry no `finish`/`size` — those options describe paint sheen/tube counts and don't apply to tools/canvases, so they're correctly excluded when a user filters by them. `ShopFilters.tsx`'s match loop: a product passes a dynamic-filter group if `product.attributes?.[key]` is included in the user's selected options for that key (OR within a group, AND across groups).
+
+- **Dynamic category filters now actually match products.** `Product` type (`types.ts`) gained `attributes?: Record<string, string>` and `isNew?: boolean`. All 16 of 18 demo products that plausibly have one got hand-assigned attribute values matching `CATEGORY_DYNAMIC_FILTERS` keys/options in `filters.ts` (e.g. `{ finish: "Matte", size: "12-Set" }` for paint products, `{ material: "Cotton", skill: "Beginner" }` for stitch-sew, etc. — multi-category products like the Embroidery Hoop Kit carry attribute keys for _each_ category they belong to). Two products (Studio Brush Set, Canvas Trio) deliberately carry no `finish`/`size` — those options describe paint sheen/tube counts and don't apply to tools/canvases, so they're correctly excluded when a user filters by them. `ShopFilters.tsx`'s match loop: a product passes a dynamic-filter group if `product.attributes?.[key]` is included in the user's selected options for that key (OR within a group, AND across groups).
 - **Fresh arrivals is now real**, not `product.id % 2 !== 0`. 6 of 18 demo products have `isNew: true` (102, 104, 105, 108, 111, 117 — spread across paint/stitch/sketch/bundles). Filter check is simply `if (fresh && !product.isNew) return false`.
 - Sidebar "Items on sale" checkbox and the shop-grid card's "Sale" badge still use **two different on-sale definitions** (checkbox: `regular_price > price`; card badge: `sale_price > 0 && sale_price < regular_price`, matching `ProductCard.astro`). They agree for all current demo data but remain structurally inconsistent — not addressed today, low priority since behavior is correct either way for existing data.
 
 ### Hero image issue (resolved 2026-10-27)
+
 - The hero image renders correctly: verified in a headless Chrome capture of the built site at 1440px and 390px.
 - Mobile note: the 1927×816 collage becomes a ~165px strip at 390px wide; the copy sits below it. Consider a taller mobile treatment later.
 - Original code path: `<Image src={heroImage} ... class="block h-auto w-full" fetchpriority="high" />`.
 
 ### Recent session changes (visual pass)
+
 - **Phase 2 UI kit added** — see below.
 - Replaced teal with olive; added `olive` tokens.
 - "The collection" band uses `bg-butter-50`.
@@ -195,7 +209,9 @@ The session to-do list still holds six older tasks; it is **stale** relative to 
 - Shop filter sidebar + dynamic filter configs added.
 
 ### UI kit (Phase 2)
+
 All in `src/components/ui/`:
+
 - `Icon.astro` — wrapper around `astro-icon`; default `h-4 w-4`, `aria-hidden` unless `label` is passed.
 - `Logo.astro` — stitched-heart + paint-dot mark; `href` (default `/`), `wordmark` (default true).
 - `Badge.astro` — flat pill; tones `clay|ink|olive|poppy|marigold|bubblegum|cream`; sizes `sm|md`.
@@ -210,19 +226,19 @@ All in `src/components/ui/`:
 
 ## 6. Known issues / broken links
 
-| Issue | Where | Notes |
-|---|---|---|
-| `.astro/` owned by root | repo root | Created by the Docker dev container; `astro dev --background` fails with `EACCES ... .astro/dev.log`. Fix: `sudo chown -R $USER .astro` (or set `user:` in `docker-compose.yml`). Blocked Phase 7 browser verification. |
-| Policies copy is draft | `policies.astro` | Needs owner sign-off before launch (refund windows, workshop cancellation rule). |
-| Favicon SVG only | `public/favicon.svg` | No `.ico` / `apple-touch-icon.png` fallback yet. |
-| Category pills misplaced | shop pages | Must move into right column above count |
-| Hero mobile crop | `index.astro` | Renders correctly; 1927×816 collage is a ~165px strip at 390px wide |
-| Static `<img>` still used | `ShopFilters.tsx`, `ProductCard.astro`, search/wishlist/cart islands | Mostly remote placeholder URLs; convert local assets to `<Image />` where possible |
-| Live product fields not mapped | `woocommerce.ts` `normalizeProduct()` | Live Store API products get no `attributes` / `isNew` / `isVirtual` → shop dynamic filters + "Fresh arrivals" match nothing with a real store. Proposed mapping in `docs/store-data-contract.md` ("Open gap"). Decide before launch. |
-| CMS email needs SMTP | live WordPress | Contact, RSVP, order emails rely on `wp_mail()`; install an SMTP plugin on Host Africa. Locally they go to Mailpit. |
-| Wishlist is device-local | `wishlist-store.ts` | localStorage only; no account sync |
-| Maker wall falls back to demo | `getUgcPosts()` in `wordpress.ts` | Reads `craft/v1/ugc`; returns `demoUgc` only when `WP_URL` is unset or the request fails. Connected + zero posts → empty → home UGC section hidden. Posts without a featured image are never returned. |
-| Sale-detection inconsistency | `ShopFilters.tsx` sidebar filter vs. card badge | See "Filter limitations" above — two different on-sale conditions coexist. |
+| Issue                          | Where                                                                | Notes                                                                                                                                                                                                                   |
+| ------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.astro/` owned by root        | repo root                                                            | Created by the Docker dev container; `astro dev --background` fails with `EACCES ... .astro/dev.log`. Fix: `sudo chown -R $USER .astro` (or set `user:` in `docker-compose.yml`). Blocked Phase 7 browser verification. |
+| Policies copy is draft         | `policies.astro`                                                     | Needs owner sign-off before launch (refund windows, workshop cancellation rule).                                                                                                                                        |
+| Favicon SVG only               | `public/favicon.svg`                                                 | No `.ico` / `apple-touch-icon.png` fallback yet.                                                                                                                                                                        |
+| Category pills misplaced       | shop pages                                                           | Must move into right column above count                                                                                                                                                                                 |
+| Hero mobile crop               | `index.astro`                                                        | Renders correctly; 1927×816 collage is a ~165px strip at 390px wide                                                                                                                                                     |
+| Static `<img>` still used      | `ShopFilters.tsx`, `ProductCard.astro`, search/wishlist/cart islands | Mostly remote placeholder URLs; convert local assets to `<Image />` where possible                                                                                                                                      |
+| Live product fields not mapped | `woocommerce.ts` `normalizeProduct()`                                | Live Store API products get no `isNew` / `isVirtual` → "Fresh arrivals" matches nothing with a real store. Proposed mapping in `docs/store-data-contract.md` ("Open gap"). Decide before launch.                        |
+| CMS email needs SMTP           | live WordPress                                                       | Contact, RSVP, order emails rely on `wp_mail()`; install an SMTP plugin on Host Africa. Locally they go to Mailpit.                                                                                                     |
+| Wishlist is device-local       | `wishlist-store.ts`                                                  | localStorage only; no account sync                                                                                                                                                                                      |
+| Maker wall falls back to demo  | `getUgcPosts()` in `wordpress.ts`                                    | Reads `craft/v1/ugc`; returns `demoUgc` only when `WP_URL` is unset or the request fails. Connected + zero posts → empty → home UGC section hidden. Posts without a featured image are never returned.                  |
+| Sale-detection inconsistency   | `ShopFilters.tsx` sidebar filter vs. card badge                      | See "Filter limitations" above — two different on-sale conditions coexist.                                                                                                                                              |
 
 ---
 
@@ -233,8 +249,8 @@ All in `src/components/ui/`:
 3. Harmonize the sale-detection inconsistency noted above (sidebar checkbox vs. card badge use different conditions — currently harmless but structurally duplicated).
 4. ~~Add policies page, 404, robots.txt, favicon, fix `og:locale`~~ — done 2026-10-30 (Phase 7); policy copy awaiting sign-off.
 5. ~~Build Phase 6 leftovers (`/diy-kits/`, `/studio/`)~~ — done 2026-10-28: `/diy-kits/` built; `/studio/` cancelled (no studio offering).
-6. ~~Phase 8 WordPress mu-plugin + docs~~ — done 2026-10-30 (user-verified). **Next: Phase 9** deploy/QA (workflow must listen for `repository_dispatch` `wordpress_update`).
-7. Map live Store API product fields (`attributes`, `isNew`) in `normalizeProduct()` — see Known issues.
+6. ~~Phase 8 WordPress mu-plugin + docs~~ — done 2026-10-30 (user-verified). ~~Phase 9 deploy/QA~~ — **workflow + guard + docs built 2026-10-31; blocked on GitHub secrets/variables, a merge to `master`, and the first live deploy + QA pass.**
+7. Map live Store API `isNew` in `normalizeProduct()` (`attributes` done 2026-11-02) — see Known issues.
 8. Replace placeholder photography/contact details before launch.
 9. Consider whether `getBestsellers()`'s demo sort (by `reviewCount`) is good enough long-term, or should factor in `rating` too.
 
@@ -246,20 +262,20 @@ All in `src/components/ui/`:
 
 ## 8. Assets
 
-| Asset | Path | Used for |
-|---|---|---|
-| **Real logo** (2026-10-28) | `src/assets/images/craftandcolours-logo.png` | Script-style red wordmark, 336×68 transparent PNG. Now the site's actual logo — see `src/components/ui/Logo.astro` (used in `Header.astro` and `/styleguide/`). Replaced the old placeholder heart-icon-in-circle + typed "Craft & Colours" text mark. |
-| Hero collage | `src/assets/images/landing-page-hero-image.png` | Home hero + default OG image |
-| CTA banner | `src/assets/images/banner.png` | Was used for the pre-footer CTA card; user removed that section manually (2026-10-28) — **asset now unused anywhere**, candidate for deletion if confirmed dead |
-| UGC background | `src/assets/images/ugc_bg.png` | UGC pinboard section background (craft flat-lay photo) |
-| Brush texture | `src/assets/images/brush-stroke-texture.jpg` | Workshop section background |
-| Mustard yarn | `src/assets/images/mustard-yarn.png` | Journal decorator |
-| Vibe drawings | `src/assets/images/vibes/{painting,crocheting,kids-craft,art-stash}.png` | Home "Shop by creative vibe" circles (via `vibeArt` map in `index.astro`, keyed by vibe slug). Transparent black line art, 1536×1024 — needs a light fill behind it (the vibe `accent` pastel). |
-| Lavender paper | `src/assets/images/textured-lavendar-paper.png` | Home journal section background (via `getImage`, webp). 2.4 MB source, avg colour ≈ `#bea0c4` |
-| Rainbow yarn | `src/assets/images/rainbow-yarn-decorator.png` | Available, currently unused |
-| Pastel heart | `src/assets/images/pastel-chalk-heart.png` | Decorative accent |
-| Payment logos | `src/assets/images/payment-methods/{mpesa,visa,mastercard}.svg` | Footer |
-| Icons | `src/assets/icons/` + `lucide` + `simple-icons` | UI + socials |
+| Asset                      | Path                                                                     | Used for                                                                                                                                                                                                                                               |
+| -------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Real logo** (2026-10-28) | `src/assets/images/craftandcolours-logo.png`                             | Script-style red wordmark, 336×68 transparent PNG. Now the site's actual logo — see `src/components/ui/Logo.astro` (used in `Header.astro` and `/styleguide/`). Replaced the old placeholder heart-icon-in-circle + typed "Craft & Colours" text mark. |
+| Hero collage               | `src/assets/images/landing-page-hero-image.png`                          | Home hero + default OG image                                                                                                                                                                                                                           |
+| CTA banner                 | `src/assets/images/banner.png`                                           | Was used for the pre-footer CTA card; user removed that section manually (2026-10-28) — **asset now unused anywhere**, candidate for deletion if confirmed dead                                                                                        |
+| UGC background             | `src/assets/images/ugc_bg.png`                                           | UGC pinboard section background (craft flat-lay photo)                                                                                                                                                                                                 |
+| Brush texture              | `src/assets/images/brush-stroke-texture.jpg`                             | Workshop section background                                                                                                                                                                                                                            |
+| Mustard yarn               | `src/assets/images/mustard-yarn.png`                                     | Journal decorator                                                                                                                                                                                                                                      |
+| Vibe drawings              | `src/assets/images/vibes/{painting,crocheting,kids-craft,art-stash}.png` | Home "Shop by creative vibe" circles (via `vibeArt` map in `index.astro`, keyed by vibe slug). Transparent black line art, 1536×1024 — needs a light fill behind it (the vibe `accent` pastel).                                                        |
+| Lavender paper             | `src/assets/images/textured-lavendar-paper.png`                          | Home journal section background (via `getImage`, webp). 2.4 MB source, avg colour ≈ `#bea0c4`                                                                                                                                                          |
+| Rainbow yarn               | `src/assets/images/rainbow-yarn-decorator.png`                           | Available, currently unused                                                                                                                                                                                                                            |
+| Pastel heart               | `src/assets/images/pastel-chalk-heart.png`                               | Decorative accent                                                                                                                                                                                                                                      |
+| Payment logos              | `src/assets/images/payment-methods/{mpesa,visa,mastercard}.svg`          | Footer                                                                                                                                                                                                                                                 |
+| Icons                      | `src/assets/icons/` + `lucide` + `simple-icons`                          | UI + socials                                                                                                                                                                                                                                           |
 
 Remote images are allowed from `placehold.co` (`astro.config.mjs → image.domains`). Product images currently point at placeholders until real photography arrives.
 
@@ -342,6 +358,7 @@ docs/
   wordpress-setup.md                  # production CMS setup (Host Africa, wp-config, Woo settings, cron, SMTP)
   store-data-contract.md              # env vars, Store API usage, craft/v1 endpoint shapes, rebuild event
 ```
+
 Empty/skeleton: `.github/workflows/` (Phase 9), `public/images/` (empty).
 
 ---
@@ -355,6 +372,7 @@ Empty/skeleton: `.github/workflows/` (Phase 9), `public/images/` (empty).
 - `formatDate` (`src/lib/format.ts`) outputs date + time for journal/workshop cards.
 
 ### Environment (`.env.example`)
+
 ```
 SITE_URL=https://craftandcolours.co.ke
 PUBLIC_WC_STORE_URL=https://cms.craftandcolours.co.ke
@@ -364,6 +382,7 @@ PUBLIC_WHATSAPP=+254700000000
 PUBLIC_INSTAGRAM=craftandcolours
 PUBLIC_FACEBOOK_URL=https://www.facebook.com/craft.colours.ke
 ```
+
 These are placeholders — confirm real values before launch. Note the stray backticks around `PUBLIC_FACEBOOK_URL` in `.env.example`.
 
 ---
@@ -381,16 +400,18 @@ npm run preview # preview built site
 ```
 
 Gotchas:
+
 - Running under Node 22.12.x caused `Bus error (core dumped)` during `astro check/build`.
 - `trailingSlash: "always"` — internal links must end with `/`.
 - Tailwind 4 is configured via `@tailwindcss/vite`, tokens use `@theme` in `global.css` (no `tailwind.config.js`).
 - `src/lib/filters.ts` currently imports an unused `Product` type (hint only).
 
 ### Docker + zrok for sharing dev with a client (2026-10-28)
+
 - `Dockerfile.dev` + `docker-compose.yml` added at repo root — **local-dev-sharing tooling only**, unrelated to the Phase 9 production deploy plan (GitHub Actions → Host Africa shared/Passenger, still static output, no adapter). Don't conflate the two.
 - `app` service: `node:24-alpine`, runs `astro dev --host 0.0.0.0 --port 4321`. Vite (which Astro's dev server wraps) rejects requests whose `Host` header doesn't match a known value by default — a zrok tunnel's `*.share.zrok.io` domain fails that check, producing a 403 "Blocked request" error.
-  - **The fix is in `astro.config.mjs`, not a CLI flag**: `vite: { server: { allowedHosts: true } } }` (dev-only, no effect on `astro build`/production). Tried `astro dev --allowed-hosts true` / `--allowed-hosts=true` first per the CLI docs — **both failed in real testing** (verified: still 403'd a spoofed `Host` header with `docker compose build/up` + `curl -H "Host: ..."`). Root cause found by reading the shipped source, `node_modules/astro/dist/cli/flags.js:20`: the CLI always receives the flag's value as a JS *string* (even literally `"true"`), so it always takes the `flags.allowedHosts.split(',')` branch → `["true"]` (a literal, useless hostname), never the boolean-`true` branch the docs describe — that branch is only reachable from `astro.config.mjs`, where a real JS boolean can be passed. This is a real discrepancy between Astro's CLI reference docs and actual 7.4.2 behavior worth knowing if it comes up again.
-  - Retested after moving the fix to `astro.config.mjs`: both a normal request and one with a spoofed `Host: craftandcolours.share.zrok.io` header returned 200 — confirmed working, not just configured.
+    - **The fix is in `astro.config.mjs`, not a CLI flag**: `vite: { server: { allowedHosts: true } } }` (dev-only, no effect on `astro build`/production). Tried `astro dev --allowed-hosts true` / `--allowed-hosts=true` first per the CLI docs — **both failed in real testing** (verified: still 403'd a spoofed `Host` header with `docker compose build/up` + `curl -H "Host: ..."`). Root cause found by reading the shipped source, `node_modules/astro/dist/cli/flags.js:20`: the CLI always receives the flag's value as a JS _string_ (even literally `"true"`), so it always takes the `flags.allowedHosts.split(',')` branch → `["true"]` (a literal, useless hostname), never the boolean-`true` branch the docs describe — that branch is only reachable from `astro.config.mjs`, where a real JS boolean can be passed. This is a real discrepancy between Astro's CLI reference docs and actual 7.4.2 behavior worth knowing if it comes up again.
+    - Retested after moving the fix to `astro.config.mjs`: both a normal request and one with a spoofed `Host: craftandcolours.share.zrok.io` header returned 200 — confirmed working, not just configured.
 - `zrok` service: `openziti/zrok` image, reaches `app` over the compose network by service name (`http://app:4321`), no `--network=host` needed (that's only for targets on the Docker host's own loopback, confirmed via zrok's docker-share guide). Mounts `${HOME}/.zrok` (outside the repo) for the zrok identity/config — never committed, nothing repo-local to gitignore.
 - **One-time setup** (documented as comments in `docker-compose.yml`, not a separate doc file): `docker compose run --rm zrok enable <token>` (token from https://myzrok.io/), then `docker compose run --rm zrok reserve public http://app:4321 --unique-name craftandcolours`. After that, `docker compose up` brings the share back at a **stable** `https://craftandcolours.share.zrok.io` every time. The image's entrypoint is already the `zrok` binary — commands are `enable <token>` / `reserve public ...`, not `zrok enable ...` (easy mistake, double-checked against zrok's compose example before writing).
 - Default `command:` for the `zrok` service is `share reserved "craftandcolours" --headless` (stable link). A comment in the file explains the one-line swap to `share public --headless http://app:4321` for a throwaway random-domain link instead, if a fixed URL isn't wanted.
@@ -412,6 +433,12 @@ Gotchas:
 ---
 
 ## 13. Change log
+
+- **2026-11-02** — **Shop filters configurable per category from WordPress (awaiting user test).** New `includes/category-filters.php`: **Shop filters** table on the product category edit screen (term meta `_craft_filters`: show, position, label, one/many) + `GET craft/v1/category-filters`. Options are terms used by catalogue products directly in that category. Products expose term slugs as `extensions.craft.filter_attributes`, read directly from the product so unticking "Visible on the product page" doesn't break filtering. `Product.attributes` is now `Record<string, string[]>` holding slugs; URLs carry slugs too (a comma in a term name would break the comma-separated param). `CATEGORY_DYNAMIC_FILTERS` replaced by `demoCategoryFilters`; demo Material and Craft Type have 7 options so demo mode shows all four inputs. New `CategoryFilterInput.tsx`; multi-select is a button + inline checkbox list, not native `<select multiple>` (Ctrl-click). `keepValidSelections()` drops stale URL values, which also fixes `utm_*` params zeroing the shop results. Rebuild now also fires on `pa_*` term and attribute edits; `verify-build.mjs` checks the endpoint. PHP not run against real WordPress yet.
+
+- **2026-10-31 (later)** — **Production domain corrected to `craftandcolors.africa`.** User confirmed the live storefront is the `.africa` domain on the Host Africa DirectAdmin account (American spelling `colors`, not `colours`). Replaced every `craftandcolours.co.ke` reference with `craftandcolors.africa` across `astro.config.mjs` (SITE_URL default), `.env.example`, `scripts/smoke-test.sh`, `.github/workflows/qa.yml`, the three Phase 9 docs, `docs/wordpress-setup.md`, `docs/store-data-contract.md`, `README.md`, `MEMORY.md`, and the hardcoded email fallbacks in `contact.astro`, `order-confirmation.astro`, `policies.astro`, `Footer.astro` and the mu-plugin header comment. Brand spelling stays "Craft & Colours" and the Instagram/TikTok handles stay `craftandcolours`; only the domain changes. `docs/deploy-hostafrica.md` §2–3 rewritten for DirectAdmin with the confirmed FTP facts: server `craftandcolors.africa`, username `craftan1`, password = panel login, explicit TLS on 21 (implicit 990 closed), `FTP_SERVER_DIR=/domains/craftandcolors.africa/public_html/`. CMS subdomain assumed `cms.craftandcolors.africa` — unconfirmed.
+
+- **2026-10-31** — **Phase 9 built (awaiting first deploy).** Added `.github/workflows/deploy.yml` (build → `npm run verify` → FTPS mirror to Host Africa → live smoke test; `master` + manual + `repository_dispatch: wordpress_update`; environment `production`; cached FTP sync state; optional `clean_deploy`), `.github/workflows/qa.yml` (Lighthouse CI on PR/`develop`, demo build, 11 URLs, a11y/SEO hard gates, perf/BP warnings), `lighthouserc.json`, `scripts/verify-build.mjs` (`npm run verify` — fails the deploy if the CMS is unreachable or demo data would ship, checks required files and localhost/mixed-content leaks), `scripts/smoke-test.sh` (`npm run smoke`), and `public/.htaccess` (HTTPS + `www`→apex 301s, `404.html`, HSTS + security headers, `_astro` immutable, HTML `no-cache`, deflate, dotfile denial; no CSP on purpose). Docs: `docs/deploy-hostafrica.md`, `docs/qa-launch.md`, `docs/release-candidate.md`; `README.md` expanded; `.gitignore` ignores `.lighthouseci/`; `package.json` gained `verify` and `smoke`. Decisions (user): FTPS via the existing DirectAdmin FTP account, deploy from `master`, full hardening scope, Lighthouse CI + manual QA, apex canonical (`www` redirects in). **No `favicon.ico`/`apple-touch-icon`** — deferred by user. Not yet run: `check`/`build`, first FTPS deploy, live Lighthouse. Guard tested against the stale Oct-28 `dist` (correctly failed on missing `404.html`, `robots.txt`, `favicon.svg`, `.htaccess` and the demo banner).
 
 - **2026-10-30** — **Phase 8 marked done** — user verified it against the local Docker WordPress. Next up: Phase 9 (deployment + QA).
 
@@ -488,6 +515,7 @@ Gotchas:
 ## 14. Update protocol
 
 At the end of each session:
+
 1. Update **Last updated** and **Current work state**.
 2. Move finished items from **Pending backlog** into **Change log**.
 3. Add any new **Known issues** or **Locked decisions**.

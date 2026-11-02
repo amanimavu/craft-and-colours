@@ -1,7 +1,8 @@
-import { demoCategories, demoProducts } from "./demo-data";
-import { stripHtml } from "./format";
+import { demoCategories, demoCategoryFilters, demoProducts } from "./demo-data";
+import { slugify, stripHtml } from "./format";
 import type {
     Category,
+    CategoryFilters,
     Price,
     Product,
     ProductImage,
@@ -71,7 +72,21 @@ function normalizeCategory(raw: RawRecord): Category {
     };
 }
 
+function normalizeFilterAttributes(raw: unknown): Record<string, string[]> {
+    // PHP sends an empty map as [].
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+
+    const attributes: Record<string, string[]> = {};
+    for (const [key, values] of Object.entries(raw)) {
+        if (Array.isArray(values)) attributes[key] = values.map(String);
+    }
+    return attributes;
+}
+
 function normalizeProduct(raw: RawRecord): Product {
+    const craft = (raw.extensions as RawRecord | undefined)?.craft as
+        | RawRecord
+        | undefined;
     const categories = Array.isArray(raw.categories)
         ? (raw.categories as RawRecord[]).map(normalizeCategory)
         : [];
@@ -97,10 +112,8 @@ function normalizeProduct(raw: RawRecord): Product {
         type: String(raw.type ?? "simple"),
         description: String(raw.description ?? ""),
         shortDescription: String(raw.short_description ?? raw.summary ?? ""),
-        goodToKnow: String(
-            ((raw.extensions as RawRecord | undefined)?.craft as RawRecord | undefined)
-                ?.good_to_know ?? "",
-        ),
+        goodToKnow: String(craft?.good_to_know ?? ""),
+        attributes: normalizeFilterAttributes(craft?.filter_attributes),
         images,
         hoverImage: images[1],
         prices: normalizePrice(raw.prices as RawRecord | undefined),
@@ -116,15 +129,6 @@ function normalizeProduct(raw: RawRecord): Product {
                 ? reviewCount
                 : undefined,
     };
-}
-
-function slugify(value: string): string {
-    return value
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
 }
 
 function normalizeVariation(raw: RawRecord): ProductVariation {
@@ -339,6 +343,26 @@ export async function getCategories(): Promise<Category[]> {
             count: counts.get(category.slug) ?? 0,
         }))
         .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Shop filters per category, set on each product category in WordPress. */
+export async function getCategoryFilters(): Promise<CategoryFilters> {
+    if (!hasStore) return demoCategoryFilters;
+
+    try {
+        const response = await fetch(
+            `${storeUrl}/wp-json/craft/v1/category-filters`,
+            { headers: { Accept: "application/json" } },
+        );
+        if (!response.ok) {
+            throw new Error(`Filters request failed (${response.status}).`);
+        }
+        return (await response.json()) as CategoryFilters;
+    } catch (error) {
+        // Not the demo filters: their options wouldn't match live products.
+        console.warn("Could not load category filters; showing none.", error);
+        return {};
+    }
 }
 
 export async function getRelatedProducts(
