@@ -25,6 +25,11 @@ add_action(
             'sanitize_callback' => 'absint',
             'default' => 0,
         ]);
+        register_setting('craft_colours', 'craft_announcements', [
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default' => '',
+        ]);
         register_setting('craft_colours', 'craft_default_good_to_know', [
             'type' => 'string',
             'sanitize_callback' => 'wp_kses_post',
@@ -130,6 +135,17 @@ function craft_render_settings_page(): void
 
         <form method="post" action="options.php">
             <?php settings_fields('craft_colours'); ?>
+            <h2>Announcements</h2>
+            <table class="form-table" role="presentation">
+                <tr>
+                    <th><label for="craft_announcements">Announcement ticker</label></th>
+                    <td>
+                        <textarea id="craft_announcements" name="craft_announcements" rows="6" class="large-text"><?php echo esc_textarea((string) get_option('craft_announcements', '')); ?></textarea>
+                        <p class="description">One announcement per line, in order. Scrolls across the top of every page. Leave empty to hide the ticker.</p>
+                    </td>
+                </tr>
+            </table>
+
             <h2>Free craft gift</h2>
             <table class="form-table" role="presentation">
                 <tr>

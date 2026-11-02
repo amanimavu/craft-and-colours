@@ -228,6 +228,10 @@ async function main() {
             `${wpUrl}/wp-json/craft/v1/workshops`,
             "Workshops endpoint",
         );
+        await fetchJson(
+            `${wpUrl}/wp-json/craft/v1/announcements`,
+            "Announcements endpoint",
+        );
     }
 
     if (storeUrl) {

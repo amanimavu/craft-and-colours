@@ -175,6 +175,7 @@ API=http://localhost:8080/wp-json
 | 12 | Same as 11 with `Origin: https://evil.example` | **No** `Access-Control-Allow-Origin` header. |
 | 13 | `curl -si $API/wp/v2/users \| head -1` | `401`. |
 | 14 | `curl -sI $API/craft/v1/workshops \| grep -iE 'nosniff\|referrer'` | Security headers present. |
+| 15 | `wpcli option update craft_announcements $'First\n\nSecond'`, then `curl -s $API/craft/v1/announcements` | `["First","Second"]` (blank lines dropped). |
 
 ### Shop filters
 

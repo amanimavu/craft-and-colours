@@ -1065,6 +1065,13 @@ export const demoVibes: Vibe[] = [
     },
 ];
 
+export const demoAnnouncements: string[] = [
+    "Free delivery in Nairobi over KES 4,500",
+    "Village Market, Nairobi · Level 2",
+    "Free Saturday crochet club",
+    "M-Pesa & card accepted",
+];
+
 export const demoUgc: UgcPost[] = [
     {
         id: 1,
