@@ -28,6 +28,7 @@ foreach (
         'free-gift',
         'product-content',
         'category-filters',
+        'announcements',
         'whatsapp-payment',
         'address-fields',
         'low-stock',

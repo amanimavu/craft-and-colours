@@ -1,4 +1,4 @@
-import { demoPages, demoPosts, demoUgc } from './demo-data';
+import { demoAnnouncements, demoPages, demoPosts, demoUgc } from './demo-data';
 import { stripHtml } from './format';
 import type { PageContent, Post, ProductImage, UgcPost } from './types';
 
@@ -103,6 +103,21 @@ export async function getUgcPosts(limit = 6): Promise<UgcPost[]> {
       error,
     );
     return demoUgc.slice(0, limit);
+  }
+}
+
+export async function getAnnouncements(): Promise<string[]> {
+  if (!hasWordPress) return demoAnnouncements;
+
+  try {
+    // As with maker posts: with a CMS connected, empty means show nothing.
+    return await craftGet<string[]>('/announcements');
+  } catch (error) {
+    console.warn(
+      `Could not load announcements from ${wpUrl}; using demo content.`,
+      error,
+    );
+    return demoAnnouncements;
   }
 }
 

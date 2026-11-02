@@ -7,11 +7,13 @@ import CartCount from './store/CartCount';
 import WishlistCount from './store/WishlistCount';
 import SearchOverlay from './store/SearchOverlay';
 import { hasStore, getCategories, getProducts } from '../lib/woocommerce';
+import { getAnnouncements } from '../lib/wordpress';
 
 const path = Astro.url.pathname;
-const [categories, products] = await Promise.all([
+const [categories, products, announcements] = await Promise.all([
   getCategories(),
   getProducts(),
+  getAnnouncements(),
 ]);
 
 const links = [
@@ -19,13 +21,6 @@ const links = [
   { href: '/workshops/', label: 'Workshops' },
   { href: '/about/', label: 'Our story' },
   { href: '/contact/', label: 'Contact' },
-];
-
-const announcements = [
-  'Free delivery in Nairobi over KES 4,500',
-  'Village Market, Nairobi · Level 2',
-  'Free Saturday crochet club',
-  'M-Pesa & card accepted',
 ];
 
 const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
@@ -80,7 +75,7 @@ const isActive = (href: string) =>
 const shopActive = isActive('/shop/');
 ---
 
-<Ticker items={announcements} tone="olive" compact />
+{announcements.length > 0 && <Ticker items={announcements} tone="olive" compact />}
 
 <header
   class="sticky top-0 z-50 border-b border-ink-900/10 bg-cream-50/90 backdrop-blur-md"

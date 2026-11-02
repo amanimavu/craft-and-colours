@@ -161,6 +161,12 @@ Selections are OR within a filter and AND across filters. Attributes named
 `category`, `fresh`, `sale` or `max` can't be filters, because `/shop/` already
 uses those URL parameters.
 
+### `GET /announcements` → `string[]`
+
+Read by `getAnnouncements()` in `src/lib/wordpress.ts` for the header ticker.
+Set under **Craft & Colours → Settings**, one per line. An empty list hides the
+ticker. Demo announcements are used only when WordPress is missing or unreachable.
+
 ### `POST /contact`
 
 Sent by `ContactForm.tsx`.
@@ -206,6 +212,7 @@ Triggers:
 - Stock changes.
 - Category or tag edits, including a category's shop filters.
 - Product attribute or attribute term edits.
+- Announcement edits.
 - A new RSVP.
 - The manual **Rebuild site** button.
 
