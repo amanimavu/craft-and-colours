@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { Check, Loader2, MessageCircle, ShoppingBag, UsersRound } from "lucide-react";
 import { getStoreUrl, hasWooCommerce } from "../../lib/cart-api";
 import { addItem } from "../../lib/cart-store";
@@ -82,7 +82,7 @@ export default function WorkshopBooking({
         }
     }
 
-    async function handleRsvp(event: FormEvent<HTMLFormElement>) {
+    async function handleRsvp(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault();
         setError(null);
 

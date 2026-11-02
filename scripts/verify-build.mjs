@@ -98,7 +98,9 @@ function report() {
     if (failures.length > 0) {
         console.error(
             "\nRefusing to publish this build. Fix the failures above" +
-                (offline ? "" : " (or set ALLOW_UNREACHABLE_CMS=1 for a local build)") +
+                (offline
+                    ? ""
+                    : " (or set ALLOW_UNREACHABLE_CMS=1 for a local build)") +
                 ".",
         );
         process.exit(1);
@@ -126,7 +128,9 @@ async function fetchJson(url, label) {
         });
 
         if (!response.ok) {
-            cmsProblems.push(`${label} returned HTTP ${response.status} — ${url}`);
+            cmsProblems.push(
+                `${label} returned HTTP ${response.status} — ${url}`,
+            );
             return null;
         }
 
@@ -156,7 +160,9 @@ async function main() {
      * 1. Environment
      * ------------------------------------------------------------ */
     if (!siteUrl) {
-        fail("SITE_URL is not set — refusing to build without a canonical origin.");
+        fail(
+            "SITE_URL is not set — refusing to build without a canonical origin.",
+        );
     } else if (!offline) {
         if (!siteUrl.startsWith("https://")) {
             fail(`SITE_URL must use https:// (got ${siteUrl}).`);
@@ -170,8 +176,16 @@ async function main() {
     // Production builds must not rely on the hardcoded placeholder fallbacks in
     // the components. Offline/local builds only warn.
     const requiredEnv = [
-        ["WP_URL", wpUrl, "journal, workshops and the maker wall would use demo content"],
-        ["PUBLIC_WC_STORE_URL", storeUrl, "the storefront would ship the demo catalogue"],
+        [
+            "WP_URL",
+            wpUrl,
+            "journal, workshops and the maker wall would use demo content",
+        ],
+        [
+            "PUBLIC_WC_STORE_URL",
+            storeUrl,
+            "the storefront would ship the demo catalogue",
+        ],
         [
             "PUBLIC_CONTACT_EMAIL",
             (process.env.PUBLIC_CONTACT_EMAIL ?? "").trim(),
@@ -192,7 +206,9 @@ async function main() {
 
     for (const name of ["PUBLIC_INSTAGRAM", "PUBLIC_FACEBOOK_URL"]) {
         if (!(process.env[name] ?? "").trim()) {
-            warn(`${name} is not set — the matching footer social link will be missing.`);
+            warn(
+                `${name} is not set — the matching footer social link will be missing.`,
+            );
         }
     }
 
@@ -208,7 +224,10 @@ async function main() {
      * ------------------------------------------------------------ */
     if (wpUrl) {
         await fetchJson(`${wpUrl}/wp-json/`, "WordPress REST index");
-        await fetchJson(`${wpUrl}/wp-json/craft/v1/workshops`, "Workshops endpoint");
+        await fetchJson(
+            `${wpUrl}/wp-json/craft/v1/workshops`,
+            "Workshops endpoint",
+        );
     }
 
     if (storeUrl) {
@@ -264,7 +283,8 @@ async function main() {
     const robotsPath = join(DIST, "robots.txt");
     if (existsSync(robotsPath)) {
         const robots = readFileSync(robotsPath, "utf8");
-        if (/^Sitemap:\s+https?:\/\//m.test(robots)) pass("robots.txt advertises a sitemap");
+        if (/^Sitemap:\s+https?:\/\//m.test(robots))
+            pass("robots.txt advertises a sitemap");
         else fail("robots.txt has no absolute Sitemap: line.");
 
         for (const privatePath of ["/cart/", "/checkout/", "/wishlist/"]) {
@@ -278,7 +298,8 @@ async function main() {
     if (siteUrl && existsSync(sitemapPath)) {
         const sitemap = readFileSync(sitemapPath, "utf8");
         if (sitemap.includes(siteUrl)) pass("sitemap uses SITE_URL");
-        else fail(`sitemap-index.xml does not reference SITE_URL (${siteUrl}).`);
+        else
+            fail(`sitemap-index.xml does not reference SITE_URL (${siteUrl}).`);
     }
 
     /* ---------------------------------------------------------------
@@ -294,10 +315,7 @@ async function main() {
 
     const siteHost = hostOf(siteUrl);
     const insecureSiteUrl = siteHost
-        ? [
-              `http://${siteHost}`,
-              `http://www.${siteHost.replace(/^www\./, "")}`,
-          ]
+        ? [`http://${siteHost}`, `http://www.${siteHost.replace(/^www\./, "")}`]
         : [];
 
     for (const file of htmlFiles) {
@@ -328,7 +346,8 @@ async function main() {
     if (siteUrl && htmlFiles.length > 0) {
         const indexHtml = readFileSync(join(DIST, "index.html"), "utf8");
         const canonical = `href="${siteUrl}/"`;
-        if (indexHtml.includes(canonical)) pass("home page canonical matches SITE_URL");
+        if (indexHtml.includes(canonical))
+            pass("home page canonical matches SITE_URL");
         else fail(`dist/index.html canonical does not match ${siteUrl}/.`);
     }
 
