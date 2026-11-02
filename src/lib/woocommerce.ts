@@ -349,17 +349,25 @@ export async function getCategories(): Promise<Category[]> {
 export async function getCategoryFilters(): Promise<CategoryFilters> {
     if (!hasStore) return demoCategoryFilters;
 
+    let response: Response;
     try {
-        const response = await fetch(
+        response = await fetch(
             `${storeUrl}/wp-json/craft/v1/category-filters`,
             { headers: { Accept: "application/json" } },
         );
+    } catch (error) {
+        // Store unreachable: getProducts() falls back to demo products too.
+        console.warn("Could not reach the store; using demo filters.", error);
+        return demoCategoryFilters;
+    }
+
+    try {
         if (!response.ok) {
             throw new Error(`Filters request failed (${response.status}).`);
         }
         return (await response.json()) as CategoryFilters;
     } catch (error) {
-        // Not the demo filters: their options wouldn't match live products.
+        // Store is up, so products are live and demo options wouldn't match.
         console.warn("Could not load category filters; showing none.", error);
         return {};
     }
