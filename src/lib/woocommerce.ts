@@ -85,8 +85,7 @@ function normalizeFilterAttributes(raw: unknown): Record<string, string[]> {
 
 function normalizeProduct(raw: RawRecord): Product {
     const craft = (raw.extensions as RawRecord | undefined)?.craft as
-        | RawRecord
-        | undefined;
+        RawRecord | undefined;
     const categories = Array.isArray(raw.categories)
         ? (raw.categories as RawRecord[]).map(normalizeCategory)
         : [];
@@ -98,7 +97,9 @@ function normalizeProduct(raw: RawRecord): Product {
               .filter(
                   (image, index, all) =>
                       all.findIndex((other) =>
-                          image.id ? other.id === image.id : other.src === image.src,
+                          image.id
+                              ? other.id === image.id
+                              : other.src === image.src,
                       ) === index,
               )
         : [];

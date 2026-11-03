@@ -13,12 +13,12 @@ for that see [wordpress-setup.md](wordpress-setup.md).
 
 `wordpress/docker-compose.yml` has four services:
 
-| Service | Image | Why it's there |
-|---|---|---|
-| `db` | `mariadb:11` | The database. Data lives in the `db` volume, so it survives restarts. A healthcheck makes WordPress wait until MariaDB is actually ready. |
-| `wordpress` | `wordpress:php8.3-apache` | WordPress on <http://localhost:8080>. The image writes `wp-config.php` from the `WORDPRESS_*` env vars on first start. |
-| `mailpit` | `axllent/mailpit` | Fake mail server. Every email (contact form, RSVP confirmations, Woo order mails) shows up at <http://localhost:8025> instead of being sent. |
-| `cli` | `wordpress:cli-php8.3` | `wp-cli`, for setup and seeding from the terminal. In the `tools` profile, so `up` never starts it — you call it with `docker compose run`. |
+| Service     | Image                     | Why it's there                                                                                                                               |
+| ----------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db`        | `mariadb:11`              | The database. Data lives in the `db` volume, so it survives restarts. A healthcheck makes WordPress wait until MariaDB is actually ready.    |
+| `wordpress` | `wordpress:php8.3-apache` | WordPress on <http://localhost:8080>. The image writes `wp-config.php` from the `WORDPRESS_*` env vars on first start.                       |
+| `mailpit`   | `axllent/mailpit`         | Fake mail server. Every email (contact form, RSVP confirmations, Woo order mails) shows up at <http://localhost:8025> instead of being sent. |
+| `cli`       | `wordpress:cli-php8.3`    | `wp-cli`, for setup and seeding from the terminal. In the `tools` profile, so `up` never starts it — you call it with `docker compose run`.  |
 
 Two YAML anchors keep `wordpress` and `cli` identical:
 
@@ -146,9 +146,9 @@ this in wp-admin; the workshop **Session details** box sets the same fields.
 Without a shipping zone, checkout stops at "No delivery options are
 available". In wp-admin → **WooCommerce → Settings → Shipping → Add zone**:
 
-1. **Kenya**: Region "Kenya". Add a *Flat rate* method, cost 300.
-2. **Uganda & Tanzania**: Regions "Uganda" and "Tanzania". Add a *Flat
-   rate* method, cost 0, titled "Courier — cost confirmed on WhatsApp".
+1. **Kenya**: Region "Kenya". Add a _Flat rate_ method, cost 300.
+2. **Uganda & Tanzania**: Regions "Uganda" and "Tanzania". Add a _Flat
+   rate_ method, cost 0, titled "Courier — cost confirmed on WhatsApp".
 
 The production setup (Nairobi / rest of Kenya / Uganda & Tanzania) is in
 [wordpress-setup.md §6](wordpress-setup.md#6-woocommerce-settings).
@@ -159,23 +159,23 @@ The production setup (Nairobi / rest of Kenya / Uganda & Tanzania) is in
 API=http://localhost:8080/wp-json
 ```
 
-| # | Command | Expect |
-|---|---|---|
-| 1 | `curl -s $API/craft/v1/workshops \| jq` | 2 workshops in the storefront `Workshop` shape. Paid: `isFree: false`, `seatsLeft: 6`, `wooProductId` = ticket ID, `price.price` = `"350000"`. Free: `isFree: true`, `seatsLeft: 2`. |
-| 2 | `curl -s $API/craft/v1/ugc \| jq` | 1 post, `handle: "@wanjiru.makes"`, image `src` under `/wp-content/uploads/`. |
-| 3 | `curl -si -X POST $API/craft/v1/newsletter -H 'Content-Type: application/json' -d '{"email":"a@b.co","source":"curl"}'` | `200 {"ok":true}`. Run it again → still 200 (no duplicate error). Appears in **Craft & Colours → Subscribers**. |
-| 4 | Same as 3 with `"email":"nope"` | `400`, message “That email doesn’t look right…” |
-| 5 | `curl -si -X POST $API/craft/v1/contact -H 'Content-Type: application/json' -d '{"name":"Test","email":"a@b.co","message":"Do you stock gouache?"}'` | `200`, and the email shows in Mailpit with Reply-To `a@b.co`. |
-| 6 | `curl -si -X POST $API/craft/v1/rsvp -H 'Content-Type: application/json' -d "{\"workshop_id\":$FREE,\"name\":\"One\",\"email\":\"one@b.co\"}"` | `200`, `seats_left: 1`. Two emails in Mailpit (attendee + shop). |
-| 7 | Repeat 6 exactly | `200` with `"already": true` — no double booking. |
-| 8 | 6 with `two@b.co`, then with `three@b.co` | Second → `200`, `seats_left: 0`. Third → `409` “this meetup is full”. |
-| 9 | 6 with `"workshop_id":$PAID` | `400` “paid workshop — please book a ticket”. |
-| 10 | 6 with `"website":"spam"` added | `200` but nothing saved (honeypot). |
-| 11 | `curl -si -X OPTIONS $API/craft/v1/rsvp -H 'Origin: http://localhost:4321' -H 'Access-Control-Request-Method: POST' \| grep -i access-control` | `Access-Control-Allow-Origin: http://localhost:4321` plus allow/expose headers. |
-| 12 | Same as 11 with `Origin: https://evil.example` | **No** `Access-Control-Allow-Origin` header. |
-| 13 | `curl -si $API/wp/v2/users \| head -1` | `401`. |
-| 14 | `curl -sI $API/craft/v1/workshops \| grep -iE 'nosniff\|referrer'` | Security headers present. |
-| 15 | `wpcli option update craft_announcements $'First\n\nSecond'`, then `curl -s $API/craft/v1/announcements` | `["First","Second"]` (blank lines dropped). |
+| #   | Command                                                                                                                                              | Expect                                                                                                                                                                               |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `curl -s $API/craft/v1/workshops \| jq`                                                                                                              | 2 workshops in the storefront `Workshop` shape. Paid: `isFree: false`, `seatsLeft: 6`, `wooProductId` = ticket ID, `price.price` = `"350000"`. Free: `isFree: true`, `seatsLeft: 2`. |
+| 2   | `curl -s $API/craft/v1/ugc \| jq`                                                                                                                    | 1 post, `handle: "@wanjiru.makes"`, image `src` under `/wp-content/uploads/`.                                                                                                        |
+| 3   | `curl -si -X POST $API/craft/v1/newsletter -H 'Content-Type: application/json' -d '{"email":"a@b.co","source":"curl"}'`                              | `200 {"ok":true}`. Run it again → still 200 (no duplicate error). Appears in **Craft & Colours → Subscribers**.                                                                      |
+| 4   | Same as 3 with `"email":"nope"`                                                                                                                      | `400`, message “That email doesn’t look right…”                                                                                                                                      |
+| 5   | `curl -si -X POST $API/craft/v1/contact -H 'Content-Type: application/json' -d '{"name":"Test","email":"a@b.co","message":"Do you stock gouache?"}'` | `200`, and the email shows in Mailpit with Reply-To `a@b.co`.                                                                                                                        |
+| 6   | `curl -si -X POST $API/craft/v1/rsvp -H 'Content-Type: application/json' -d "{\"workshop_id\":$FREE,\"name\":\"One\",\"email\":\"one@b.co\"}"`       | `200`, `seats_left: 1`. Two emails in Mailpit (attendee + shop).                                                                                                                     |
+| 7   | Repeat 6 exactly                                                                                                                                     | `200` with `"already": true` — no double booking.                                                                                                                                    |
+| 8   | 6 with `two@b.co`, then with `three@b.co`                                                                                                            | Second → `200`, `seats_left: 0`. Third → `409` “this meetup is full”.                                                                                                                |
+| 9   | 6 with `"workshop_id":$PAID`                                                                                                                         | `400` “paid workshop — please book a ticket”.                                                                                                                                        |
+| 10  | 6 with `"website":"spam"` added                                                                                                                      | `200` but nothing saved (honeypot).                                                                                                                                                  |
+| 11  | `curl -si -X OPTIONS $API/craft/v1/rsvp -H 'Origin: http://localhost:4321' -H 'Access-Control-Request-Method: POST' \| grep -i access-control`       | `Access-Control-Allow-Origin: http://localhost:4321` plus allow/expose headers.                                                                                                      |
+| 12  | Same as 11 with `Origin: https://evil.example`                                                                                                       | **No** `Access-Control-Allow-Origin` header.                                                                                                                                         |
+| 13  | `curl -si $API/wp/v2/users \| head -1`                                                                                                               | `401`.                                                                                                                                                                               |
+| 14  | `curl -sI $API/craft/v1/workshops \| grep -iE 'nosniff\|referrer'`                                                                                   | Security headers present.                                                                                                                                                            |
+| 15  | `wpcli option update craft_announcements $'First\n\nSecond'`, then `curl -s $API/craft/v1/announcements`                                             | `["First","Second"]` (blank lines dropped).                                                                                                                                          |
 
 ### Shop filters
 

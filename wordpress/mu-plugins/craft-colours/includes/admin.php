@@ -1,4 +1,5 @@
 <?php
+
 /**
  * wp-admin → Craft & Colours: newsletter subscribers (with CSV export),
  * free-gift product setting and storefront rebuild status.
@@ -39,7 +40,7 @@ add_action(
 );
 
 // Let shop managers (not just admins) save the settings form.
-add_filter('option_page_capability_craft_colours', static fn () => craft_rebuild_capability());
+add_filter('option_page_capability_craft_colours', static fn() => craft_rebuild_capability());
 
 /* -------------------------------------------------------------------------
  * Subscribers
@@ -60,25 +61,33 @@ function craft_render_subscribers_page(): void
         ),
     );
     $export_url = wp_nonce_url(admin_url('admin-post.php?action=craft_export_subscribers'), 'craft_export_subscribers');
-    ?>
+?>
     <div class="wrap">
         <h1 class="wp-heading-inline">Newsletter subscribers</h1>
         <a class="page-title-action" href="<?php echo esc_url($export_url); ?>">Download CSV</a>
         <p><?php echo esc_html(sprintf(_n('%s subscriber', '%s subscribers', $total), number_format_i18n($total))); ?> from the storefront sign-up forms.</p>
 
         <table class="widefat striped">
-            <thead><tr><th>Email</th><th>Signed up from</th><th>Date</th></tr></thead>
-            <tbody>
-            <?php if (!$rows) : ?>
-                <tr><td colspan="3">No subscribers yet.</td></tr>
-            <?php endif; ?>
-            <?php foreach ($rows as $row) : ?>
+            <thead>
                 <tr>
-                    <td><a href="mailto:<?php echo esc_attr($row->email); ?>"><?php echo esc_html($row->email); ?></a></td>
-                    <td><?php echo esc_html($row->source ?: '—'); ?></td>
-                    <td><?php echo esc_html(mysql2date('j M Y, H:i', $row->created_at)); ?></td>
+                    <th>Email</th>
+                    <th>Signed up from</th>
+                    <th>Date</th>
                 </tr>
-            <?php endforeach; ?>
+            </thead>
+            <tbody>
+                <?php if (!$rows) : ?>
+                    <tr>
+                        <td colspan="3">No subscribers yet.</td>
+                    </tr>
+                <?php endif; ?>
+                <?php foreach ($rows as $row) : ?>
+                    <tr>
+                        <td><a href="mailto:<?php echo esc_attr($row->email); ?>"><?php echo esc_html($row->email); ?></a></td>
+                        <td><?php echo esc_html($row->source ?: '—'); ?></td>
+                        <td><?php echo esc_html(mysql2date('j M Y, H:i', $row->created_at)); ?></td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
 
@@ -96,7 +105,7 @@ function craft_render_subscribers_page(): void
         }
         ?>
     </div>
-    <?php
+<?php
 }
 
 add_action(
@@ -129,7 +138,7 @@ function craft_render_settings_page(): void
         : [];
     $last = get_option('craft_rebuild_last', []);
     $next = wp_next_scheduled(CRAFT_REBUILD_HOOK);
-    ?>
+?>
     <div class="wrap">
         <h1>Craft &amp; Colours settings</h1>
 
@@ -222,5 +231,5 @@ function craft_render_settings_page(): void
             </p>
         <?php endif; ?>
     </div>
-    <?php
+<?php
 }

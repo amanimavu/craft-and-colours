@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extra product copy for the storefront product page.
  *
@@ -82,7 +83,7 @@ add_action(
 );
 
 // Changing the default affects every product page.
-add_action('update_option_craft_default_good_to_know', static fn () => craft_schedule_rebuild('Default “Good to know” updated'));
+add_action('update_option_craft_default_good_to_know', static fn() => craft_schedule_rebuild('Default “Good to know” updated'));
 
 add_action(
     'woocommerce_blocks_loaded',
@@ -94,11 +95,11 @@ add_action(
         woocommerce_store_api_register_endpoint_data([
             'endpoint' => \Automattic\WooCommerce\StoreApi\Schemas\V1\ProductSchema::IDENTIFIER,
             'namespace' => 'craft',
-            'data_callback' => static fn (WC_Product $product): array => [
+            'data_callback' => static fn(WC_Product $product): array => [
                 'good_to_know' => craft_good_to_know_html($product->get_parent_id() ?: $product->get_id()),
                 'filter_attributes' => craft_product_filter_attributes($product),
             ],
-            'schema_callback' => static fn (): array => [
+            'schema_callback' => static fn(): array => [
                 'good_to_know' => [
                     'description' => 'HTML for the "Good to know" section (product value or site default).',
                     'type' => 'string',

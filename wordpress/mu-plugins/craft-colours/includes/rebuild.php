@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Static-site rebuild hook.
  *
@@ -101,8 +102,8 @@ add_action(
     3,
 );
 
-add_action('woocommerce_product_set_stock', static fn () => craft_schedule_rebuild('stock change'));
-add_action('woocommerce_variation_set_stock', static fn () => craft_schedule_rebuild('stock change'));
+add_action('woocommerce_product_set_stock', static fn() => craft_schedule_rebuild('stock change'));
+add_action('woocommerce_variation_set_stock', static fn() => craft_schedule_rebuild('stock change'));
 
 foreach (['created_term', 'edited_term', 'delete_term'] as $craft_term_hook) {
     add_action(
@@ -120,7 +121,7 @@ unset($craft_term_hook);
 
 // Attribute names are the default shop filter labels.
 foreach (['woocommerce_attribute_added', 'woocommerce_attribute_updated', 'woocommerce_attribute_deleted'] as $craft_attribute_hook) {
-    add_action($craft_attribute_hook, static fn () => craft_schedule_rebuild('product attribute updated'));
+    add_action($craft_attribute_hook, static fn() => craft_schedule_rebuild('product attribute updated'));
 }
 unset($craft_attribute_hook);
 

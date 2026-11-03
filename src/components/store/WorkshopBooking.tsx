@@ -1,5 +1,11 @@
 import { useState, type SubmitEvent } from "react";
-import { Check, Loader2, MessageCircle, ShoppingBag, UsersRound } from "lucide-react";
+import {
+    Check,
+    Loader2,
+    MessageCircle,
+    ShoppingBag,
+    UsersRound,
+} from "lucide-react";
 import { getStoreUrl, hasWooCommerce } from "../../lib/cart-api";
 import { addItem } from "../../lib/cart-store";
 import { formatMoney } from "../../lib/format";
@@ -90,7 +96,9 @@ export default function WorkshopBooking({
         const trimmedEmail = email.trim();
 
         if (!trimmedName || !trimmedEmail) {
-            setError("Please add your name and email so we can save your seat.");
+            setError(
+                "Please add your name and email so we can save your seat.",
+            );
             return;
         }
 
@@ -125,9 +133,9 @@ export default function WorkshopBooking({
                 },
             );
 
-            const data = (await response.json().catch(() => null)) as
-                | { message?: string }
-                | null;
+            const data = (await response.json().catch(() => null)) as {
+                message?: string;
+            } | null;
 
             if (response.status === 409) {
                 setFull(true);
@@ -258,7 +266,10 @@ export default function WorkshopBooking({
                 </label>
 
                 {error && (
-                    <p role="alert" className="text-sm font-semibold text-clay-600">
+                    <p
+                        role="alert"
+                        className="text-sm font-semibold text-clay-600"
+                    >
                         {error}
                     </p>
                 )}
@@ -319,7 +330,10 @@ export default function WorkshopBooking({
             )}
 
             {error && (
-                <p role="alert" className="mt-3 text-sm font-semibold text-clay-600">
+                <p
+                    role="alert"
+                    className="mt-3 text-sm font-semibold text-clay-600"
+                >
                     {error}
                 </p>
             )}

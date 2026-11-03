@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: Craft & Colours
  * Description: Headless storefront support for craftandcolors.africa — CORS, security headers, contact/newsletter/RSVP endpoints, workshops and maker-post types, free-gift logic, low-stock widget and static-site rebuild hook.
