@@ -50,27 +50,9 @@ export async function getPastWorkshops(): Promise<Workshop[]> {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-export function isFullyBooked(workshop: Workshop): boolean {
-  return workshop.seatsLeft <= 0;
-}
-
-export function seatsTaken(workshop: Workshop): number {
-  return Math.max(0, workshop.capacity - workshop.seatsLeft);
-}
-
-/** Share of seats already taken, 0–100. */
-export function seatsFilledPercent(workshop: Workshop): number {
-  if (workshop.capacity <= 0) return isFullyBooked(workshop) ? 100 : 0;
-  return Math.min(
-    100,
-    Math.max(0, Math.round((seatsTaken(workshop) / workshop.capacity) * 100)),
-  );
-}
-
-/** Few seats left: at most 3, or at most a fifth of the room. */
-export function isAlmostFull(workshop: Workshop): boolean {
-  return (
-    !isFullyBooked(workshop) &&
-    (workshop.seatsLeft <= 3 || workshop.seatsLeft <= workshop.capacity * 0.2)
-  );
-}
+export {
+  isAlmostFull,
+  isFullyBooked,
+  seatsFilledPercent,
+  seatsTaken,
+} from './workshop-seats';

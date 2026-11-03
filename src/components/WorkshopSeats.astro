@@ -1,11 +1,6 @@
 ---
 import type { Workshop } from '../lib/types';
-import {
-  isAlmostFull,
-  isFullyBooked,
-  seatsFilledPercent,
-  seatsTaken,
-} from '../lib/workshops';
+import { seatsSummary } from '../lib/workshop-seats';
 
 interface Props {
   workshop: Workshop;
@@ -18,32 +13,30 @@ const { workshop, tone = 'light', class: className } = Astro.props;
 
 // The bar fills up as seats are taken (not down as they run out), so a full
 // session reads as a full bar.
-const full = isFullyBooked(workshop);
-const almostFull = isAlmostFull(workshop);
-const taken = seatsTaken(workshop);
-const percent = seatsFilledPercent(workshop);
-
-const status = full ? 'Fully booked' : almostFull ? 'Almost full' : 'Seats taken';
-const detail = full
-  ? `All ${workshop.capacity} seats taken`
-  : `${taken} of ${workshop.capacity} taken · ${workshop.seatsLeft} left`;
+const { state, status, detail, taken, percent } = seatsSummary(workshop);
 
 const dark = tone === 'dark';
 ---
 
-<div class={className}>
+<div
+  class:list={['group', className]}
+  data-workshop-seats={workshop.id}
+  data-capacity={workshop.capacity}
+  data-state={state}
+>
   <div class="flex items-baseline justify-between gap-4 text-xs">
     <span
+      data-seats-status
       class:list={[
         'font-bold uppercase tracking-[0.12em]',
-        full || almostFull
-          ? dark ? 'text-marigold-500' : 'text-poppy-600'
-          : dark ? 'text-olive-100/70' : 'text-ink-400',
+        dark
+          ? 'text-olive-100/70 group-data-[state=full]:text-marigold-500 group-data-[state=low]:text-marigold-500'
+          : 'text-ink-400 group-data-[state=full]:text-poppy-600 group-data-[state=low]:text-poppy-600',
       ]}
     >
       {status}
     </span>
-    <span class:list={['font-semibold', dark ? 'text-cream-50' : 'text-ink-900']}>
+    <span data-seats-detail class:list={['font-semibold', dark ? 'text-cream-50' : 'text-ink-900']}>
       {detail}
     </span>
   </div>
@@ -57,9 +50,10 @@ const dark = tone === 'dark';
     aria-valuetext={detail}
   >
     <div
+      data-seats-bar
       class:list={[
-        'h-full rounded-full',
-        full ? (dark ? 'bg-cream-50/60' : 'bg-ink-900/60') : almostFull ? 'bg-poppy-500' : 'bg-olive-500',
+        'h-full rounded-full bg-olive-500 group-data-[state=low]:bg-poppy-500',
+        dark ? 'group-data-[state=full]:bg-cream-50/60' : 'group-data-[state=full]:bg-ink-900/60',
       ]}
       style={`width: ${percent}%`}
     />

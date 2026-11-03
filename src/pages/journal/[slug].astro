@@ -57,14 +57,14 @@ const schema = {
           ]}
         />
 
-        <div class="mx-auto mt-8 max-w-3xl text-center">
+        <div class="mt-8 max-w-3xl">
           <p class="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-300">
             {post.categories.join(' · ') || 'Journal'} · {formatDate(post.date)}
           </p>
           <h1 class="mt-4 text-balance font-display text-4xl leading-[1.04] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
             {post.title}
           </h1>
-          <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-ink-500">
+          <p class="mt-5 max-w-2xl text-base leading-8 text-ink-500">
             {post.excerpt}
           </p>
         </div>

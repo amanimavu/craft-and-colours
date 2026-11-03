@@ -1,0 +1,65 @@
+---
+// Static pages only know the seat count from the last build. This refreshes it
+// in the browser. If the CMS can't be reached, the built count stays.
+---
+
+<script>
+  import { SEATS_EVENT, seatsSummary, type SeatsEventDetail } from '../lib/workshop-seats';
+
+  const storeUrl = (import.meta.env.PUBLIC_WC_STORE_URL || '').replace(/\/$/, '');
+
+  function render({ id, seatsLeft }: SeatsEventDetail) {
+    document
+      .querySelectorAll(`[data-workshop-seats-left="${id}"]`)
+      .forEach((count) => {
+        count.textContent = String(seatsLeft);
+      });
+
+    document
+      .querySelectorAll<HTMLElement>(`[data-workshop-seats="${id}"]`)
+      .forEach((root) => {
+        const capacity = Number(root.dataset.capacity);
+        const summary = seatsSummary({ capacity, seatsLeft });
+        const meter = root.querySelector('[role="meter"]');
+        const bar = root.querySelector<HTMLElement>('[data-seats-bar]');
+
+        root.dataset.state = summary.state;
+        root.querySelector('[data-seats-status]')!.textContent = summary.status;
+        root.querySelector('[data-seats-detail]')!.textContent = summary.detail;
+        meter?.setAttribute('aria-valuenow', String(summary.taken));
+        meter?.setAttribute('aria-valuetext', summary.detail);
+        if (bar) bar.style.width = `${summary.percent}%`;
+      });
+  }
+
+  window.addEventListener(SEATS_EVENT, (event) => {
+    render((event as CustomEvent<SeatsEventDetail>).detail);
+  });
+
+  const ids = [
+    ...new Set(
+      [...document.querySelectorAll<HTMLElement>('[data-workshop-seats], [data-workshop-seats-left]')].map(
+        (element) => element.dataset.workshopSeats ?? element.dataset.workshopSeatsLeft,
+      ),
+    ),
+  ];
+
+  if (storeUrl && ids.length > 0) {
+    fetch(`${storeUrl}/wp-json/craft/v1/workshop-seats?ids=${ids.join(',')}`, {
+      credentials: 'omit',
+    })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((seats: Record<string, number>) => {
+        for (const [id, seatsLeft] of Object.entries(seats)) {
+          window.dispatchEvent(
+            new CustomEvent<SeatsEventDetail>(SEATS_EVENT, {
+              detail: { id: Number(id), seatsLeft },
+            }),
+          );
+        }
+      })
+      .catch(() => {
+        // Keep the count from the build.
+      });
+  }
+</script>

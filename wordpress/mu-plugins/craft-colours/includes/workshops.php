@@ -6,6 +6,8 @@
  *   location, linked WooCommerce ticket product).
  * - GET  /wp-json/craft/v1/workshops — read at build time by src/lib/workshops.ts,
  *   in the storefront's Workshop shape.
+ * - GET  /wp-json/craft/v1/workshop-seats?ids=1,2 — live seat counts, read in
+ *   the browser by LiveWorkshopSeats.astro.
  * - POST /wp-json/craft/v1/rsvp      — free-meetup RSVPs from WorkshopBooking.tsx.
  *
  * A workshop with a ticket product is paid (booked through the cart, seats =
@@ -274,6 +276,12 @@ add_action(
             'permission_callback' => '__return_true',
         ]);
 
+        register_rest_route(CRAFT_REST_NAMESPACE, '/workshop-seats', [
+            'methods' => WP_REST_Server::READABLE,
+            'callback' => 'craft_workshop_seats',
+            'permission_callback' => '__return_true',
+        ]);
+
         register_rest_route(CRAFT_REST_NAMESPACE, '/rsvp', [
             'methods' => WP_REST_Server::CREATABLE,
             'callback' => 'craft_handle_rsvp',
@@ -329,6 +337,24 @@ function craft_store_price(?WC_Product $product): array
     ];
 }
 
+function craft_workshop_product(array $meta): ?WC_Product
+{
+    $product = $meta['ticket_product'] && function_exists('wc_get_product')
+        ? wc_get_product($meta['ticket_product'])
+        : null;
+    return $product instanceof WC_Product ? $product : null;
+}
+
+function craft_workshop_seats_left(int $post_id, array $meta, ?WC_Product $product): int
+{
+    if ($product) {
+        return $product->managing_stock()
+            ? max(0, (int) $product->get_stock_quantity())
+            : ($product->is_in_stock() ? $meta['capacity'] : 0);
+    }
+    return max(0, $meta['capacity'] - craft_rsvp_count($post_id));
+}
+
 function craft_workshop_payload(WP_Post $post): array
 {
     $meta = craft_workshop_meta($post->ID);
@@ -340,18 +366,8 @@ function craft_workshop_payload(WP_Post $post): array
         $end = $start->setTime($hour, $minute);
     }
 
-    $product = $meta['ticket_product'] && function_exists('wc_get_product')
-        ? wc_get_product($meta['ticket_product'])
-        : null;
-    $product = $product instanceof WC_Product ? $product : null;
-
-    if ($product) {
-        $seats_left = $product->managing_stock()
-            ? max(0, (int) $product->get_stock_quantity())
-            : ($product->is_in_stock() ? $meta['capacity'] : 0);
-    } else {
-        $seats_left = max(0, $meta['capacity'] - craft_rsvp_count($post->ID));
-    }
+    $product = craft_workshop_product($meta);
+    $seats_left = craft_workshop_seats_left($post->ID, $meta, $product);
 
     $title = craft_plain(get_the_title($post));
 
@@ -393,6 +409,23 @@ function craft_list_workshops(): WP_REST_Response
     ));
 
     return rest_ensure_response($workshops);
+}
+
+/** Called on every workshop page view, so it only reads what the count needs. */
+function craft_workshop_seats(WP_REST_Request $request): WP_REST_Response
+{
+    $ids = array_filter(array_map('absint', explode(',', (string) $request->get_param('ids'))));
+    $seats = [];
+
+    foreach (array_slice(array_unique($ids), 0, 50) as $id) {
+        $post = get_post($id);
+        if ($post && $post->post_type === CRAFT_WORKSHOP_TYPE && $post->post_status === 'publish') {
+            $meta = craft_workshop_meta($id);
+            $seats[$id] = craft_workshop_seats_left($id, $meta, craft_workshop_product($meta));
+        }
+    }
+
+    return rest_ensure_response((object) $seats);
 }
 
 function craft_handle_rsvp(WP_REST_Request $request): WP_REST_Response|WP_Error
@@ -451,9 +484,15 @@ function craft_handle_rsvp(WP_REST_Request $request): WP_REST_Response|WP_Error
     }
 
     craft_send_rsvp_emails($payload, $name, $email);
-    craft_schedule_rebuild('RSVP: ' . $payload['title']);
 
-    return rest_ensure_response(['ok' => true, 'seats_left' => max(0, $payload['seatsLeft'] - 1)]);
+    $seats_left = max(0, $payload['seatsLeft'] - 1);
+    // Pages fetch the count live, so only the built "Fully booked" labels and
+    // buttons need a rebuild, once the last seat goes.
+    if ($seats_left === 0) {
+        craft_schedule_rebuild('Fully booked: ' . $payload['title']);
+    }
+
+    return rest_ensure_response(['ok' => true, 'seats_left' => $seats_left]);
 }
 
 function craft_send_rsvp_emails(array $workshop, string $name, string $email): void

@@ -6,6 +6,7 @@ import Icon from "../../components/ui/Icon.astro";
 import Badge from "../../components/ui/Badge.astro";
 import WorkshopBooking from "../../components/store/WorkshopBooking";
 import WorkshopSeats from "../../components/WorkshopSeats.astro";
+import LiveWorkshopSeats from "../../components/LiveWorkshopSeats.astro";
 import {
     getWorkshops,
     isAlmostFull,
@@ -106,7 +107,7 @@ const schema = {
                                 ]}
                             >
                                 {almostFull ? "Almost full · " : ""}
-                                {workshop.seatsLeft} of {workshop.capacity} seats
+                                <span data-workshop-seats-left={workshop.id}>{workshop.seatsLeft}</span> of {workshop.capacity} seats
                                 left
                             </span>
                         )
@@ -302,4 +303,5 @@ const schema = {
             </a>
         </div>
     </div>
+    <LiveWorkshopSeats />
 </BaseLayout>

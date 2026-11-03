@@ -127,6 +127,12 @@ ordered by start.
 }
 ```
 
+### `GET /workshop-seats?ids=1,2` → `{ "1": 6, "2": 0 }`
+
+Read in the browser by `LiveWorkshopSeats.astro` on the workshop pages, so seat
+counts stay current between builds. Maps each published workshop ID to its seats
+left (at most 50 IDs). The home page keeps the count from the build.
+
 ### `GET /ugc?limit=12` → `UgcPost[]`
 
 Read by `getUgcPosts()` in `src/lib/wordpress.ts`. Only maker posts with a
@@ -200,7 +206,7 @@ Sent by `WorkshopBooking.tsx`, for free sessions only.
 
 - Stored in `{prefix}craft_rsvps`, unique per workshop + email.
 - Sends a confirmation to the attendee and a notification to the shop.
-- Schedules a rebuild, so the static seat count catches up.
+- Schedules a rebuild only when it takes the last seat, for the static "Fully booked" labels. Workshop pages read the count live from `GET /workshop-seats`.
 
 ## Rebuild hook → GitHub Actions (Phase 9)
 
@@ -223,7 +229,7 @@ Triggers:
 - Category or tag edits, including a category's shop filters.
 - Product attribute or attribute term edits.
 - Announcement edits.
-- A new RSVP.
+- An RSVP that takes the last seat.
 - The manual **Rebuild site** button.
 
 Batched: one dispatch at most every `CRAFT_REBUILD_DELAY` seconds (default 300).

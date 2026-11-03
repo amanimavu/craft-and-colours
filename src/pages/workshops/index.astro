@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/ui/Icon.astro';
 import WorkshopSeats from '../../components/WorkshopSeats.astro';
+import LiveWorkshopSeats from '../../components/LiveWorkshopSeats.astro';
 import { getUpcomingWorkshops, getPastWorkshops, isFullyBooked } from '../../lib/workshops';
 import CmsImage from '../../components/ui/CmsImage.astro';
 import { formatMoney } from '../../lib/format';
@@ -155,7 +156,7 @@ const schema = {
                   {isFullyBooked(workshop) ? (
                     <span class="ml-1 font-bold text-poppy-600">· Fully booked</span>
                   ) : (
-                    <span class="ml-1 font-medium text-ink-400">· {workshop.seatsLeft} left</span>
+                    <span class="ml-1 font-medium text-ink-400">· <span data-workshop-seats-left={workshop.id}>{workshop.seatsLeft}</span> left</span>
                   )}
                 </span>
                 <a
@@ -215,4 +216,5 @@ const schema = {
       </section>
     )}
   </div>
+  <LiveWorkshopSeats />
 </BaseLayout>

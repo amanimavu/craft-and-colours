@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from "react";
+import { useEffect, useState, type SubmitEvent } from "react";
 import {
     Check,
     Loader2,
@@ -9,6 +9,7 @@ import {
 import { getStoreUrl, hasWooCommerce } from "../../lib/cart-api";
 import { addItem } from "../../lib/cart-store";
 import { formatMoney } from "../../lib/format";
+import { SEATS_EVENT, type SeatsEventDetail } from "../../lib/workshop-seats";
 
 interface Props {
     workshopId: number;
@@ -63,6 +64,17 @@ export default function WorkshopBooking({
     const [rsvpDone, setRsvpDone] = useState(false);
     // Also flips when the server says the last seat went while this page was open.
     const [full, setFull] = useState(seatsLeft <= 0);
+
+    // The live count can differ from the build, in either direction.
+    useEffect(() => {
+        function onSeats(event: Event) {
+            const detail = (event as CustomEvent<SeatsEventDetail>).detail;
+            if (detail.id === workshopId) setFull(detail.seatsLeft <= 0);
+        }
+
+        window.addEventListener(SEATS_EVENT, onSeats);
+        return () => window.removeEventListener(SEATS_EVENT, onSeats);
+    }, [workshopId]);
 
     const priceLabel = formatMoney(price, currencyCode, minorUnit);
     const soldOut = full || !ticketProductId;
@@ -135,6 +147,7 @@ export default function WorkshopBooking({
 
             const data = (await response.json().catch(() => null)) as {
                 message?: string;
+                seats_left?: number;
             } | null;
 
             if (response.status === 409) {
@@ -147,6 +160,17 @@ export default function WorkshopBooking({
             }
 
             setRsvpDone(true);
+
+            if (typeof data?.seats_left === "number") {
+                window.dispatchEvent(
+                    new CustomEvent<SeatsEventDetail>(SEATS_EVENT, {
+                        detail: {
+                            id: workshopId,
+                            seatsLeft: data.seats_left,
+                        },
+                    }),
+                );
+            }
         } catch (rsvpError) {
             setError(
                 rsvpError instanceof Error
