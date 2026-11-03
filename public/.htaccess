@@ -41,8 +41,9 @@ ErrorDocument 404 /404.html
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
 
-    # Only sent over HTTPS, where browsers honour it.
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+    # Only sent over HTTPS, where browsers honour it. Short max-age until this
+    # .htaccess is proven on the server; raise it after that.
+    Header always set Strict-Transport-Security "max-age=300" env=HTTPS
 
     Header append Vary Accept-Encoding
 </IfModule>

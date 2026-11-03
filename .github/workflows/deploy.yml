@@ -84,6 +84,8 @@ jobs:
               with:
                   name: dist
                   path: dist/
+                  # dist/.htaccess is a dotfile; the action skips those by default.
+                  include-hidden-files: true
                   retention-days: 30
 
     deploy:
