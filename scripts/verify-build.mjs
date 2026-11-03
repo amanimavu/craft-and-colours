@@ -117,9 +117,12 @@ function walk(dir) {
     return files;
 }
 
-async function fetchJson(url, label) {
+/* The CMS is on shared hosting and may still be busy just after a build. */
+const RETRY_DELAYS_MS = [5_000, 10_000, 20_000, 40_000];
+
+async function fetchOnce(url) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15_000);
+    const timer = setTimeout(() => controller.abort(), 60_000);
 
     try {
         const response = await fetch(url, {
@@ -128,22 +131,37 @@ async function fetchJson(url, label) {
         });
 
         if (!response.ok) {
-            cmsProblems.push(
-                `${label} returned HTTP ${response.status} — ${url}`,
-            );
-            return null;
+            return {
+                problem: `returned HTTP ${response.status}`,
+                retry: response.status === 429 || response.status >= 500,
+            };
         }
 
-        return await response.json();
+        return { data: await response.json() };
     } catch (error) {
         const reason =
             error?.name === "AbortError"
-                ? "timed out after 15s"
+                ? "timed out after 60s"
                 : (error?.message ?? String(error));
-        cmsProblems.push(`${label} unreachable: ${reason} — ${url}`);
-        return null;
+        return { problem: `unreachable: ${reason}`, retry: true };
     } finally {
         clearTimeout(timer);
+    }
+}
+
+async function fetchJson(url, label) {
+    for (let attempt = 0; ; attempt += 1) {
+        const { data, problem, retry } = await fetchOnce(url);
+        if (!problem) return data;
+
+        if (!retry || attempt >= RETRY_DELAYS_MS.length) {
+            cmsProblems.push(`${label} ${problem} — ${url}`);
+            return null;
+        }
+
+        await new Promise((resolve) =>
+            setTimeout(resolve, RETRY_DELAYS_MS[attempt]),
+        );
     }
 }
 

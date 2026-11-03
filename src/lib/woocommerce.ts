@@ -1,3 +1,4 @@
+import { cmsFetch } from "./cms-fetch";
 import { demoCategories, demoCategoryFilters, demoProducts } from "./demo-data";
 import { slugify, stripHtml } from "./format";
 import type {
@@ -180,9 +181,8 @@ async function fetchAllProducts(
 
     for (let page = 1; page <= 20; page += 1) {
         search.set("page", String(page));
-        const response = await fetch(
+        const response = await cmsFetch(
             `${storeUrl}/wp-json/wc/store/v1/products?${search.toString()}`,
-            { headers: { Accept: "application/json" } },
         );
 
         if (!response.ok) {
@@ -239,9 +239,8 @@ export async function getBestsellers(limit = 5): Promise<Product[]> {
     }
 
     try {
-        const response = await fetch(
+        const response = await cmsFetch(
             `${storeUrl}/wp-json/wc/store/v1/products?orderby=popularity&catalog_visibility=${CATALOG_VISIBILITY}&per_page=${limit}`,
-            { headers: { Accept: "application/json" } },
         );
         if (!response.ok) {
             throw new Error(`WooCommerce request failed (${response.status}).`);
@@ -263,9 +262,8 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
     }
 
     try {
-        const response = await fetch(
+        const response = await cmsFetch(
             `${storeUrl}/wp-json/wc/store/v1/products?featured=true&catalog_visibility=${CATALOG_VISIBILITY}&per_page=${limit}`,
-            { headers: { Accept: "application/json" } },
         );
         if (!response.ok) {
             throw new Error(`WooCommerce request failed (${response.status}).`);
@@ -285,9 +283,8 @@ export async function getProduct(slug: string): Promise<Product | undefined> {
     }
 
     try {
-        const response = await fetch(
+        const response = await cmsFetch(
             `${storeUrl}/wp-json/wc/store/v1/products/${encodeURIComponent(slug)}`,
-            { headers: { Accept: "application/json" } },
         );
 
         if (response.status === 404) return undefined;
@@ -299,9 +296,8 @@ export async function getProduct(slug: string): Promise<Product | undefined> {
         const product = normalizeProduct(raw);
 
         if (raw.type === "variable" || raw.has_options) {
-            const variationResponse = await fetch(
+            const variationResponse = await cmsFetch(
                 `${storeUrl}/wp-json/wc/store/v1/products?type=variation&parent=${product.id}&per_page=100`,
-                { headers: { Accept: "application/json" } },
             );
 
             if (variationResponse.ok) {
@@ -352,9 +348,8 @@ export async function getCategoryFilters(): Promise<CategoryFilters> {
 
     let response: Response;
     try {
-        response = await fetch(
+        response = await cmsFetch(
             `${storeUrl}/wp-json/craft/v1/category-filters`,
-            { headers: { Accept: "application/json" } },
         );
     } catch (error) {
         // Store unreachable: getProducts() falls back to demo products too.
@@ -394,9 +389,8 @@ export async function getRelatedProducts(
     }
 
     try {
-        const response = await fetch(
+        const response = await cmsFetch(
             `${storeUrl}/wp-json/wc/store/v1/products?related=${product.id}&catalog_visibility=${CATALOG_VISIBILITY}&per_page=${limit}`,
-            { headers: { Accept: "application/json" } },
         );
         if (response.ok) {
             const raw = (await response.json()) as RawRecord[];

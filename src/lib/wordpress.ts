@@ -1,3 +1,4 @@
+import { cmsFetch } from "./cms-fetch";
 import { demoAnnouncements, demoPages, demoPosts, demoUgc } from "./demo-data";
 import { stripHtml } from "./format";
 import type { PageContent, Post, ProductImage, UgcPost } from "./types";
@@ -60,11 +61,8 @@ function normalizePost(raw: WpPost): Post {
 }
 
 async function wpGet<T>(path: string): Promise<T> {
-    const response = await fetch(
+    const response = await cmsFetch(
         `${wpUrl}/wp-json/wp/v2${path}${path.includes("?") ? "&" : "?"}_embed`,
-        {
-            headers: { Accept: "application/json" },
-        },
     );
 
     if (!response.ok) {
@@ -79,9 +77,7 @@ async function wpGet<T>(path: string): Promise<T> {
  * (wordpress/mu-plugins/craft-colours, see docs/store-data-contract.md).
  */
 export async function craftGet<T>(path: string): Promise<T> {
-    const response = await fetch(`${wpUrl}/wp-json/craft/v1${path}`, {
-        headers: { Accept: "application/json" },
-    });
+    const response = await cmsFetch(`${wpUrl}/wp-json/craft/v1${path}`);
 
     if (!response.ok) {
         throw new Error(`WordPress request failed (${response.status}).`);
