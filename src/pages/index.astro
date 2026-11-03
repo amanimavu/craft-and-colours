@@ -21,6 +21,7 @@ import { demoVibes } from "../lib/demo-data";
 import { DEMO_FREE_GIFT_THRESHOLD } from "../lib/cart-api";
 import { getBestsellers, getProducts } from "../lib/woocommerce";
 import { getPosts, getUgcPosts } from "../lib/wordpress";
+import CmsImage from "../components/ui/CmsImage.astro";
 import { getUpcomingWorkshops, isFullyBooked } from "../lib/workshops";
 import WorkshopSeats from "../components/WorkshopSeats.astro";
 import { Image, getImage } from "astro:assets";
@@ -345,8 +346,10 @@ const schema = {
                 featuredWorkshop && (
                     <div class="mt-12 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                         <div class="overflow-hidden rounded-3xl bg-cream-200 aspect-[16/10] shadow-sm">
-                            <img
+                            <CmsImage
                                 src={featuredWorkshop.image.src}
+                                widths={[480, 800, 1200]}
+                                sizes="(min-width: 1024px) 55vw, 100vw"
                                 alt={featuredWorkshop.image.alt}
                                 loading="lazy"
                                 class="h-full w-full object-cover"
@@ -569,8 +572,10 @@ const schema = {
                                         aria-hidden="true"
                                     />
                                     <div class="aspect-square overflow-hidden bg-cream-200">
-                                        <img
+                                        <CmsImage
                                             src={post.image.src}
+                                            widths={[240, 400]}
+                                            sizes="(min-width: 640px) 25vw, 50vw"
                                             alt={post.image.alt}
                                             loading="lazy"
                                             class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
@@ -624,8 +629,10 @@ const schema = {
                             >
                                 <div class="aspect-[3/2] overflow-hidden bg-cream-200">
                                     {post.image ? (
-                                        <img
+                                        <CmsImage
                                             src={post.image.src}
+                                            widths={[400, 640, 800]}
+                                            sizes="(min-width: 768px) 33vw, 100vw"
                                             alt={post.image.alt}
                                             loading="lazy"
                                             class="h-full w-full object-cover transition duration-700 group-hover:scale-105"

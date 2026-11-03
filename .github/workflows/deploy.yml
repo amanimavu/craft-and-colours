@@ -52,6 +52,16 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
+            # After npm ci, which clears node_modules. Without this every build
+            # downloads and resizes every CMS image again over a slow connection.
+            - name: Restore optimized image cache
+              uses: actions/cache@v4
+              with:
+                  path: node_modules/.astro/assets
+                  key: astro-assets-${{ github.run_id }}
+                  restore-keys: |
+                      astro-assets-
+
             - name: Type check
               run: npm run check
 

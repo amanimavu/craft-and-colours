@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { optimizeProductImages } from "../../lib/cms-image";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import Icon from "../../components/ui/Icon.astro";
@@ -106,6 +107,11 @@ const schema = {
         url: absolute(`/shop/${product.slug}/`),
     },
 };
+
+const galleryImages = await optimizeProductImages(
+    product.images,
+    [480, 720, 960, 1200],
+);
 ---
 
 <BaseLayout title={product.name} description={description} schema={schema}>
@@ -130,7 +136,7 @@ const schema = {
         >
             <ProductGallery
                 client:load
-                images={product.images}
+                images={galleryImages}
                 name={product.name}
             />
 

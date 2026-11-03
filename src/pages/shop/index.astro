@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ShopFilters from "../../components/store/ShopFilters";
+import { optimizeProductImages } from "../../lib/cms-image";
 import {
     getCategories,
     getCategoryFilters,
@@ -13,6 +14,17 @@ const [products, categories, categoryFilters] = await Promise.all([
     getCategories(),
     getCategoryFilters(),
 ]);
+
+// Only the first image shows on a shop card.
+const productsWithImages = await Promise.all(
+    products.map(async (product) => ({
+        ...product,
+        images: await optimizeProductImages(
+            product.images.slice(0, 1),
+            [320, 480, 640, 800],
+        ),
+    })),
+);
 const formattedCategories = categories.map((c) => ({
     name: c.name,
     slug: c.slug,
@@ -69,7 +81,7 @@ const formattedCategories = categories.map((c) => ({
         </script>
         <ShopFilters
             client:load
-            products={products}
+            products={productsWithImages}
             categories={formattedCategories}
             categoryFilters={categoryFilters}
         />

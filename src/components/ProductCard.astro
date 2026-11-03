@@ -2,6 +2,7 @@
 import { formatCardPrice, formatMoney } from '../lib/format';
 import type { Product } from '../lib/types';
 import Badge from './ui/Badge.astro';
+import CmsImage from './ui/CmsImage.astro';
 import Icon from './ui/Icon.astro';
 
 interface Props {
@@ -24,8 +25,10 @@ const soldOut = !product.isInStock || !product.isPurchasable;
   >
     <div class="relative aspect-[4/5] overflow-hidden">
       {image ? (
-        <img
+        <CmsImage
           src={image.src}
+          widths={[320, 480, 640, 800]}
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           alt={image.alt}
           loading="lazy"
           decoding="async"

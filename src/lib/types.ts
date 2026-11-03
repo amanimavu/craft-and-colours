@@ -17,6 +17,8 @@ export interface ProductImage {
   src: string;
   alt: string;
   thumbnail?: string;
+  /** Build-time resized copies. Absent when the image wasn't optimized. */
+  srcset?: string;
 }
 
 export interface VariationAttribute {

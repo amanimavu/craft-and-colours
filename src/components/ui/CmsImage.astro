@@ -1,0 +1,23 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { optimizeCmsImage } from '../../lib/cms-image';
+
+type Props = Omit<HTMLAttributes<'img'>, 'src' | 'srcset'> & {
+  src: string;
+  alt: string;
+  /** Widths to generate, in pixels. Base them on how wide the image displays. */
+  widths: number[];
+  sizes: string;
+};
+
+const { src, widths, width, height, ...attributes } = Astro.props;
+const image = await optimizeCmsImage(src, widths);
+---
+
+<img
+  {...attributes}
+  src={image.src || undefined}
+  srcset={image.srcset}
+  width={image.width ?? width}
+  height={image.height ?? height}
+/>

@@ -353,6 +353,8 @@ export default function ShopFilters({
                                                 {image ? (
                                                     <img
                                                         src={image.src}
+                                                        srcSet={image.srcset}
+                                                        sizes="(min-width: 1280px) 30vw, (min-width: 640px) 50vw, 100vw"
                                                         alt={image.alt}
                                                         loading="lazy"
                                                         decoding="async"

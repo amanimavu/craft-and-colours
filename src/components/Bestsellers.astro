@@ -1,6 +1,7 @@
 ---
 import Icon from "./ui/Icon.astro";
 import Badge from "./ui/Badge.astro";
+import CmsImage from "./ui/CmsImage.astro";
 import { formatCardPrice } from "../lib/format";
 import type { Product } from "../lib/types";
 
@@ -60,8 +61,10 @@ const threshold = new Intl.NumberFormat("en-KE", {
                                     <span class="w-7 shrink-0 font-display text-xl text-ink-300">
                                         {String(index + 1).padStart(2, "0")}
                                     </span>
-                                    <img
-                                        src={image?.src}
+                                    <CmsImage
+                                        src={image?.src ?? ""}
+                                        widths={[160]}
+                                        sizes="80px"
                                         alt={image?.alt ?? product.name}
                                         loading="lazy"
                                         decoding="async"
@@ -132,8 +135,10 @@ const threshold = new Intl.NumberFormat("en-KE", {
                                         href={`/shop/${bundle.slug}/`}
                                         class="group flex items-center gap-4 rounded-2xl bg-white/70 p-3 ring-1 ring-ink-900/5 transition hover:bg-white hover:shadow-sm"
                                     >
-                                        <img
-                                            src={image?.src}
+                                        <CmsImage
+                                            src={image?.src ?? ""}
+                                            widths={[112]}
+                                            sizes="56px"
                                             alt={image?.alt ?? bundle.name}
                                             loading="lazy"
                                             decoding="async"

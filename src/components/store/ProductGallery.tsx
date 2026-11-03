@@ -7,6 +7,8 @@ interface Props {
   name: string;
 }
 
+const GALLERY_SIZES = '(min-width: 1024px) 50vw, 100vw';
+
 // Product page gallery. Images come from WooCommerce "Product image" +
 // "Product gallery" (Store API `images[]`, main image first). With more than
 // one image it becomes a carousel: swipe (CSS scroll-snap), arrows, dots,
@@ -79,6 +81,8 @@ export default function ProductGallery({ images, name }: Props) {
       <div className="overflow-hidden rounded-3xl bg-cream-200/60">
         <img
           src={images[0].src}
+          srcSet={images[0].srcset}
+          sizes={GALLERY_SIZES}
           alt={images[0].alt || name}
           width={900}
           height={1125}
@@ -114,6 +118,8 @@ export default function ProductGallery({ images, name }: Props) {
             >
               <img
                 src={image.src}
+                srcSet={image.srcset}
+                sizes={GALLERY_SIZES}
                 alt={image.alt || name}
                 width={900}
                 height={1125}

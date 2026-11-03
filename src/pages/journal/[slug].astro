@@ -4,6 +4,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Icon from '../../components/ui/Icon.astro';
 import { formatDate, truncate } from '../../lib/format';
 import { getPost, getPosts } from '../../lib/wordpress';
+import CmsImage from '../../components/ui/CmsImage.astro';
 
 export async function getStaticPaths() {
   const posts = await getPosts(50);
@@ -73,8 +74,10 @@ const schema = {
     {post.image && (
       <div class="container-page -mb-2 pt-10">
         <div class="overflow-hidden rounded-[2rem] bg-cream-200">
-          <img
+          <CmsImage
             src={post.image.src}
+            widths={[800, 1200, 1600]}
+            sizes="100vw"
             alt={post.image.alt}
             class="h-auto w-full object-cover"
             width="1600"
@@ -117,8 +120,10 @@ const schema = {
               <a href={`/journal/${item.slug}/`} class="block overflow-hidden rounded-2xl">
                 <div class="aspect-[3/2] overflow-hidden bg-cream-200">
                   {item.image ? (
-                    <img
+                    <CmsImage
                       src={item.image.src}
+                      widths={[400, 640, 800]}
+                      sizes="(min-width: 768px) 33vw, 100vw"
                       alt={item.image.alt}
                       loading="lazy"
                       class="h-full w-full object-cover transition duration-700 group-hover:scale-105"

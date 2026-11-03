@@ -25,7 +25,7 @@ export default defineConfig({
         }),
     ],
     image: {
-        domains: ["placehold.co"],
+        domains: ["placehold.co", "cms.craftandcolors.africa", "localhost"],
     },
     vite: {
         plugins: [tailwindcss()],
