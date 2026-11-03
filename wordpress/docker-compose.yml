@@ -39,6 +39,8 @@ name: craft-wordpress
 services:
     db:
         image: mariadb:11
+        ports:
+            - "3308:3306"
         environment:
             MARIADB_DATABASE: wordpress
             MARIADB_USER: wordpress
