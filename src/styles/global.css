@@ -1,10 +1,8 @@
-@import "@fontsource-variable/fraunces";
-@import "@fontsource-variable/manrope";
 @import "tailwindcss";
 
 @theme {
-    --font-display: "Fraunces Variable", Georgia, "Times New Roman", serif;
-    --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-fraunces);
+    --font-sans: var(--font-manrope);
 
     --color-cream-50: #fbf7ef;
     --color-cream-100: #f6efe2;

@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MobileBar from '../components/MobileBar.astro';
@@ -50,6 +51,8 @@ const showMobileBar = !['/cart/', '/checkout/', '/order-confirmation/'].some(
     <meta name="theme-color" content="#fbf7ef" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
+    <Font cssVariable="--font-fraunces" preload={[{ style: 'normal' }]} />
+    <Font cssVariable="--font-manrope" preload={[{ style: 'normal' }]} />
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
