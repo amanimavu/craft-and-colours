@@ -119,7 +119,7 @@ const shareImage = post.image ? await optimizeShareImage(post.image.src) : undef
 
         <div class="mt-8 grid gap-6 md:grid-cols-3">
           {related.map((item) => (
-            <article class="group">
+            <article class="tilt-card group">
               <a href={`/journal/${item.slug}/`} class="block overflow-hidden rounded-2xl">
                 <div class="aspect-[3/2] overflow-hidden bg-cream-200">
                   {item.image ? (

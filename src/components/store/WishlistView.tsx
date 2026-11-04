@@ -28,7 +28,7 @@ export default function WishlistView() {
   return (
     <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <article key={item.id} className="group">
+        <article key={item.id} className="tilt-card group">
           <div className="relative overflow-hidden rounded-2xl bg-cream-200">
             <a href={`/shop/${item.slug}/`} className="block aspect-[4/5]">
               {item.image ? (

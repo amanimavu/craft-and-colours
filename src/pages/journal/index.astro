@@ -73,7 +73,7 @@ const [lead, ...rest] = posts;
     {rest.length > 0 && (
       <div class="mt-14 grid gap-x-6 gap-y-12 border-t border-ink-900/10 pt-12 sm:grid-cols-2 lg:grid-cols-3">
         {rest.map((post) => (
-          <article class="group">
+          <article class="tilt-card group">
             <a href={`/journal/${post.slug}/`} class="block overflow-hidden rounded-2xl">
               <div class="aspect-[3/2] overflow-hidden bg-cream-200">
                 {post.image ? (

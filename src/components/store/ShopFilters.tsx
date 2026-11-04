@@ -343,7 +343,7 @@ export default function ShopFilters({
                                 return (
                                     <article
                                         key={product.id}
-                                        className="group rounded-3xl border border-ink-900/10 bg-white/70 p-4 shadow-sm transition hover:shadow-md"
+                                        className="tilt-card group rounded-3xl border border-ink-900/10 bg-white/70 p-4 shadow-sm transition hover:shadow-md"
                                     >
                                         <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-cream-200/60">
                                             <a
@@ -402,7 +402,7 @@ export default function ShopFilters({
                                                             ] === "busy"
                                                         }
                                                         aria-label={`Quick add ${product.name} to cart`}
-                                                        className="absolute bottom-3 left-3 grid h-10 w-10 place-items-center rounded-full bg-poppy-500 text-cream-50 shadow-sm transition duration-300 ease-bounce hover:bg-poppy-600 hover:scale-105 disabled:cursor-wait"
+                                                        className="btn-wiggle absolute bottom-3 left-3 grid h-10 w-10 place-items-center rounded-full bg-poppy-500 text-cream-50 shadow-sm transition duration-300 ease-bounce hover:bg-poppy-600 hover:scale-105 disabled:cursor-wait"
                                                     >
                                                         {cartStatus[
                                                             product.id

@@ -1,7 +1,7 @@
 # Craft & Colours — Project Memory
 
 > Persistent context for this repository. Read this first when resuming work.
-> **Last updated:** 2026-11-02
+> **Last updated:** 2026-11-04
 > **Source:** reconstructed from the plan-mode transcript + repository inspection.
 
 ---
@@ -461,6 +461,8 @@ Gotchas:
 ---
 
 ## 13. Change log
+
+- **2026-11-04** — **Playful hover motion (awaiting user test).** `global.css` adds `.tilt-card` (also applied to `.card-hover`; ±1deg alternating, 4px lift), a one-shot wiggle on `.btn-primary/secondary/clay` and new `.btn-wiggle` for inline pills, and `.bounce-circle` on the home vibe circles. All gated behind `prefers-reduced-motion: no-preference`; pointer effects also need `hover: hover` + `pointer: fine`, with keyboard focus equivalents. Journal lead image and UGC polaroids deliberately left alone.
 
 - **2026-11-02** — **Announcement ticker editable in WordPress (awaiting user test).** New `includes/announcements.php` (`GET craft/v1/announcements`, rebuild on save) and a textarea under Craft & Colours → Settings (option `craft_announcements`, one per line). `Header.astro` reads `getAnnouncements()`; old hard-coded list moved to `demoAnnouncements`, used only when WordPress is missing or unreachable. With WordPress connected, an empty list hides the ticker, so the live list must be entered before launch. Open copy questions: "M-Pesa & card accepted" (launch payment is via WhatsApp) and "Free Saturday crochet club" (demo workshop says Sunday).
 

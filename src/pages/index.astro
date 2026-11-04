@@ -171,7 +171,7 @@ const schema = {
             <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
                 <a
                     href="/shop/"
-                    class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-5 py-2.5 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                    class="btn-wiggle inline-flex items-center gap-2 rounded-full bg-poppy-500 px-5 py-2.5 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
                 >
                     Shop All Supplies
                     <Icon name="lucide:arrow-right" class="h-4 w-4" />
@@ -179,7 +179,7 @@ const schema = {
 
                 <a
                     href="/contact/"
-                    class="inline-flex items-center gap-2 rounded-full border border-ink-900/25 px-5 py-2.5 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                    class="btn-wiggle inline-flex items-center gap-2 rounded-full border border-ink-900/25 px-5 py-2.5 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
                 >
                     Book a Workshop
                     <Icon
@@ -267,7 +267,7 @@ const schema = {
                             href={vibe.href}
                             class="group flex flex-col items-center gap-4 text-center"
                         >
-                            <div class="relative">
+                            <div class="bounce-circle relative">
                                 <div
                                     class="absolute inset-0 rounded-full opacity-70 blur-xl transition group-hover:opacity-90"
                                     style={`background-color: ${vibe.accent}`}
@@ -335,7 +335,7 @@ const schema = {
                 </div>
                 <a
                     href="/workshops/"
-                    class="inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                    class="btn-wiggle inline-flex items-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
                 >
                     View all workshops
                     <Icon name="lucide:arrow-right" class="h-4 w-4" />
@@ -440,7 +440,7 @@ const schema = {
                                 ) : (
                                     <a
                                         href={`/workshops/${featuredWorkshop.slug}/`}
-                                        class="inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
+                                        class="btn-wiggle inline-flex items-center gap-2 rounded-full bg-ink-900 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-ink-800"
                                     >
                                         {featuredWorkshop.isFree
                                             ? "RSVP / Join meetup"
@@ -622,7 +622,7 @@ const schema = {
             <div class="mt-10 grid gap-6 md:grid-cols-3">
                 {
                     posts.map((post) => (
-                        <article class="group">
+                        <article class="tilt-card group">
                             <a
                                 href={`/journal/${post.slug}/`}
                                 class="block overflow-hidden rounded-2xl"

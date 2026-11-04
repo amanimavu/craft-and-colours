@@ -281,6 +281,121 @@
     animation: trash-wiggle 520ms var(--ease-bounce);
 }
 
+@keyframes btn-wiggle {
+    0%,
+    100% {
+        transform: rotate(0);
+    }
+    20% {
+        transform: rotate(-2deg);
+    }
+    45% {
+        transform: rotate(1.5deg);
+    }
+    70% {
+        transform: rotate(-1deg);
+    }
+    85% {
+        transform: rotate(0.5deg);
+    }
+}
+
+@keyframes circle-bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    35% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(0);
+    }
+    80% {
+        transform: translateY(-4px);
+    }
+}
+
+/* Playful micro-interactions: .tilt-card / .card-hover, the .btn-* family plus
+   .btn-wiggle for one-off pills, and .bounce-circle inside a .group link.
+   Each animation runs once per hover or keyboard focus, never on a loop. Pointer
+   effects are limited to real hover devices so a tap doesn't leave them stuck.
+   Tilt and lift use the individual rotate/translate properties, and the keyframes
+   use transform, so both compose with Tailwind's translate/scale utilities. */
+@media (prefers-reduced-motion: no-preference) {
+    .tilt-card,
+    .card-hover {
+        position: relative;
+        transition:
+            translate 300ms var(--ease-bounce),
+            rotate 300ms var(--ease-bounce),
+            box-shadow 300ms ease;
+    }
+
+    .tilt-card:has(:focus-visible),
+    .card-hover:focus-visible {
+        translate: 0 -0.25rem;
+        rotate: -1deg;
+    }
+
+    .tilt-card:nth-child(even):has(:focus-visible),
+    li:nth-child(even) > .card-hover:focus-visible {
+        rotate: 1deg;
+    }
+
+    :is(.btn-primary, .btn-secondary, .btn-clay, .btn-wiggle):not(
+            :disabled,
+            [aria-disabled="true"]
+        ):focus-visible {
+        animation: btn-wiggle 480ms ease-in-out;
+    }
+
+    :is(.btn-primary, .btn-secondary, .btn-clay, .btn-wiggle):not(
+            :disabled,
+            [aria-disabled="true"]
+        ):active {
+        scale: 0.96;
+    }
+
+    .group:focus-visible .bounce-circle {
+        animation: circle-bounce 620ms ease-in-out;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .tilt-card:hover,
+        .card-hover:hover {
+            translate: 0 -0.25rem;
+            rotate: -1deg;
+        }
+
+        .tilt-card:nth-child(even):hover,
+        li:nth-child(even) > .card-hover:hover {
+            rotate: 1deg;
+        }
+
+        /* Invisible margin so the tilted edge can't slip out from under the
+           pointer and make the card flicker. */
+        .tilt-card:hover::after,
+        .card-hover:hover::after {
+            content: "";
+            position: absolute;
+            inset: -0.5rem;
+            z-index: -1;
+        }
+
+        :is(.btn-primary, .btn-secondary, .btn-clay, .btn-wiggle):not(
+                :disabled,
+                [aria-disabled="true"]
+            ):hover {
+            animation: btn-wiggle 480ms ease-in-out;
+        }
+
+        .group:hover .bounce-circle {
+            animation: circle-bounce 620ms ease-in-out;
+        }
+    }
+}
+
 .marquee:hover .marquee-track {
     animation-play-state: paused;
 }

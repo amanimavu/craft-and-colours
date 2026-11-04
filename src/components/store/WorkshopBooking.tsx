@@ -209,7 +209,7 @@ export default function WorkshopBooking({
                     href={waitlistHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink-900/20 bg-cream-50 px-6 py-3 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                    className="mt-4 btn-wiggle inline-flex w-full items-center justify-center gap-2 rounded-full border border-ink-900/20 bg-cream-50 px-6 py-3 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
                 >
                     <MessageCircle className="h-4 w-4" aria-hidden="true" />
                     Join the waitlist on WhatsApp
@@ -301,7 +301,7 @@ export default function WorkshopBooking({
                 <button
                     type="submit"
                     disabled={busy}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="btn-wiggle inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     {busy && <Loader2 className="h-4 w-4 animate-spin" />}
                     {busy ? "Saving your seat…" : "RSVP — free"}
@@ -326,7 +326,7 @@ export default function WorkshopBooking({
                 type="button"
                 onClick={handleBook}
                 disabled={busy || added || soldOut}
-                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-5 btn-wiggle inline-flex w-full items-center justify-center gap-2 rounded-full bg-poppy-500 px-6 py-3 text-sm font-bold text-cream-50 transition hover:bg-poppy-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
                 {busy ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
