@@ -2,7 +2,7 @@ import { demoWorkshops } from './demo-data';
 import { craftGet, hasWordPress } from './wordpress';
 import type { Workshop } from './types';
 
-const PLACEHOLDER_IMAGE =
+export const PLACEHOLDER_IMAGE =
   'https://placehold.co/1200x900/F4DDD1/211D19?text=Workshop';
 
 // Workshops come from the "Workshops" post type in the mu-plugin, already in

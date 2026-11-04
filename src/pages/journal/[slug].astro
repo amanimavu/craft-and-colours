@@ -5,6 +5,7 @@ import Icon from '../../components/ui/Icon.astro';
 import { formatDate, truncate } from '../../lib/format';
 import { getPost, getPosts } from '../../lib/wordpress';
 import CmsImage from '../../components/ui/CmsImage.astro';
+import { optimizeShareImage } from '../../lib/cms-image';
 
 export async function getStaticPaths() {
   const posts = await getPosts(50);
@@ -38,12 +39,14 @@ const schema = {
   publisher: { '@type': 'Organization', name: 'Craft & Colours' },
   mainEntityOfPage: absolute(`/journal/${post.slug}/`),
 };
+
+const shareImage = post.image ? await optimizeShareImage(post.image.src) : undefined;
 ---
 
 <BaseLayout
   title={post.title}
   description={truncate(post.excerpt, 180)}
-  image={post.image?.src}
+  image={shareImage}
   type="article"
   schema={schema}
 >

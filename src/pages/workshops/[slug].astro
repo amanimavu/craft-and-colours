@@ -7,7 +7,9 @@ import Badge from "../../components/ui/Badge.astro";
 import WorkshopBooking from "../../components/store/WorkshopBooking";
 import WorkshopSeats from "../../components/WorkshopSeats.astro";
 import LiveWorkshopSeats from "../../components/LiveWorkshopSeats.astro";
+import { optimizeShareImage } from "../../lib/cms-image";
 import {
+    PLACEHOLDER_IMAGE,
     getWorkshops,
     isAlmostFull,
     isFullyBooked,
@@ -72,11 +74,18 @@ const schema = {
         url: Astro.url.toString(),
     },
 };
+
+// A workshop without a photo keeps the site's default share image.
+const shareImage =
+    workshop.image.src === PLACEHOLDER_IMAGE
+        ? undefined
+        : await optimizeShareImage(workshop.image.src);
 ---
 
 <BaseLayout
-    title={`${workshop.title} | Workshops & Meetups`}
+    title={workshop.title}
     description={workshop.excerpt}
+    image={shareImage}
     type="article"
     schema={schema}
 >

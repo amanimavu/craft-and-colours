@@ -18,6 +18,8 @@ const cmsHosts = new Set(
     ),
 );
 
+const SHARE_IMAGE_WIDTH = 1200;
+
 // Pages share images, so only read each one's size once.
 const remoteSizes = new Map<string, ReturnType<typeof inferRemoteSize>>();
 
@@ -64,6 +66,27 @@ export async function optimizeCmsImage(
     } catch (error) {
         console.warn(`Could not optimize CMS image ${src}; using the original.`, error);
         return { src };
+    }
+}
+
+/**
+ * A copy for link previews, served from the storefront. JPEG because not every
+ * app that fetches previews can read WebP.
+ */
+export async function optimizeShareImage(src: string): Promise<string> {
+    if (!isCmsImage(src)) return src;
+
+    try {
+        const size = await remoteSize(src);
+        if (size.format === "svg" || size.format === "gif") return src;
+
+        const width = Math.min(SHARE_IMAGE_WIDTH, size.width);
+        const height = Math.round((width * size.height) / size.width);
+        const image = await getImage({ src, width, height, format: "jpeg" });
+        return image.src;
+    } catch (error) {
+        console.warn(`Could not optimize share image ${src}; using the original.`, error);
+        return src;
     }
 }
 

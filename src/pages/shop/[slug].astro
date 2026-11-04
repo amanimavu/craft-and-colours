@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { optimizeProductImages } from "../../lib/cms-image";
+import { optimizeProductImages, optimizeShareImage } from "../../lib/cms-image";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import Icon from "../../components/ui/Icon.astro";
@@ -108,13 +108,17 @@ const schema = {
     },
 };
 
+const shareImage = product.images[0]
+    ? await optimizeShareImage(product.images[0].src)
+    : undefined;
+
 const galleryImages = await optimizeProductImages(
     product.images,
     [480, 720, 960, 1200],
 );
 ---
 
-<BaseLayout title={product.name} description={description} schema={schema}>
+<BaseLayout title={product.name} description={description} image={shareImage} schema={schema}>
     <section class="container-page py-10 sm:py-14">
         <Breadcrumbs
             items={[
