@@ -1,0 +1,71 @@
+---
+import Icon from "./ui/Icon.astro";
+
+interface Props {
+    /** Must include a position (e.g. `absolute ...`): the spinning ring is
+     * absolutely positioned against the badge. */
+    class: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<a
+    href="/shop/"
+    class:list={[
+        "shop-all-badge btn-wiggle group grid h-24 w-24 place-items-center rounded-full bg-poppy-500 text-cream-50 shadow-chunky ring-4 ring-cream-50/70 transition duration-300 ease-bounce hover:scale-105 hover:bg-poppy-600 sm:h-32 sm:w-32 lg:h-36 lg:w-36",
+        className,
+    ]}
+    aria-label="Shop all supplies"
+>
+    <svg
+        viewBox="0 0 100 100"
+        class="shop-all-ring absolute inset-0 h-full w-full"
+        aria-hidden="true"
+    >
+        <defs>
+            <path
+                id="shop-all-ring-path"
+                d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"
+            />
+        </defs>
+        <text
+            class="fill-current text-[9px] font-extrabold uppercase"
+            textLength="230"
+            lengthAdjust="spacing"
+        >
+            <textPath href="#shop-all-ring-path">
+                Shop all supplies • Shop all supplies •
+            </textPath>
+        </text>
+    </svg>
+
+    <span
+        class="relative grid h-10 w-10 place-items-center rounded-full bg-cream-50 text-ink-900 transition duration-300 ease-bounce group-hover:rotate-45 sm:h-12 sm:w-12"
+        aria-hidden="true"
+    >
+        <Icon name="lucide:arrow-up-right" class="h-5 w-5 sm:h-6 sm:w-6" />
+    </span>
+</a>
+
+<style>
+    .shop-all-ring {
+        animation: shop-all-spin 16s linear infinite;
+    }
+
+    .shop-all-badge:hover .shop-all-ring {
+        animation-play-state: paused;
+    }
+
+    @keyframes shop-all-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .shop-all-ring {
+            animation: none;
+        }
+    }
+</style>

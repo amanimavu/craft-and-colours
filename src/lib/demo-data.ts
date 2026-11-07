@@ -1066,6 +1066,7 @@ export const demoVibes: Vibe[] = [
 ];
 
 export const demoAnnouncements: string[] = [
+    "We offer FREE Gift Wrapping!",
     "Free delivery in Nairobi over KES 4,500",
     "Village Market, Nairobi · Level 2",
     "Free Saturday crochet club",

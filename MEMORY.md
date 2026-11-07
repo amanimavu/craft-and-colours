@@ -1,7 +1,7 @@
 # Craft & Colours — Project Memory
 
 > Persistent context for this repository. Read this first when resuming work.
-> **Last updated:** 2026-11-04
+> **Last updated:** 2026-11-07
 > **Source:** reconstructed from the plan-mode transcript + repository inspection.
 
 ---
@@ -461,6 +461,8 @@ Gotchas:
 ---
 
 ## 13. Change log
+
+- **2026-11-07** — **Home hero is now a fading category carousel (awaiting user test).** New `src/components/HeroCarousel.astro` replaces the static hero `<picture>` in `index.astro`: 6 slides (brand collage, yarn, hooks, stationery, art supplies, gifting) from `src/assets/images/hero-carousel/` (9:16 phone crop, 3:2 tablet/desktop crop; brand slide keeps the wide `landing-page-hero-image.png` on lg). 1.1s cross-fade, 6s autoplay, prev/next/dots/pause, swipe, arrow keys; pauses on hover, keyboard focus and hidden tab; no autoplay under reduced motion. Category CTAs point at the nearest existing shop category (yarn/hooks→stitch-sew, stationery→sketch, art→paint, gifting→bundles) until real categories exist. Gift-wrap image files were mislabelled and got swapped names.
 
 - **2026-11-04** — **Playful hover motion (awaiting user test).** `global.css` adds `.tilt-card` (also applied to `.card-hover`; ±1deg alternating, 4px lift), a one-shot wiggle on `.btn-primary/secondary/clay` and new `.btn-wiggle` for inline pills, and `.bounce-circle` on the home vibe circles. All gated behind `prefers-reduced-motion: no-preference`; pointer effects also need `hover: hover` + `pointer: fine`, with keyboard focus equivalents. Journal lead image and UGC polaroids deliberately left alone.
 

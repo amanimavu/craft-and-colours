@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Bestsellers from "../components/Bestsellers.astro";
+import HeroCarousel from "../components/HeroCarousel.astro";
+import ShopAllBadge from "../components/ShopAllBadge.astro";
 import SectionHeading from "../components/SectionHeading.astro";
 import Icon from "../components/ui/Icon.astro";
 import Ticker from "../components/ui/Ticker.astro";
@@ -8,8 +10,6 @@ import Sticker from "../components/ui/Sticker.astro";
 import Badge from "../components/ui/Badge.astro";
 import WavyDivider from "../components/ui/WavyDivider.astro";
 import heroImage from "../assets/images/landing-page-hero-image.png";
-import heroImageTablet from "../assets/images/landing-page-hero-image_3_to_2.png";
-import heroImageMobile from "../assets/images/landing-page-hero-image_9_to_16.png";
 import brushStrokeTexture from "../assets/images/brush-stroke-texture.jpg";
 import mustardYarnDecorator from "../assets/images/mustard-yarn.png";
 import ugcBackground from "../assets/images/ugc_bg.png";
@@ -45,11 +45,11 @@ const featuredWorkshop = upcomingWorkshops[0];
 
 const featuredFull = featuredWorkshop ? isFullyBooked(featuredWorkshop) : false;
 
-// Art-directed responsive images: a different crop per breakpoint, not just
-// a resized version of the same crop. Breakpoints match Tailwind's sm/lg.
-const heroImageDesktop = await getImage({ src: heroImage });
-const heroImageTabletOptimized = await getImage({ src: heroImageTablet });
-const heroImageMobileOptimized = await getImage({ src: heroImageMobile });
+// Crochet club CTA: the shop's WhatsApp Channel. PUBLIC_WHATSAPP_CHANNEL can
+// override it per environment.
+const crochetClubHref =
+    import.meta.env.PUBLIC_WHATSAPP_CHANNEL ||
+    "https://whatsapp.com/channel/0029VaHzv4VCXC3LFoL9LH3d";
 
 const ugcBackgroundDesktop = await getImage({ src: ugcBackground });
 const ugcBackgroundTabletOptimized = await getImage({
@@ -83,6 +83,7 @@ const vibeArt: Record<string, { src: ImageMetadata; alt: string }> = {
 };
 
 const marqueeItems = [
+    "We offer FREE Gift Wrapping!",
     "Free delivery in Nairobi over KES 4,500",
     "Free Saturday crochet club",
     "Air-dry pottery kits in stock",
@@ -119,28 +120,7 @@ const schema = {
 >
     <section class="relative overflow-hidden bg-butter-50">
         <div class="relative">
-            <picture>
-                <source
-                    media="(max-width: 639px)"
-                    srcset={heroImageMobileOptimized.src}
-                    width={heroImageMobileOptimized.attributes.width}
-                    height={heroImageMobileOptimized.attributes.height}
-                />
-                <source
-                    media="(max-width: 1023px)"
-                    srcset={heroImageTabletOptimized.src}
-                    width={heroImageTabletOptimized.attributes.width}
-                    height={heroImageTabletOptimized.attributes.height}
-                />
-                <img
-                    src={heroImageDesktop.src}
-                    width={heroImageDesktop.attributes.width}
-                    height={heroImageDesktop.attributes.height}
-                    alt="A colourful flat-lay of paint, yarn, clay, fabric and craft supplies spelling Craft & Colours"
-                    class="block h-auto w-full"
-                    fetchpriority="high"
-                />
-            </picture>
+            <HeroCarousel />
 
             <div
                 class="pointer-events-none absolute inset-x-0 top-3 flex justify-center px-4 sm:top-4"
@@ -151,13 +131,11 @@ const schema = {
                 </Sticker>
             </div>
 
-            <div
-                class="pointer-events-none absolute bottom-4 right-4 hidden sm:block"
-            >
-                <Sticker tone="bubblegum" rotate="left">
-                    Happy mail · Good vibes only
-                </Sticker>
-            </div>
+            <!-- Sits above every slide; bottom-right, clear of the slide copy
+                 (left) and the carousel controls (bottom centre). -->
+            <ShopAllBadge
+                class="absolute bottom-20 right-4 z-10 sm:bottom-8 sm:right-8 lg:bottom-10 lg:right-12"
+            />
         </div>
 
         <div class="px-5 pb-10 pt-8 text-center sm:pb-12 sm:pt-10">
@@ -168,25 +146,16 @@ const schema = {
                 &amp; weekend workshops at Village Market.
             </h1>
 
-            <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+            <div class="mt-7 flex justify-center">
                 <a
-                    href="/shop/"
-                    class="btn-wiggle inline-flex items-center gap-2 rounded-full bg-poppy-500 px-5 py-2.5 text-sm font-bold text-cream-50 transition hover:bg-poppy-600"
+                    href={crochetClubHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn-wiggle inline-flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-4 text-base font-bold tracking-wide text-ink-900 shadow-chunky ring-4 ring-[#25D366]/20 transition hover:bg-[#1fb855] sm:px-10 sm:py-5 sm:text-lg"
                 >
-                    Shop All Supplies
-                    <Icon name="lucide:arrow-right" class="h-4 w-4" />
-                </a>
-
-                <a
-                    href="/contact/"
-                    class="btn-wiggle inline-flex items-center gap-2 rounded-full border border-ink-900/25 px-5 py-2.5 text-sm font-bold text-ink-900 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
-                >
-                    Book a Workshop
-                    <Icon
-                        name="lucide:scissors"
-                        class="h-4 w-4"
-                        aria-hidden="true"
-                    />
+                    <Icon name="simple-icons:whatsapp" class="h-5 w-5 sm:h-6 sm:w-6" />
+                    Join the Crochet Club
+                    <span class="sr-only">(opens WhatsApp)</span>
                 </a>
             </div>
 
