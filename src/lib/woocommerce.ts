@@ -317,24 +317,48 @@ export async function getProduct(slug: string): Promise<Product | undefined> {
     }
 }
 
+/**
+ * Shop categories as set up in WordPress, including ones with no products yet
+ * (count 0), so the menu matches Products → Categories. "Uncategorized" is
+ * WooCommerce's catch-all and is left out. Counts are the products the shop
+ * actually lists in each category.
+ */
 export async function getCategories(): Promise<Category[]> {
+    if (!hasStore) return demoCategories;
+
     const products = await getProducts();
     const counts = new Map<string, number>();
-    const categories = new Map<string, Category>();
-
+    const fromProducts = new Map<string, Category>();
     for (const product of products) {
         for (const category of product.categories) {
             if (!category.slug) continue;
-            categories.set(category.slug, category);
+            fromProducts.set(category.slug, category);
             counts.set(category.slug, (counts.get(category.slug) ?? 0) + 1);
         }
     }
 
-    if (categories.size === 0) {
-        return demoCategories;
+    let categories: Category[];
+    try {
+        const response = await cmsFetch(
+            `${storeUrl}/wp-json/wp/v2/product_cat?per_page=100&_fields=id,name,slug,description`,
+        );
+        if (!response.ok) {
+            throw new Error(`Categories request failed (${response.status}).`);
+        }
+        categories = ((await response.json()) as RawRecord[]).map(
+            normalizeCategory,
+        );
+    } catch (error) {
+        // Still show the categories the products carry rather than demo ones.
+        console.warn(
+            `Could not load categories from ${storeUrl}; using the products' categories.`,
+            error,
+        );
+        categories = [...fromProducts.values()];
     }
 
-    return [...categories.values()]
+    return categories
+        .filter((category) => category.slug && category.slug !== "uncategorized")
         .map((category) => ({
             ...category,
             count: counts.get(category.slug) ?? 0,

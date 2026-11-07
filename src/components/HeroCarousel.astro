@@ -119,7 +119,8 @@ const slides: Slide[] = [
     },
 ];
 
-// Categories come from the CMS (only ones with products are listed).
+// Categories come from the CMS; empty ones are skipped so a button never
+// opens an empty shop page.
 const shopCategories = await getCategories();
 const toKey = (value: string) =>
     value
@@ -132,7 +133,8 @@ const categoryHref = (wanted: string[]) => {
     for (const key of wanted.map(toKey)) {
         const match = shopCategories.find(
             (category) =>
-                toKey(category.slug) === key || toKey(category.name) === key,
+                category.count > 0 &&
+                (toKey(category.slug) === key || toKey(category.name) === key),
         );
         if (match) return `/shop/?category=${encodeURIComponent(match.slug)}`;
     }

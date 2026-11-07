@@ -59,6 +59,17 @@ const categoryMeta: Record<string, { icon: string; blurb: string }> = {
     blurb: 'Everything you need in one box',
   },
   bundles: { icon: 'lucide:gift', blurb: 'Curated sets & starter stashes' },
+  yarn: { icon: 'lucide:spool', blurb: 'Acrylic, velvet & cotton yarn' },
+  hooks: { icon: 'lucide:pen-tool', blurb: 'Crochet hooks in every size' },
+  'art-supplies': {
+    icon: 'lucide:palette',
+    blurb: 'Paints, pastels, canvas & brushes',
+  },
+  stationery: {
+    icon: 'lucide:notebook-pen',
+    blurb: 'Pens, pencils, erasers & more',
+  },
+  gifting: { icon: 'lucide:ribbon', blurb: 'Ribbons, gift boxes & wrapping' },
 };
 
 const categoryCards = categories.map((category) => ({
@@ -109,7 +120,7 @@ const shopActive = isActive('/shop/');
                 <div>
                   <p class="eyebrow">Shop by craft</p>
                   <p class="mt-1 text-xs leading-5 text-ink-500">
-                    Seven little worlds of making, all under one roof.
+                    Every corner of making, all under one roof.
                   </p>
                 </div>
                 <a
