@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
-import { ArrowUpRight, Check, ShoppingBag } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+    ArrowUpRight,
+    Check,
+    ShoppingBag,
+    SlidersHorizontal,
+    X,
+} from "lucide-react";
 import type { CategoryFilters, Product } from "../../lib/types";
 import { keepValidSelections } from "../../lib/filters";
 import CategoryFilterInput from "./CategoryFilterInput";
@@ -13,6 +19,8 @@ interface ShopFiltersProps {
 }
 
 const DEFAULT_MAX_PRICE = 15000;
+/** Tailwind's lg breakpoint: the filters are a sidebar from here up. */
+const SIDEBAR_QUERY = "(min-width: 1024px)";
 const RESERVED_PARAMS = new Set(["category", "fresh", "sale", "max"]);
 
 // Client-only. Must only ever be called after mount (inside useEffect),
@@ -56,6 +64,44 @@ export default function ShopFilters({
     >({});
 
     const dynamicFilterConfigs = categoryFilters[category] ?? [];
+
+    // Below lg the filters live in a drawer instead of above the grid.
+    const [filtersOpen, setFiltersOpen] = useState(false);
+    const filtersButtonRef = useRef<HTMLButtonElement>(null);
+    const filtersCloseRef = useRef<HTMLButtonElement>(null);
+    const wasFiltersOpen = useRef(false);
+
+    useEffect(() => {
+        if (!filtersOpen) return;
+
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        filtersCloseRef.current?.focus();
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") setFiltersOpen(false);
+        };
+        // Widening to the sidebar layout while open: drop the drawer.
+        const sidebar = window.matchMedia(SIDEBAR_QUERY);
+        const onSidebar = () => {
+            if (sidebar.matches) setFiltersOpen(false);
+        };
+        document.addEventListener("keydown", onKeyDown);
+        sidebar.addEventListener("change", onSidebar);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            document.removeEventListener("keydown", onKeyDown);
+            sidebar.removeEventListener("change", onSidebar);
+        };
+    }, [filtersOpen]);
+
+    useEffect(() => {
+        if (wasFiltersOpen.current && !filtersOpen) {
+            filtersButtonRef.current?.focus();
+        }
+        wasFiltersOpen.current = filtersOpen;
+    }, [filtersOpen]);
 
     // Hydrate the real filter values from the URL once, right after mount.
     // This runs strictly after hydration, so it's an ordinary state update
@@ -176,6 +222,19 @@ export default function ShopFilters({
         return true;
     });
 
+    const activeFilterCount =
+        Number(fresh) +
+        Number(onSale) +
+        Number(maxPrice < DEFAULT_MAX_PRICE) +
+        Object.values(dynamicFilters).reduce(
+            (total, options) => total + options.length,
+            0,
+        );
+
+    const piecesLabel = `${filteredProducts.length} ${
+        filteredProducts.length === 1 ? "piece" : "pieces"
+    }`;
+
     const pillClass = (active: boolean) =>
         `rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${
             active
@@ -221,16 +280,69 @@ export default function ShopFilters({
             </div>
 
             <div className="mt-10 grid gap-10 lg:grid-cols-[280px_1fr]">
-                {/* Sidebar Filters */}
-                <aside className="space-y-8 rounded-3xl border border-ink-900/10 bg-white/60 p-6 shadow-sm h-fit lg:sticky lg:top-38">
-                    <div>
-                        <h3 className="font-display text-lg text-ink-900">
-                            Filters
-                        </h3>
-                        <p className="text-xs text-ink-500 mt-1">
-                            Refine your selection
-                        </p>
+                {/* Filters: sidebar on lg+, drawer below (only open there). */}
+                <div
+                    className={
+                        filtersOpen ? "fixed inset-0 z-[70]" : "hidden lg:block"
+                    }
+                    role={filtersOpen ? "dialog" : undefined}
+                    aria-modal={filtersOpen ? true : undefined}
+                    aria-labelledby={filtersOpen ? "shop-filters-title" : undefined}
+                >
+                    {filtersOpen && (
+                        <button
+                            type="button"
+                            onClick={() => setFiltersOpen(false)}
+                            aria-label="Close filters"
+                            tabIndex={-1}
+                            className="drawer-backdrop absolute inset-0 cursor-default bg-ink-900/45 backdrop-blur-[2px]"
+                        />
+                    )}
+                <aside
+                    className={
+                        filtersOpen
+                            ? "drawer-panel absolute inset-y-0 right-0 flex w-full max-w-sm flex-col bg-cream-50 shadow-2xl"
+                            : "space-y-8 rounded-3xl border border-ink-900/10 bg-white/60 p-6 shadow-sm h-fit lg:sticky lg:top-38"
+                    }
+                >
+                    <div
+                        className={
+                            filtersOpen
+                                ? "flex items-center justify-between border-b border-ink-900/10 px-5 py-4"
+                                : undefined
+                        }
+                    >
+                        <div>
+                            <h3
+                                id="shop-filters-title"
+                                className="font-display text-lg text-ink-900"
+                            >
+                                Filters
+                            </h3>
+                            <p className="text-xs text-ink-500 mt-1">
+                                Refine your selection
+                            </p>
+                        </div>
+                        {filtersOpen && (
+                            <button
+                                ref={filtersCloseRef}
+                                type="button"
+                                onClick={() => setFiltersOpen(false)}
+                                aria-label="Close filters"
+                                className="grid h-10 w-10 place-items-center rounded-full border border-ink-900/15 text-ink-700 transition hover:bg-ink-900 hover:text-cream-50"
+                            >
+                                <X size={18} strokeWidth={2} aria-hidden="true" />
+                            </button>
+                        )}
                     </div>
+
+                    <div
+                        className={
+                            filtersOpen
+                                ? "flex-1 space-y-8 overflow-y-auto px-5 py-4"
+                                : "space-y-8"
+                        }
+                    >
 
                     {/* Shared Filter 1: Fresh Arrivals */}
                     <div className="space-y-3 pt-4 border-t border-ink-900/10">
@@ -305,27 +417,67 @@ export default function ShopFilters({
                         </div>
                     )}
 
-                    {/* Reset */}
-                    {(fresh ||
-                        onSale ||
-                        maxPrice < 15000 ||
-                        Object.keys(dynamicFilters).length > 0) && (
+                    {/* Reset (the drawer has its own in the footer) */}
+                    {!filtersOpen && activeFilterCount > 0 && (
                         <button
+                            type="button"
                             onClick={resetFilters}
                             className="w-full rounded-full border border-ink-900/15 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-700 transition hover:bg-ink-900 hover:text-cream-50"
                         >
                             Reset Filters
                         </button>
                     )}
+                    </div>
+
+                    {filtersOpen && (
+                        <div className="flex gap-3 border-t border-ink-900/10 px-5 py-4">
+                            <button
+                                type="button"
+                                onClick={resetFilters}
+                                disabled={activeFilterCount === 0}
+                                className="flex-1 rounded-full border border-ink-900/15 py-3 text-xs font-bold uppercase tracking-[0.12em] text-ink-700 transition hover:bg-ink-900 hover:text-cream-50 disabled:pointer-events-none disabled:opacity-40"
+                            >
+                                Reset
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setFiltersOpen(false)}
+                                className="flex-[2] rounded-full bg-ink-900 py-3 text-xs font-bold uppercase tracking-[0.12em] text-cream-50 transition hover:bg-poppy-600"
+                            >
+                                Show {piecesLabel}
+                            </button>
+                        </div>
+                    )}
                 </aside>
+                </div>
 
                 {/* Product Grid */}
                 <main data-shop-results>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between gap-4 mb-6">
                         <p className="text-xs font-semibold text-ink-500">
-                            Showing {filteredProducts.length}{" "}
-                            {filteredProducts.length === 1 ? "piece" : "pieces"}
+                            Showing {piecesLabel}
                         </p>
+                        <button
+                            ref={filtersButtonRef}
+                            type="button"
+                            onClick={() => setFiltersOpen(true)}
+                            aria-haspopup="dialog"
+                            aria-expanded={filtersOpen}
+                            className="inline-flex items-center gap-2 rounded-full border border-ink-900/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-ink-700 transition hover:border-ink-900 hover:text-ink-900 lg:hidden"
+                        >
+                            <SlidersHorizontal
+                                size={15}
+                                strokeWidth={2}
+                                aria-hidden="true"
+                            />
+                            Filters
+                            {mounted && activeFilterCount > 0 && (
+                                <span className="grid h-5 min-w-5 place-items-center rounded-full bg-poppy-500 px-1.5 text-[0.62rem] text-cream-50">
+                                    {activeFilterCount}
+                                    <span className="sr-only"> active</span>
+                                </span>
+                            )}
+                        </button>
                     </div>
 
                     {filteredProducts.length > 0 ? (
