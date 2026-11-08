@@ -1,0 +1,70 @@
+---
+/**
+ * "Want to reach us? Chat more with us on WhatsApp" — the whole card is the
+ * link. `lg` on the contact page, `sm` in the footer's "Say hello" column.
+ */
+import Icon from './ui/Icon.astro';
+
+interface Props {
+  size?: 'sm' | 'lg';
+  class?: string;
+}
+
+const { size = 'lg', class: className } = Astro.props;
+
+const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
+const href = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+  'Hi Craft & Colours! I have a question.',
+)}`;
+
+const large = size === 'lg';
+---
+
+<a
+  href={href}
+  target="_blank"
+  rel="noreferrer"
+  class:list={[
+    'group flex items-center border border-whatsapp-500/40 bg-whatsapp-50 text-whatsapp-800 shadow-sm transition duration-300 ease-bounce hover:-translate-y-0.5 hover:border-whatsapp-500 hover:shadow-soft active:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-whatsapp-800',
+    large ? 'gap-4 rounded-3xl p-5 sm:p-6' : 'gap-2.5 rounded-2xl px-3 py-2.5',
+    className,
+  ]}
+>
+  <span
+    class:list={[
+      'grid shrink-0 place-items-center rounded-full bg-whatsapp-500 text-white transition duration-300 ease-bounce group-hover:scale-110 group-hover:-rotate-6',
+      large ? 'h-12 w-12' : 'h-8 w-8',
+    ]}
+    aria-hidden="true"
+  >
+    <Icon name="simple-icons:whatsapp" class={large ? 'h-6 w-6' : 'h-4 w-4'} />
+  </span>
+  <span class="min-w-0 flex-1">
+    <span
+      class:list={[
+        'block whitespace-nowrap font-bold uppercase text-whatsapp-800/70',
+        large ? 'text-[0.66rem] tracking-[0.14em]' : 'text-[0.55rem] tracking-[0.1em]',
+      ]}
+    >
+      Want to reach us?
+    </span>
+    <span
+      class:list={[
+        'mt-0.5 block',
+        large ? 'font-display text-xl leading-snug sm:text-2xl' : 'text-[0.8rem] font-semibold leading-tight',
+      ]}
+    >
+      Chat more with us on WhatsApp
+    </span>
+  </span>
+  {
+    // The footer column is ~200px wide; there the whole card is the cue.
+    large && (
+      <Icon
+        name="lucide:arrow-right"
+        class="h-5 w-5 shrink-0 transition duration-300 ease-bounce group-hover:translate-x-1"
+      />
+    )
+  }
+  <span class="sr-only">(opens WhatsApp in a new tab)</span>
+</a>

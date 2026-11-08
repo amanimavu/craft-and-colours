@@ -31,6 +31,12 @@
     --color-marigold-500: #ffaa00;
     --color-cobalt-500: #2354e6;
 
+    /* WhatsApp brand green, for the chat callout only. White text fails
+       contrast on 500, so 500 is for the icon disc and 800 for text. */
+    --color-whatsapp-50: #e9fbf0;
+    --color-whatsapp-500: #25d366;
+    --color-whatsapp-800: #0b5c3b;
+
     --color-sand-200: #ead9c0;
     --color-sand-300: #d9c3a5;
 

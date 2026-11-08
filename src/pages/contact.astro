@@ -2,12 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import ContactForm from '../components/store/ContactForm';
+import WhatsAppCallout from '../components/WhatsAppCallout.astro';
 import { getPage } from '../lib/wordpress';
 
 const page = await getPage('contact');
 const email = import.meta.env.PUBLIC_CONTACT_EMAIL || 'hello@craftandcolors.africa';
-const whatsapp = import.meta.env.PUBLIC_WHATSAPP || '+254700000000';
-const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
 ---
 
 <BaseLayout
@@ -42,9 +41,11 @@ const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
       </div>
 
       <aside class="space-y-4">
+        <WhatsAppCallout />
+
         <div class="rounded-3xl border border-ink-900/10 bg-olive-700 p-6 text-cream-50 sm:p-8">
           <p class="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-olive-100/60">
-            The quickest way
+            Prefer email?
           </p>
           <h2 class="mt-3 font-display text-3xl">Email us</h2>
           <a
@@ -57,14 +58,6 @@ const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
             We read every note ourselves. For order questions, include your
             order number so we can help faster.
           </p>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            class="btn-clay mt-6"
-          >
-            Message on WhatsApp
-          </a>
         </div>
 
         <div class="rounded-3xl border border-ink-900/10 bg-white/55 p-6 sm:p-8">
@@ -80,11 +73,11 @@ const whatsappHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`;
           <dl class="mt-5 space-y-3 border-t border-ink-900/10 pt-5 text-sm">
             <div class="flex justify-between gap-4">
               <dt class="font-semibold text-ink-700">Monday–Saturday</dt>
-              <dd class="text-ink-500">09:00–18:00</dd>
+              <dd class="text-ink-500">9 am–7 pm</dd>
             </div>
             <div class="flex justify-between gap-4">
               <dt class="font-semibold text-ink-700">Sunday</dt>
-              <dd class="text-ink-500">10:00–16:00</dd>
+              <dd class="text-ink-500">9:30 am–6:30 pm</dd>
             </div>
             <div class="flex justify-between gap-4">
               <dt class="font-semibold text-ink-700">Workshops</dt>

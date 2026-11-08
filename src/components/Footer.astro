@@ -1,5 +1,6 @@
 ---
 import Icon from "./ui/Icon.astro";
+import WhatsAppCallout from "./WhatsAppCallout.astro";
 import NewsletterForm from "./store/NewsletterForm";
 import Mpesa from "../assets/images/payment-methods/mpesa.svg";
 import Visa from "../assets/images/payment-methods/visa.svg";
@@ -13,10 +14,6 @@ const { mobileBarSpace = false } = Astro.props;
 
 const email =
     import.meta.env.PUBLIC_CONTACT_EMAIL || "hello@craftandcolors.africa";
-const whatsapp = import.meta.env.PUBLIC_WHATSAPP || "+254700000000";
-const waHref = `https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(
-    "Hi Craft & Colours! I have a question about a product.",
-)}`;
 const instagram = "https://www.instagram.com/craftandcolours/";
 const facebook = "https://www.facebook.com/craft.colours.ke/";
 const tiktok = "https://www.tiktok.com/@craftandcolours";
@@ -179,18 +176,7 @@ const socials = [
                             >
                         </li>
                         <li>
-                            <a
-                                class="inline-flex items-center gap-1.5 hover:text-clay-600"
-                                href={waHref}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <Icon
-                                    name="simple-icons:whatsapp"
-                                    class="h-3.5 w-3.5"
-                                />
-                                WhatsApp us
-                            </a>
+                            <WhatsAppCallout size="sm" />
                         </li>
                         <li
                             class="pt-2 text-xs font-medium leading-6 text-ink-500"
