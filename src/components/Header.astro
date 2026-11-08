@@ -1,5 +1,5 @@
 ---
-import Ticker from './ui/Ticker.astro';
+import AnnouncementBar from './ui/AnnouncementBar.astro';
 import Logo from './ui/Logo.astro';
 import Icon from './ui/Icon.astro';
 import Badge from './ui/Badge.astro';
@@ -86,7 +86,7 @@ const isActive = (href: string) =>
 const shopActive = isActive('/shop/');
 ---
 
-{announcements.length > 0 && <Ticker items={announcements} tone="olive" compact />}
+{announcements.length > 0 && <AnnouncementBar items={announcements} />}
 
 <header
   class="sticky top-0 z-50 border-b border-ink-900/10 bg-cream-50/90 backdrop-blur-md"

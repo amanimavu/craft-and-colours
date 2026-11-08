@@ -283,7 +283,7 @@ export default function ShopFilters({
                 {/* Filters: sidebar on lg+, drawer below (only open there). */}
                 <div
                     className={
-                        filtersOpen ? "fixed inset-0 z-[70]" : "hidden lg:block"
+                        filtersOpen ? "fixed inset-0 z-70" : "hidden lg:block"
                     }
                     role={filtersOpen ? "dialog" : undefined}
                     aria-modal={filtersOpen ? true : undefined}
@@ -442,7 +442,7 @@ export default function ShopFilters({
                             <button
                                 type="button"
                                 onClick={() => setFiltersOpen(false)}
-                                className="flex-[2] rounded-full bg-ink-900 py-3 text-xs font-bold uppercase tracking-[0.12em] text-cream-50 transition hover:bg-poppy-600"
+                                className="flex-2 rounded-full bg-ink-900 py-3 text-xs font-bold uppercase tracking-[0.12em] text-cream-50 transition hover:bg-poppy-600"
                             >
                                 Show {piecesLabel}
                             </button>
