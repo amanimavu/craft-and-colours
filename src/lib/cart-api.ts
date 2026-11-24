@@ -1,4 +1,5 @@
 import { demoProducts } from "./demo-data";
+import { FREE_DELIVERY_THRESHOLD_KES, freeDeliveryAmount } from "./delivery";
 import { stripHtml } from "./format";
 import type {
     AddItemInput,
@@ -29,7 +30,7 @@ export const getStoreUrl = () => storeUrl;
 const CART_TOKEN_KEY = "craft_cart_token";
 const DEMO_CART_KEY = "craft_demo_cart_v1";
 const DEMO_FLAT_SHIPPING = 30000;
-const DEMO_FREE_SHIPPING_THRESHOLD = 450000;
+const DEMO_FREE_SHIPPING_THRESHOLD = FREE_DELIVERY_THRESHOLD_KES * 100;
 export const DEMO_FREE_GIFT_THRESHOLD = 500000;
 
 function readToken(): string | null {
@@ -507,8 +508,7 @@ function buildDemoCart(state: DemoState): Cart {
                       {
                           rateId: "free_shipping",
                           name: "Free delivery",
-                          description:
-                              "Free delivery in Nairobi over KES 4,500",
+                          description: `Free delivery in Nairobi over ${freeDeliveryAmount}`,
                           price: "0",
                           taxes: "0",
                           selected:

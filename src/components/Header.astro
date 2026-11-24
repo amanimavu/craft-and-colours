@@ -8,6 +8,7 @@ import WishlistCount from './store/WishlistCount';
 import SearchOverlay from './store/SearchOverlay';
 import { hasStore, getCategories, getProducts } from '../lib/woocommerce';
 import { getAnnouncements } from '../lib/wordpress';
+import { freeDeliveryAmount } from '../lib/delivery';
 
 const path = Astro.url.pathname;
 const [categories, products, announcements] = await Promise.all([
@@ -60,14 +61,21 @@ const categoryMeta: Record<string, { icon: string; blurb: string }> = {
   },
   bundles: { icon: 'lucide:gift', blurb: 'Curated sets & starter stashes' },
   yarn: { icon: 'lucide:spool', blurb: 'Acrylic, velvet & cotton yarn' },
-  hooks: { icon: 'lucide:pen-tool', blurb: 'Crochet hooks in every size' },
+  'sewing-supplies': {
+    icon: 'lucide:scissors',
+    blurb: 'Fabric, thread, pins & notions',
+  },
+  'hooks-needles': {
+    icon: 'lucide:pen-tool',
+    blurb: 'Crochet hooks, knitting & sewing needles',
+  },
   'art-supplies': {
     icon: 'lucide:palette',
     blurb: 'Paints, pastels, canvas & brushes',
   },
-  stationery: {
-    icon: 'lucide:notebook-pen',
-    blurb: 'Pens, pencils, erasers & more',
+  'crafting-supplies': {
+    icon: 'lucide:sticker',
+    blurb: 'Paper, glue, washi tape & craft bits',
   },
   gifting: { icon: 'lucide:ribbon', blurb: 'Ribbons, gift boxes & wrapping' },
 };
@@ -230,7 +238,7 @@ const shopActive = isActive('/shop/');
                           name="lucide:truck"
                           class="mt-0.5 h-4 w-4 shrink-0 text-olive-700"
                         />
-                        Free Nairobi delivery over KES 4,500.
+                        Free Nairobi delivery over {freeDeliveryAmount}.
                       </li>
                       <li class="flex items-start gap-2.5">
                         <Icon

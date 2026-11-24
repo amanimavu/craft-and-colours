@@ -8,6 +8,7 @@ import AddToCart from "../../components/store/AddToCart";
 import ProductGallery from "../../components/store/ProductGallery";
 import WishlistToggle from "../../components/store/WishlistToggle";
 import { stripHtml } from "../../lib/format";
+import { freeDeliveryAmount } from "../../lib/delivery";
 import {
     getProduct,
     getProducts,
@@ -228,7 +229,7 @@ const galleryImages = await optimizeProductImages(
                         >
                             ✓
                         </span>
-                        Free delivery in Nairobi on orders over KES 4,500.
+                        Free delivery in Nairobi on orders over {freeDeliveryAmount}.
                     </li>
                     <li class="flex items-start gap-3">
                         <span
@@ -309,7 +310,7 @@ const galleryImages = await optimizeProductImages(
                             <p>
                                 Orders are packed with care and sent by courier
                                 within 3–5 working days. Free delivery in
-                                Nairobi on orders over KES 4,500.
+                                Nairobi on orders over {freeDeliveryAmount}.
                             </p>
                             <p>
                                 If something is not right, contact us within 14

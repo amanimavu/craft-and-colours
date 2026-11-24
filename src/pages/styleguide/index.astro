@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { freeDeliveryAmount } from '../../lib/delivery';
 import Logo from '../../components/ui/Logo.astro';
 import Icon from '../../components/ui/Icon.astro';
 import Badge from '../../components/ui/Badge.astro';
@@ -21,6 +22,7 @@ const palette = [
   { name: 'Bubblegum', hex: '#FF6584', swatch: 'bg-bubblegum-500' },
   { name: 'Marigold', hex: '#FFAA00', swatch: 'bg-marigold-500' },
   { name: 'Cobalt', hex: '#2354E6', swatch: 'bg-cobalt-500' },
+  { name: 'Cobalt 900', hex: '#1C2B6E', swatch: 'bg-cobalt-900' },
   { name: 'Ink 900', hex: '#211D19', swatch: 'bg-ink-900' },
 ];
 
@@ -40,7 +42,7 @@ const icons = [
 ];
 
 const tickerItems = [
-  'Free delivery in Nairobi over KES 4,500',
+  `Free delivery in Nairobi over ${freeDeliveryAmount}`,
   'Free Saturday crochet club',
   'M-Pesa & card accepted',
 ];

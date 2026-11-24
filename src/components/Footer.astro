@@ -175,38 +175,34 @@ const socials = [
                                 href={`mailto:${email}`}>{email}</a
                             >
                         </li>
-                        <li>
-                            <WhatsAppCallout size="sm" />
-                        </li>
-                        <li
-                            class="pt-2 text-xs font-medium leading-6 text-ink-500"
-                        >
+                        <li class="text-xs font-medium leading-6 text-ink-500">
                             Village Market, Limuru Road, Nairobi.<br />
                             Mon–Sat 9 am–7 pm · Sun 9:30 am–6:30 pm EAT.
                         </li>
+                        <li class="pt-1">
+                            <WhatsAppCallout size="sm" />
+                        </li>
                     </ul>
                 </div>
-            </div>
 
-            <div class="mt-10 flex flex-wrap items-center gap-3 lg:hidden">
-                <span
-                    class="mr-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink-400"
-                >
-                    Follow
-                </span>
-                {
-                    socials.map((social) => (
-                        <a
-                            href={social.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label={social.label}
-                            class="grid h-9 w-9 place-items-center rounded-full border border-ink-900/15 bg-cream-50 text-ink-700 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
-                        >
-                            <Icon name={social.icon} class="h-4 w-4" />
-                        </a>
-                    ))
-                }
+                <div class="col-span-2 sm:col-span-3 lg:hidden">
+                    <p class="eyebrow">Follow</p>
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        {
+                            socials.map((social) => (
+                                <a
+                                    href={social.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label={social.label}
+                                    class="grid h-12 w-12 place-items-center rounded-full border border-ink-900/15 bg-cream-50 text-ink-700 transition hover:border-ink-900 hover:bg-ink-900 hover:text-cream-50"
+                                >
+                                    <Icon name={social.icon} class="h-5 w-5" />
+                                </a>
+                            ))
+                        }
+                    </div>
+                </div>
             </div>
         </div>
 

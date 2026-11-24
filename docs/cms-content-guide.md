@@ -301,7 +301,7 @@ Go to **WooCommerce → Settings**. Change these only when the shop's policy cha
 
 | Delivery zone (order matters) | Regions          | Methods                                                                   |
 | ----------------------------- | ---------------- | ------------------------------------------------------------------------- |
-| Nairobi                       | Nairobi County   | Flat rate KES 300. Free shipping on orders of KES 4,500 or more           |
+| Nairobi                       | Nairobi County   | Flat rate KES 300. Free shipping on orders of KES 7,500 or more           |
 | Rest of Kenya                 | Kenya            | Flat rate KES 0, titled "Courier — cost confirmed on WhatsApp"            |
 | Uganda & Tanzania             | Uganda, Tanzania | Flat rate KES 0, titled "Courier — cost confirmed on WhatsApp"            |
 

@@ -1,14 +1,16 @@
 ---
 /**
- * Slim alert bar that shows one announcement at a time. Each message drops in
- * from the top, holds, then falls out the bottom while the next drops in.
+ * Slim alert bar that shows one announcement at a time. Each message glides
+ * down into place, holds still, then glides out the bottom before the next
+ * one arrives, so two lines of text never move at once.
  *
  * Pure CSS: every message runs the same keyframes, offset by its slot. The
  * keyframe percentages depend on the message count, so they're generated
  * here. Each keyframe segment sets its own animation-timing-function:
- *   enter - overshoots slightly and settles (like a card landing)
- *   hold  - linear (nothing moves)
- *   exit  - accelerates away, as if gravity took it
+ *   enter - decelerates and settles, no overshoot (text must not wobble)
+ *   hold  - linear (nothing moves); most of the slot, for reading
+ *   exit  - eases in, leaving gently
+ * The travel is short and paired with a fade, so the motion stays small.
  */
 interface Props {
   items: string[];
@@ -17,37 +19,37 @@ interface Props {
   slot?: number;
 }
 
-const { items, label = 'Shop announcements', slot = 4.5 } = Astro.props;
+const { items, label = 'Shop announcements', slot = 7 } = Astro.props;
 
-const ENTER = 0.7; // s
-const EXIT = 0.5; // s, overlaps the next message's entrance
+const ENTER = 0.6; // s
+const EXIT = 0.4; // s, ends as the next message starts entering
 
 const animated = items.length > 1;
 const total = items.length * slot;
 const pct = (seconds: number) => `${((seconds / total) * 100).toFixed(3)}%`;
 
-const EASE_ENTER = 'cubic-bezier(0.34, 1.56, 0.64, 1)'; // = --ease-bounce
-const EASE_EXIT = 'cubic-bezier(0.55, 0, 1, 0.45)'; // ease-in, "falls"
+const EASE_ENTER = 'cubic-bezier(0.33, 1, 0.68, 1)'; // ease-out (cubic)
+const EASE_EXIT = 'cubic-bezier(0.32, 0, 0.67, 0)'; // ease-in (cubic)
 
 const keyframes = animated
   ? `
 @keyframes announcement-drop {
-  0% { transform: translateY(-110%); opacity: 0; animation-timing-function: ${EASE_ENTER}; }
+  0% { transform: translateY(-50%); opacity: 0; animation-timing-function: ${EASE_ENTER}; }
   ${pct(ENTER)} { transform: translateY(0); opacity: 1; animation-timing-function: linear; }
-  ${pct(slot)} { transform: translateY(0); opacity: 1; animation-timing-function: ${EASE_EXIT}; }
-  ${pct(slot + EXIT)}, 100% { transform: translateY(110%); opacity: 0; }
+  ${pct(slot - EXIT)} { transform: translateY(0); opacity: 1; animation-timing-function: ${EASE_EXIT}; }
+  ${pct(slot)}, 100% { transform: translateY(50%); opacity: 0; }
 }
 @keyframes announcement-fade {
   0% { opacity: 0; animation-timing-function: ease-out; }
   ${pct(ENTER)} { opacity: 1; animation-timing-function: linear; }
-  ${pct(slot)} { opacity: 1; animation-timing-function: ease-in; }
-  ${pct(slot + EXIT)}, 100% { opacity: 0; }
+  ${pct(slot - EXIT)} { opacity: 1; animation-timing-function: ease-in; }
+  ${pct(slot)}, 100% { opacity: 0; }
 }`
   : '';
 ---
 
 <div
-  class="announcement-bar relative h-8 overflow-hidden border-b border-cream-50/10 bg-olive-700 text-cream-50"
+  class="announcement-bar relative h-9 overflow-hidden border-b border-ink-900/10 bg-poppy-500 text-ink-900"
   role="region"
   aria-label={label}
   data-animated={animated ? '' : undefined}
@@ -65,7 +67,7 @@ const keyframes = animated
             animated ? `animation-delay:${index * slot - ENTER}s` : undefined
           }
         >
-          <span class="truncate text-[0.62rem] font-bold uppercase tracking-[0.16em] sm:text-[0.66rem]">
+          <span class="truncate text-[0.72rem] font-bold uppercase tracking-[0.12em] sm:text-xs">
             {item}
           </span>
         </li>

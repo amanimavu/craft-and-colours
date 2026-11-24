@@ -19,6 +19,7 @@ import lavenderPaperTexture from "../assets/images/textured-lavendar-paper.png";
 import { formatDate, formatMoney } from "../lib/format";
 import { demoVibes } from "../lib/demo-data";
 import { DEMO_FREE_GIFT_THRESHOLD } from "../lib/cart-api";
+import { freeDeliveryAmount } from "../lib/delivery";
 import { getBestsellers, getProducts } from "../lib/woocommerce";
 import { getPosts, getUgcPosts } from "../lib/wordpress";
 import CmsImage from "../components/ui/CmsImage.astro";
@@ -84,7 +85,7 @@ const vibeArt: Record<string, { src: ImageMetadata; alt: string }> = {
 
 const marqueeItems = [
     "We offer FREE Gift Wrapping!",
-    "Free delivery in Nairobi over KES 4,500",
+    `Free delivery in Nairobi over ${freeDeliveryAmount}`,
     "Free crotchet class once a month",
     "Gigiri Village Market, Level 2",
     "Serving makers across East Africa",
@@ -204,7 +205,7 @@ const schema = {
     />
 
     <section
-        class="relative overflow-hidden bg-olive-700 pb-16 pt-24 text-cream-50 sm:pb-20 sm:pt-28"
+        class="relative overflow-hidden bg-cobalt-900 pb-16 pt-24 text-cream-50 sm:pb-20 sm:pt-28"
     >
         <WavyDivider class="absolute inset-x-0 top-0 text-[#f8f2e8]" flip />
         <div class="container-page">
@@ -213,7 +214,7 @@ const schema = {
             >
                 <div class="max-w-2xl">
                     <p
-                        class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-olive-100/80"
+                        class="text-[0.7rem] font-bold uppercase tracking-[0.22em] text-marigold-500"
                     >
                         Shop by creative vibe
                     </p>
@@ -239,12 +240,7 @@ const schema = {
                         >
                             <div class="bounce-circle relative">
                                 <div
-                                    class="absolute inset-0 rounded-full opacity-70 blur-xl transition group-hover:opacity-90"
-                                    style={`background-color: ${vibe.accent}`}
-                                    aria-hidden="true"
-                                />
-                                <div
-                                    class="relative grid h-36 w-36 place-items-center overflow-hidden rounded-full ring-4 ring-cream-50/15 transition duration-300 ease-bounce group-hover:scale-105 sm:h-40 sm:w-40"
+                                    class="relative grid h-36 w-36 place-items-center overflow-hidden rounded-full ring-1 ring-cream-50/30 ring-offset-4 ring-offset-cobalt-900 transition duration-300 ease-bounce group-hover:scale-105 sm:h-40 sm:w-40"
                                     style={`background-color: ${vibe.accent}`}
                                 >
                                     {vibeArt[vibe.slug] ? (

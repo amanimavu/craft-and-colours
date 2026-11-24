@@ -93,7 +93,7 @@ available". Create them in this order (WooCommerce uses the first match):
 
 | Zone                  | Regions                | Methods                                                                                                    |
 | --------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Nairobi**           | Kenya → Nairobi County | _Flat rate_ KES 300, titled "Nairobi courier". _Free shipping_ with "A minimum order amount" of KES 4,500. |
+| **Nairobi**           | Kenya → Nairobi County | _Flat rate_ KES 300, titled "Nairobi courier". _Free shipping_ with "A minimum order amount" of KES 7,500 (must match `FREE_DELIVERY_THRESHOLD_KES` in `src/lib/delivery.ts`). |
 | **Rest of Kenya**     | Kenya                  | _Flat rate_ KES 0, titled "Courier — cost confirmed on WhatsApp"                                           |
 | **Uganda & Tanzania** | Uganda, Tanzania       | _Flat rate_ KES 0, titled "Courier — cost confirmed on WhatsApp"                                           |
 

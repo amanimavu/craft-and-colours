@@ -80,7 +80,7 @@ at least the checkout pass.
       (County / District / Region) and postcode visibility.
 - [ ] Kenya + Nairobi + postcode blank → accepted (postcode optional).
 - [ ] Uganda (Kampala) and Tanzania (Dar es Salaam) → accepted, no postcode.
-- [ ] Shipping: Nairobi KES 300; free over KES 4,500; other zones show
+- [ ] Shipping: Nairobi KES 300; free over KES 7,500; other zones show
       "cost confirmed on WhatsApp".
 - [ ] Payment step shows **Order now, pay on confirmation** only.
 - [ ] Place the order → confirmation page, order number, total, WhatsApp button

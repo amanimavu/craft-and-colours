@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Hero carousel: the 3:2 layout. Chosen by screen shape as well as width, so a
+   phone reporting a wide viewport (zoomed out, "desktop site") still gets the
+   9:16 layout. Exact complement of PORTRAIT_MEDIA in HeroCarousel.astro. */
+@custom-variant hero-wide (@media (width >= 640px) and (aspect-ratio >= 3/5));
+
 @theme {
     --font-display: var(--font-fraunces);
     --font-sans: var(--font-manrope);
@@ -30,6 +35,8 @@
     --color-bubblegum-500: #ff6584;
     --color-marigold-500: #ffaa00;
     --color-cobalt-500: #2354e6;
+    /* Deep cobalt: "Shop by creative vibe" band and announcement bar. */
+    --color-cobalt-900: #1c2b6e;
 
     /* WhatsApp brand green, for the chat callout only. White text fails
        contrast on 500, so 500 is for the icon disc and 800 for text. */

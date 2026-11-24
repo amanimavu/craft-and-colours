@@ -1,3 +1,4 @@
+import { freeDeliveryAmount } from "./delivery";
 import type {
     Category,
     CategoryFilter,
@@ -1067,7 +1068,7 @@ export const demoVibes: Vibe[] = [
 
 export const demoAnnouncements: string[] = [
     "We offer FREE Gift Wrapping!",
-    "Free delivery in Nairobi over KES 4,500",
+    `Free delivery in Nairobi over ${freeDeliveryAmount}`,
     "Village Market, Nairobi · Level 2",
     "Free Saturday crochet club",
     "M-Pesa & card accepted",
@@ -1201,7 +1202,7 @@ export const demoPages: Record<string, PageContent> = {
         slug: "about",
         title: "A happy little art shop in Nairobi",
         content:
-            "<p>Craft &amp; Colours is an art, craft and haberdashery shop at Village Market, Nairobi. We stock the supplies we actually use, run workshops for every level, and keep a big table free for anyone who wants to make something.</p><p>We opened because we wanted a place in Nairobi where you could buy one good brush, ask a question without feeling silly, and find a workshop that did not assume you already knew everything.</p><h2>What you will find here</h2><p>Paint, stitch and sew, clay, sketch, kids’ projects and DIY kits. Everything is chosen by our team, and we are always happy to help you put a project together.</p><blockquote>You do not need to be good at it. You just need to start.</blockquote><p>Come in, touch the paper, ask us what the difference is between two brushes, and stay for a while. We are at Village Market, and the kettle is usually on.</p>",
+            "<p>Craft &amp; Colours is an art, craft and haberdashery shop at Village Market, Nairobi. We stock the supplies we actually use, run workshops for every level, and keep a big table free for anyone who wants to make something.</p><p>We opened because we wanted a place in Nairobi where you could buy one good brush, ask a question without feeling silly, and find a workshop that did not assume you already knew everything.</p><h2>What you will find here</h2><p>From paint and clay to sewing, sketching, kids’ projects and DIY kits, every item is chosen by our team, and we’re always happy to help you put a project together.</p><blockquote>You do not need to be good at it. You just need to start.</blockquote><p>Come in, touch the paper, ask us what the difference is between two brushes, and stay for a while. We are at Village Market, and the kettle is usually on.</p>",
     },
     contact: {
         slug: "contact",
